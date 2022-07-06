@@ -14,9 +14,6 @@ INSERT INTO major_muscle VALUES ("Quadriceps","Front of thighs.");
 INSERT INTO major_muscle VALUES ("Hamstring","Back of thighs.");
 INSERT INTO major_muscle VALUES ("Adductors","Inside of thighs.");
 INSERT INTO major_muscle VALUES ("Calves","");
-
-
-
 INSERT INTO exercise (name) VALUES ("Conventional Deadlift");
 INSERT INTO exercise (name) VALUES ("Romanian Deadlift");
 INSERT INTO exercise (name) VALUES ("Straight-legged Deadlift");

@@ -1,7 +1,7 @@
 import {Entity,Column, PrimaryGeneratedColumn} from "typeorm/browser";
+import "reflect-metadata";
 
-
-@Entity("Exercise")
+@Entity({name:"exercise"})
 export class Exercise{
 
     @PrimaryGeneratedColumn("uuid")

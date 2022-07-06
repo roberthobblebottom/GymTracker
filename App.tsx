@@ -4,10 +4,8 @@ import 'react-native-gesture-handler';
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import "reflect-metadata";
-import { connect,AppDataSource } from './dbHandler';
-import { Exercise } from "./entities/Exercise";
-
+import {AppDataSource} from './dbHandler';
+import { Exercise } from './entities/Exercise';
 
 function PlanScreen() {
   return (
@@ -27,8 +25,7 @@ function SettingsScreen() {
 
 const Tab = createBottomTabNavigator();
 export default function App() {
-  connect();
-
+AppDataSource.getRepository(Exercise);
   return (
     <NavigationContainer>
       <Tab.Navigator>

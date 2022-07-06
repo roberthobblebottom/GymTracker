@@ -1,31 +1,31 @@
 import {Entity,Column, PrimaryGeneratedColumn,OneToOne} from "typeorm/browser";
 import {Exercise}  from "./Exercise";
 
-@Entity("setOfSets")
+@Entity({name:"setofsets"})
 export class SetOfSets{
 
     @PrimaryGeneratedColumn()
     id!:number;
 
     @OneToOne(()=> Exercise)
-    @Column()
-    exercise!: Exercise;
+    @Column("text")
+    exercise!: Text;
 
-    @Column()
+    @Column("int")
     reps!:number;
 
-    @Column()
+    @Column("int")
     percentComplete!:number;
 
-    @Column()
+    @Column("int")
     sets:number;
 
-    @Column()
+    @Column("int")
     durationInSeconds:number;
 
-    @Column()
+    @Column("int")
     weight!:number;
 
-    @Column()
+    @Column("text")
     notes:Text;
 }

@@ -1,7 +1,7 @@
 import {Entity,Column, PrimaryGeneratedColumn} from "typeorm/browser";
 
 
-@Entity("majorMuscles")
+@Entity({name:"majormuscles"})
 export class MajorMuscles{
 
     @PrimaryGeneratedColumn()
@@ -10,9 +10,9 @@ export class MajorMuscles{
     @Column({type:"text"})
     name!: Text;
 
-    @Column()
+    @Column("text")
     notes:Text;
 
-    @Column()
+    @Column("text")
     imageJSON:Text;
 }
