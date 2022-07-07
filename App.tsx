@@ -4,9 +4,7 @@ import 'react-native-gesture-handler';
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import {AppDataSource} from './dbHandler';
-import { Exercise } from './entities/Exercise';
-
+import {init,dropTables} from './dbhandler';
 function PlanScreen() {
   return (
     <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
@@ -25,7 +23,8 @@ function SettingsScreen() {
 
 const Tab = createBottomTabNavigator();
 export default function App() {
-AppDataSource.getRepository(Exercise);
+// dropTables();
+    init();
   return (
     <NavigationContainer>
       <Tab.Navigator>
