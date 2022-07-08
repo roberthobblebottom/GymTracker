@@ -1,8 +1,8 @@
 
-import { StyleSheet, Text, View, Button, Alert } from 'react-native';
-import { resetTables } from './dbhandler';
+import { View, Button, Alert } from 'react-native';
+import { resetTables } from '../dbhandler';
 import React from 'react';
-import layout from './constants/Layout';//can give any name if it is not mentioned in orginal file.
+import layoutConstants from '../constants/Layout';//can give any name if it is not mentioned in orginal file.
 function confirmation() {
     return Alert.alert(
         "Comfirmation",
@@ -17,7 +17,7 @@ export function SettingsScreen() {
             flex: 1,
             alignItems: 'stretch',
             justifyContent: 'flex-start',
-            margin: layout.defaultMargin
+            margin: layoutConstants.defaultMargin
         }}>
             <Button title='Reset Database' onPress={() => confirmation()} />
         </View>

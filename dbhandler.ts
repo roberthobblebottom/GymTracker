@@ -1,7 +1,6 @@
 import * as SQLite from 'expo-sqlite';
 import Toast from 'react-native-simple-toast';
 const db = SQLite.openDatabase("exercisetracker");
-
 function init() {
     db.transaction(t =>
         t.executeSql('SELECT 1 FROM sqlite_master WHERE type = ? AND name = ?',
@@ -18,7 +17,7 @@ function createData(showAlert: boolean) {
     splittedCommands.forEach(c => db.transaction(t => t.executeSql(c, undefined, undefined,
         (_, e) => { console.log(+ e); return true }
     )))
-    if (showAlert) Toast.show("Database had been reset." );
+    if (showAlert) Toast.show("Database had been reset.");
     // db.transaction(t =>
     //     t.executeSql(
     //         'SELECT * FROM exercise;'
@@ -53,7 +52,8 @@ function resetTables() {
     console.log("droped tables");
     createData(true);
 }
-export { db, resetTables, init };//TODO: remove dropTables in production.
+
+export { resetTables, init, db };//TODO: remove dropTables in production.
 const commands = `
 CREATE TABLE IF NOT EXISTS "set_of_sets" (
 	"id"	INTEGER PRIMARY KEY AUTOINCREMENT,
