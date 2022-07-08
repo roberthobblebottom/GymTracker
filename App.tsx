@@ -1,30 +1,17 @@
 import { StyleSheet, Text, View } from 'react-native';
 import { ExercisesScreen } from './ExercisesScreen';
+import { SettingsScreen } from './SettingsScreen';
+import { PlanScreen } from './PlanScreen';
 import 'react-native-gesture-handler';
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import {init,dropTables} from './dbhandler';
-function PlanScreen() {
-  return (
-    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-      <Text>Plan Screen</Text>
-    </View>
-  );
-}
-
-function SettingsScreen() {
-  return (
-    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-      <Text>Settings Screen</Text>
-    </View>
-  );
-}
+import { init } from './dbhandler';
 
 const Tab = createBottomTabNavigator();
 export default function App() {
-// dropTables();
-    init();
+  // resetTables();
+  init();
   return (
     <NavigationContainer>
       <Tab.Navigator>
@@ -35,7 +22,6 @@ export default function App() {
     </NavigationContainer>
   );
 }
-
 
 const styles = StyleSheet.create({
   container: {
