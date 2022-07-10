@@ -11,13 +11,13 @@ function init() {
             }
         ));
 }
-function createData(showAlert: boolean) {
+function createData(showResetAlert: boolean) {
     console.log("creating tables and inserting data");
     let splittedCommands: Array<string> = commands.split(";");
     splittedCommands.forEach(c => db.transaction(t => t.executeSql(c, undefined, undefined,
         (_, e) => { console.log(+ e); return true }
     )))
-    if (showAlert) Toast.show("Database had been reset.");
+    if (showResetAlert) Toast.show("Database had been reset.");
     // db.transaction(t =>
     //     t.executeSql(
     //         'SELECT * FROM exercise;'
@@ -102,51 +102,51 @@ INSERT INTO "major_muscle" VALUES ('Quadriceps','Front of thighs.',NULL);
 INSERT INTO "major_muscle" VALUES ('Hamstring','Back of thighs.',NULL);
 INSERT INTO "major_muscle" VALUES ('Adductors','Inside of thighs.',NULL);
 INSERT INTO "major_muscle" VALUES ('Calves','',NULL);
-INSERT INTO "exercise" VALUES ('Conventional Deadlift',NULL,NULL);
-INSERT INTO "exercise" VALUES ('Romanian Deadlift',NULL,NULL);
-INSERT INTO "exercise" VALUES ('Straight-legged Deadlift',NULL,NULL);
-INSERT INTO "exercise" VALUES ('Sumo Deadlift',NULL,NULL);
-INSERT INTO "exercise" VALUES ('Trap Bar Deadlift',NULL,NULL);
-INSERT INTO "exercise" VALUES ('Back Squat',NULL,NULL);
-INSERT INTO "exercise" VALUES ('Front Squat',NULL,NULL);
-INSERT INTO "exercise" VALUES ('Box Squat',NULL,NULL);
-INSERT INTO "exercise" VALUES ('Sumo Squat',NULL,NULL);
-INSERT INTO "exercise" VALUES ('Overhead Squat',NULL,NULL);
-INSERT INTO "exercise" VALUES ('Split Squat',NULL,NULL);
-INSERT INTO "exercise" VALUES ('Smoth Squat',NULL,NULL);
-INSERT INTO "exercise" VALUES ('Bodyweight Squat',NULL,NULL);
-INSERT INTO "exercise" VALUES ('Jump Squat',NULL,NULL);
-INSERT INTO "exercise" VALUES ('Flat Barbell Bench Press',NULL,NULL);
-INSERT INTO "exercise" VALUES ('Incline Barbell Bench Press',NULL,NULL);
-INSERT INTO "exercise" VALUES ('Decline Barbell Bench Press',NULL,NULL);
-INSERT INTO "exercise" VALUES ('Flat Dumbbell Bench Press',NULL,NULL);
-INSERT INTO "exercise" VALUES ('Incline Dumbbell Bench Press',NULL,NULL);
-INSERT INTO "exercise" VALUES ('Decline Dumbbell Bench Press',NULL,NULL);
-INSERT INTO "exercise" VALUES ('Chest Fly',NULL,NULL);
-INSERT INTO "exercise" VALUES ('Dips',NULL,NULL);
-INSERT INTO "exercise" VALUES ('Pull-up',NULL,NULL);
-INSERT INTO "exercise" VALUES ('Pull-down',NULL,NULL);
-INSERT INTO "exercise" VALUES ('Chin-up',NULL,NULL);
-INSERT INTO "exercise" VALUES ('Muscle-up',NULL,NULL);
-INSERT INTO "exercise" VALUES ('Seated Row',NULL,NULL);
-INSERT INTO "exercise" VALUES ('Face Pull',NULL,NULL);
-INSERT INTO "exercise" VALUES ('Shoulder Shrug',NULL,NULL);
-INSERT INTO "exercise" VALUES ('Upright Row',NULL,NULL);
-INSERT INTO "exercise" VALUES ('Bent-over Row',NULL,NULL);
-INSERT INTO "exercise" VALUES ('Bridge',NULL,NULL);
-INSERT INTO "exercise" VALUES ('Front raise',NULL,NULL);
-INSERT INTO "exercise" VALUES ('lateral Raise',NULL,NULL);
-INSERT INTO "exercise" VALUES ('Military Press',NULL,NULL);
-INSERT INTO "exercise" VALUES ('Overhead Press',NULL,NULL);
-INSERT INTO "exercise" VALUES ('Biceps Curl',NULL,NULL);
-INSERT INTO "exercise" VALUES ('Wirst Curl',NULL,NULL);
-INSERT INTO "exercise" VALUES ('Crunch',NULL,NULL);
-INSERT INTO "exercise" VALUES ('Leg Raise',NULL,NULL);
-INSERT INTO "exercise" VALUES ('Sit-Up',NULL,NULL);
-INSERT INTO "exercise" VALUES ('Plank',NULL,NULL);
-INSERT INTO "exercise" VALUES ('Good-morning',NULL,NULL);
-INSERT INTO "exercise" VALUES ('Hyperextension',NULL,NULL);
-INSERT INTO "exercise" VALUES ('Leg Press',NULL,NULL);
-INSERT INTO "exercise" VALUES ('Lunge',NULL,NULL);
-INSERT INTO "exercise" VALUES ('Calf Raise',NULL,NULL);
+INSERT INTO "exercise" VALUES ('Conventional Deadlift','TESTING DESCRIPTION',"{}");
+INSERT INTO "exercise" VALUES ('Romanian Deadlift','TESTING DESCRIPTION',"{}");
+INSERT INTO "exercise" VALUES ('Straight-legged Deadlift','TESTING DESCRIPTION',"{}");
+INSERT INTO "exercise" VALUES ('Sumo Deadlift','TESTING DESCRIPTION',"{}");
+INSERT INTO "exercise" VALUES ('Trap Bar Deadlift','TESTING DESCRIPTION',"{}");
+INSERT INTO "exercise" VALUES ('Back Squat','TESTING DESCRIPTION',"{}");
+INSERT INTO "exercise" VALUES ('Front Squat','TESTING DESCRIPTION',"{}");
+INSERT INTO "exercise" VALUES ('Box Squat','TESTING DESCRIPTION',"{}");
+INSERT INTO "exercise" VALUES ('Sumo Squat','TESTING DESCRIPTION',"{}");
+INSERT INTO "exercise" VALUES ('Overhead Squat','TESTING DESCRIPTION',"{}");
+INSERT INTO "exercise" VALUES ('Split Squat','TESTING DESCRIPTION',"{}");
+INSERT INTO "exercise" VALUES ('Smoth Squat','TESTING DESCRIPTION',"{}");
+INSERT INTO "exercise" VALUES ('Bodyweight Squat','TESTING DESCRIPTION',"{}");
+INSERT INTO "exercise" VALUES ('Jump Squat','TESTING DESCRIPTION',"{}");
+INSERT INTO "exercise" VALUES ('Flat Barbell Bench Press','TESTING DESCRIPTION',"{}");
+INSERT INTO "exercise" VALUES ('Incline Barbell Bench Press','TESTING DESCRIPTION',"{}");
+INSERT INTO "exercise" VALUES ('Decline Barbell Bench Press','TESTING DESCRIPTION',"{}");
+INSERT INTO "exercise" VALUES ('Flat Dumbbell Bench Press','TESTING DESCRIPTION',"{}");
+INSERT INTO "exercise" VALUES ('Incline Dumbbell Bench Press','TESTING DESCRIPTION',"{}");
+INSERT INTO "exercise" VALUES ('Decline Dumbbell Bench Press','TESTING DESCRIPTION',"{}");
+INSERT INTO "exercise" VALUES ('Chest Fly','TESTING DESCRIPTION',"{}");
+INSERT INTO "exercise" VALUES ('Dips','TESTING DESCRIPTION',"{}");
+INSERT INTO "exercise" VALUES ('Pull-up','TESTING DESCRIPTION',"{}");
+INSERT INTO "exercise" VALUES ('Pull-down','TESTING DESCRIPTION',"{}");
+INSERT INTO "exercise" VALUES ('Chin-up','TESTING DESCRIPTION',"{}");
+INSERT INTO "exercise" VALUES ('Muscle-up','TESTING DESCRIPTION',"{}");
+INSERT INTO "exercise" VALUES ('Seated Row','TESTING DESCRIPTION',"{}");
+INSERT INTO "exercise" VALUES ('Face Pull','TESTING DESCRIPTION',"{}");
+INSERT INTO "exercise" VALUES ('Shoulder Shrug','TESTING DESCRIPTION',"{}");
+INSERT INTO "exercise" VALUES ('Upright Row','TESTING DESCRIPTION',"{}");
+INSERT INTO "exercise" VALUES ('Bent-over Row','TESTING DESCRIPTION',"{}");
+INSERT INTO "exercise" VALUES ('Bridge','TESTING DESCRIPTION',"{}");
+INSERT INTO "exercise" VALUES ('Front raise','TESTING DESCRIPTION',"{}");
+INSERT INTO "exercise" VALUES ('lateral Raise','TESTING DESCRIPTION',"{}");
+INSERT INTO "exercise" VALUES ('Military Press','TESTING DESCRIPTION',"{}");
+INSERT INTO "exercise" VALUES ('Overhead Press','TESTING DESCRIPTION',"{}");
+INSERT INTO "exercise" VALUES ('Biceps Curl','TESTING DESCRIPTION',"{}");
+INSERT INTO "exercise" VALUES ('Wirst Curl','TESTING DESCRIPTION',"{}");
+INSERT INTO "exercise" VALUES ('Crunch','TESTING DESCRIPTION',"{}");
+INSERT INTO "exercise" VALUES ('Leg Raise','TESTING DESCRIPTION',"{}");
+INSERT INTO "exercise" VALUES ('Sit-Up','TESTING DESCRIPTION',"{}");
+INSERT INTO "exercise" VALUES ('Plank','TESTING DESCRIPTION',"{}");
+INSERT INTO "exercise" VALUES ('Good-morning','TESTING DESCRIPTION',"{}");
+INSERT INTO "exercise" VALUES ('Hyperextension','TESTING DESCRIPTION',"{}");
+INSERT INTO "exercise" VALUES ('Leg Press','TESTING DESCRIPTION',"{}");
+INSERT INTO "exercise" VALUES ('Lunge','TESTING DESCRIPTION',"{}");
+INSERT INTO "exercise" VALUES ('Calf Raise','TESTING DESCRIPTION',"{}");
 `;

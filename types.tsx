@@ -9,7 +9,7 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 declare global {
   namespace ReactNavigation {
-    interface RootParamList extends RootStackParamList {}
+    interface RootParamList extends RootStackParamList { }
   }
 }
 
@@ -33,3 +33,20 @@ export type RootTabScreenProps<Screen extends keyof RootTabParamList> = Composit
   BottomTabScreenProps<RootTabParamList, Screen>,
   NativeStackScreenProps<RootStackParamList>
 >;
+
+export type Exercise = {
+  name: string,
+  description: string,
+  imageJson: string
+}
+
+export type SetOfSets = {
+  id: Number,
+  exercise: Exercise,
+  rep: Number,
+  percent_complete: Number,
+  sets: Number,
+  duration_in_seconds: Number,
+  weight: Number,
+  notes: string
+}

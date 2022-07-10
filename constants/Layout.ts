@@ -9,5 +9,6 @@ export default {
     height,
   },
   isSmallDevice: width < 375,
-  defaultMargin: 10
+  defaultMargin: 10 ,
+  defaultFontSize:20
 };
