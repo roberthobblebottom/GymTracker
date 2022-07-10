@@ -37,7 +37,7 @@ export type RootTabScreenProps<Screen extends keyof RootTabParamList> = Composit
 export type Exercise = {
   name: string,
   description: string,
-  imageJson: string
+  imagesJson: string
 }
 
 export type SetOfSets = {
