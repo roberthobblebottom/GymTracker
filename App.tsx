@@ -1,17 +1,16 @@
-import { Modal, StyleSheet, View, Text, Button, Pressable, TouchableOpacity } from 'react-native';
+import { Modal, StyleSheet, View, Text, Button, TouchableOpacity, Alert, LogBox, TextInput } from 'react-native';
 import { ExercisesScreen } from './screens/ExercisesScreen';
 import { SettingsScreen } from './screens/SettingsScreen';
 import { PlanScreen } from './screens/PlanScreen';
 import 'react-native-gesture-handler';
-import React, { useContext, useState, useEffect } from 'react';
+import React, { JSXElementConstructor, useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { init, db, resetTables } from './dbhandler';
-import { Alert, LogBox, TextInput } from 'react-native';
 import { Exercise } from './types';
 import Toast from 'react-native-simple-toast';
-import Layout from './constants/Layout';
 import Colors from './constants/Colors';
+
 LogBox.ignoreLogs(['Require cycle:']);
 const Tab = createBottomTabNavigator();
 const dummy: Exercise[] = [{ name: "fetch new exercises", description: "", imagesJson: "" }]
@@ -21,11 +20,17 @@ export const ExerciseScreenContext = React.createContext(
 );
 export default function App() {
   const [exercises, setExercises] = useState(dummy);
-  const [isEditModalVisible, setEditModalVisibility] = useState(false);
-  const [selectedExerciseName,setSelectedExerciseName] =useState("");
-  const [selectedExerciseDescription,setSelectedExerciseDescription] = useState("");
-  const [selectedExerciseImageJson,setSelectedExerciseImageJson] = useState("");
-  const [oldExerciseName,setOldExerciseName]=useState("");
+  const [isDialogModalVisible, setDialogModalVisibility] = useState(false);
+  const [aExerciseName, setaExerciseName] = useState("");
+  const [aExerciseDescription, setaExerciseDescription] = useState("");
+  const [aExerciseImageJson, setaExerciseImageJson] = useState("");
+  const [aExercise, setaExercise] = useState(dummy[0]);
+  const [oldExerciseName, setOldExerciseName] = useState("");
+  const [textInputBackgroundColor, setTextInputBackgroundColor] = useState("white");
+  const [isEditable, setEditability] = useState(false);
+
+
+  //init data required in the app
   console.log("In App Function");
   if (exercises[0].name == "fetch new exercises")
     db.transaction(t => t.executeSql(
@@ -41,63 +46,91 @@ export default function App() {
   }
 
   const handleExerciseCRUDPress = (exercise: Exercise) => {
-    Alert.alert(
-      exercise.name,
-      exercise.description + "\n" + exercise.imagesJson,
-      [{ text: "Delete", onPress: () => deleteConfirmation(exercise) },
-      {
-        text: "Edit", onPress: () => {
-          setEditModalVisibility(true);
-          // setSelectedExercise(exercise);
-          console.log(oldExerciseName);
-          setSelectedExerciseName( exercise.name);
-          setOldExerciseName(exercise.name);
-          setSelectedExerciseDescription(exercise.description);
-          console.log(oldExerciseName);
-        }
-      },
-      { text: "Cancel" }],
-      { cancelable: true }
-    );
-    let deleteConfirmation = (exercise: Exercise) => {
-      Alert.alert(
-        "Confirmation",
-        "Are you sure you want to delete this exercise?",
-        [{ text: "Yes", onPress: () => deleteOperation(exercise) },
-        { text: "No", onPress: () => handleExerciseCRUDPress(exercise) }],//warning, recursive
-        { cancelable: true }
-      )
-    };
-    let deleteOperation = (exercise: Exercise) => {
-      db.transaction(t => t.executeSql("DELETE FROM exercise where name= ?", [exercise.name],
-        () => {
-          let deletedName = exercise.name;
-          exercises.splice(exercises.indexOf(exercise), 1);
-          //correct way of removing element from a array for me. Not using delete keyword which leaves a undefined space
-          Toast.show("The exercise " + deletedName + " has been deleted");
-          setExercises([...exercises]);
-        },
-        (_, err) => {
-          console.log(err);
-          return true;
-        }
-      ))
-    }
+    setaExercise(exercise);
+    setaExerciseName(exercise.name);
+    setaExerciseDescription(exercise.description);
+    setOldExerciseName(exercise.name);
+    setDialogModalVisibility(true);
+  }
+  
+  const ButtonSet = () => {
+    if (textInputBackgroundColor == "white")
+      return (
+        <View style={{ flexDirection: "row", justifyContent: "space-around" }}>
+          <Button title="delete" onPress={() => deleteConfirmation(aExercise)} />
+          <Button title='Edit' onPress={() => {
+            setOldExerciseName(oldExerciseName);
+            setEditability(true);
+            setTextInputBackgroundColor(styles.textInput.backgroundColor);
+          }} />
+          <Button title='Cancel' onPress={() => {
+            cancelDialog();
+          }} />
+        </View>
+      );
+    else
+      return (
+        <View style={{ flexDirection: "row", justifyContent: "space-around" }}>
+          <Button title='Cancel' onPress={() => cancelDialog()} />
+          <Button title='Save' onPress={() => updateExercise()}></Button>
+        </View>
+      );
+  }
+  function cancelDialog() {
+    setEditability(false);
+    setTextInputBackgroundColor("white");
+    setDialogModalVisibility(false);
   }
 
+  let deleteConfirmation = (exercise: Exercise) => {
+    Alert.alert(
+      "Confirmation",
+      "Are you sure you want to delete this exercise?",
+      [{ text: "Yes", onPress: () => deleteOperation(exercise) },
+      { text: "No", onPress: () => handleExerciseCRUDPress(exercise) }],//warning, recursive
+      { cancelable: true }
+    )
+  };
+  let deleteOperation = (exercise: Exercise) => {
+    console.log("delete operation function");
+    db.transaction(t => t.executeSql("DELETE FROM exercise where name= ?", [exercise.name],
+      () => {
+        console.log("in here");
+        let deletedName = exercise.name;
+        let es: Exercise[] = exercises;
+        es.forEach((e1, i) => {
+          if (e1.name == deletedName) {
+            es.splice(i, 1);
+            return;
+          }
+        });
+        //correct way of removing element from a array for me. Not using delete keyword which leaves a undefined space
+        Toast.show("The exercise " + deletedName + " has is deleted.");
+        setExercises([...es]);
+        setDialogModalVisibility(false);
+      },
+      (_, err) => {
+        console.log(err);
+        return true;
+      }
+    ));
+  }
   const updateExercise = () => {
+    console.log("update operation function");
     db.transaction(t => t.executeSql("UPDATE exercise SET name = ?, description = ?,imagesJson=? where name = ?",
-      [selectedExerciseName, selectedExerciseDescription, selectedExerciseImageJson, oldExerciseName],
+      [aExerciseName, aExerciseDescription, aExerciseImageJson, oldExerciseName],
       (_, result) => {
-        let e:Exercise = {name:selectedExerciseName,description:selectedExerciseDescription,imagesJson:selectedExerciseImageJson}
-        let es:Exercise[] = exercises;
-        es.forEach((e1,i) =>{
-          if(e1.name ==oldExerciseName) {
-            es.splice(i,1,e);
+        let e: Exercise = { name: aExerciseName, description: aExerciseDescription, imagesJson: aExerciseImageJson }
+        let es: Exercise[] = exercises;
+        es.forEach((e1, i) => {
+          if (e1.name == oldExerciseName) {
+            es.splice(i, 1, e);
             return;
           }
         })
         setExercises([...es]);
+        Toast.show("The exercise is updated.")
+        setDialogModalVisibility(false);
       },
       (_, err) => {
         console.log(err)
@@ -107,8 +140,8 @@ export default function App() {
   }
   return (
     <NavigationContainer >
-      <Modal visible={isEditModalVisible} animationType="fade" transparent={true} >
-        <TouchableOpacity style={{ flex: 1 }} onPressIn={() => setEditModalVisibility(false)} >
+      <Modal visible={isDialogModalVisible} animationType="fade" transparent={true} >
+        <TouchableOpacity style={{ flex: 1 }} onPressIn={() => setDialogModalVisibility(false)} >
           <TouchableOpacity style={styles.innerTouchableOpacity}
             onPress={() => { }}
             activeOpacity={1}
@@ -117,28 +150,22 @@ export default function App() {
             <View style={{ flexDirection: "row" }}>
               <Text>name:</Text>
               <TextInput placeholder='Type in exercise name.'
-                style={{ backgroundColor: styles.textInput.backgroundColor }}
-                value={selectedExerciseName}
-                onChangeText={setSelectedExerciseName}
+                style={{ backgroundColor: textInputBackgroundColor }}
+                value={aExerciseName}
+                onChangeText={setaExerciseName}
+                editable={isEditable}
               ></TextInput>
             </View>
             <View style={{ flexDirection: "row" }}>
               <Text>description</Text>
-              <TextInput style={{ backgroundColor: styles.textInput.backgroundColor }}
+              <TextInput style={{ backgroundColor: textInputBackgroundColor }}
                 multiline={true} placeholder='Type in exercise description.'
-                value={selectedExerciseDescription}
-                onChangeText={setSelectedExerciseDescription}
+                value={aExerciseDescription}
+                onChangeText={setaExerciseDescription}
+                editable={isEditable}
               />
             </View>
-            <View style={{ flexDirection: "row", justifyContent: "space-around" }}>
-              <Button title='Cancel' onPress={() => setEditModalVisibility(false)} />
-              <Button title='Save' onPress={() => {
-                updateExercise();
-                Toast.show("Exercises information is updated.");
-                setEditModalVisibility(false);
-              }}></Button>
-            </View>
-
+            {ButtonSet()}
           </TouchableOpacity>
         </TouchableOpacity>
       </Modal>
@@ -175,7 +202,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 4,
     elevation: 5,
-    top: '40%',
+    top: '70%',
     justifyContent: 'space-around'
   },
   textInput: {

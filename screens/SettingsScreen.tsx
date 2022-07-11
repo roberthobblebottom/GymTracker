@@ -1,6 +1,5 @@
 
 import { View, Button, Alert } from 'react-native';
-import { resetTables } from '../dbhandler';
 import React, { useContext } from 'react';
 import {handleResetDBContext} from '../App';
 import layoutConstants from '../constants/Layout';//can give any name if it is not mentioned in orginal file.

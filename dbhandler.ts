@@ -7,7 +7,7 @@ function init() {
             ['table', 'exercise'],
             (_, r) => {
                 if (r.rows.item(0) === undefined) createData(false);
-                else console.log("tables and data are already present");
+                else console.log("init(): tables and data are already present");
             }
         ));
 }
