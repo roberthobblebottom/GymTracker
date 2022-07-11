@@ -10,13 +10,14 @@ import { init, db, resetTables } from './dbhandler';
 import { Exercise } from './types';
 import Toast from 'react-native-simple-toast';
 import Colors from './constants/Colors';
+import { setBackgroundColorAsync } from 'expo-system-ui';
 
 LogBox.ignoreLogs(['Require cycle:']);
 const Tab = createBottomTabNavigator();
 const dummy: Exercise[] = [{ name: "fetch new exercises", description: "", imagesJson: "" }]
 export const handleResetDBContext = React.createContext(() => { });
 export const ExerciseScreenContext = React.createContext(
-  { exercises: dummy, deleteFunc: (exercise: Exercise) => { } }
+  { exercises: dummy, deleteFunc: (exercise: Exercise) => { }, createFunc: () => { } }
 );
 export default function App() {
   const [exercises, setExercises] = useState(dummy);
@@ -26,9 +27,14 @@ export default function App() {
   const [aExerciseImageJson, setaExerciseImageJson] = useState("");
   const [aExercise, setaExercise] = useState(dummy[0]);
   const [oldExerciseName, setOldExerciseName] = useState("");
+
+
   const [textInputBackgroundColor, setTextInputBackgroundColor] = useState("white");
   const [isEditable, setEditability] = useState(false);
-
+  const ExerciseInformationText = "Exercise Information";
+  const EditExerciseText = "Edit Exercise:";
+  const CreateExerciseText = "Create Exercise:";
+  const [dialogText, setDialogText] = useState(ExerciseInformationText);
 
   //init data required in the app
   console.log("In App Function");
@@ -46,15 +52,18 @@ export default function App() {
   }
 
   const handleExerciseCRUDPress = (exercise: Exercise) => {
+    setEditability(false);
+    setTextInputBackgroundColor("white");
     setaExercise(exercise);
     setaExerciseName(exercise.name);
     setaExerciseDescription(exercise.description);
     setOldExerciseName(exercise.name);
+    setDialogText(ExerciseInformationText);
     setDialogModalVisibility(true);
   }
-  
+
   const ButtonSet = () => {
-    if (textInputBackgroundColor == "white")
+    if (dialogText == ExerciseInformationText)
       return (
         <View style={{ flexDirection: "row", justifyContent: "space-around" }}>
           <Button title="delete" onPress={() => deleteConfirmation(aExercise)} />
@@ -62,23 +71,31 @@ export default function App() {
             setOldExerciseName(oldExerciseName);
             setEditability(true);
             setTextInputBackgroundColor(styles.textInput.backgroundColor);
+            setDialogText(EditExerciseText);
           }} />
           <Button title='Cancel' onPress={() => {
             cancelDialog();
           }} />
         </View>
       );
+    else if (dialogText == CreateExerciseText) {
+      return (
+        <View style={{ flexDirection: "row", justifyContent: "space-around" }}>
+          <Button title='Save' onPress={() => createExercise()}></Button>
+          <Button title='Cancel' onPress={() => cancelDialog()} />
+        </View>
+      );
+    }
     else
       return (
         <View style={{ flexDirection: "row", justifyContent: "space-around" }}>
-          <Button title='Cancel' onPress={() => cancelDialog()} />
           <Button title='Save' onPress={() => updateExercise()}></Button>
+          <Button title='Back' onPress={() => handleExerciseCRUDPress(aExercise)} />
+          <Button title='Cancel' onPress={() => cancelDialog()} />
         </View>
       );
   }
   function cancelDialog() {
-    setEditability(false);
-    setTextInputBackgroundColor("white");
     setDialogModalVisibility(false);
   }
 
@@ -138,6 +155,30 @@ export default function App() {
       }))
 
   }
+
+  const showCreateExerciseDialog = () => {
+    console.log("in createExercise function")
+    setEditability(true);
+    setTextInputBackgroundColor(Colors.light.altBackground);
+    setaExerciseName("");
+    setaExerciseDescription("");
+    setDialogText(CreateExerciseText);
+    setDialogModalVisibility(true);
+  }
+  function createExercise() {
+    db.transaction(t => t.executeSql("INSERT INTO exercise VALUES (?,?,?)",
+      [aExerciseName, aExerciseDescription, aExerciseImageJson],
+      (_, result) => { 
+        const es:Exercise[] = exercises;
+        es.push({name:aExerciseName,description:aExerciseDescription,imagesJson:aExerciseImageJson});
+        setExercises([...es]);
+        Toast.show("The exercise "+aExerciseName+" is created.");
+        cancelDialog();
+      },
+      (_, err) => {
+        return true;
+      }))
+  }
   return (
     <NavigationContainer >
       <Modal visible={isDialogModalVisible} animationType="fade" transparent={true} >
@@ -146,19 +187,19 @@ export default function App() {
             onPress={() => { }}
             activeOpacity={1}
           >
-            <Text >Edit Exercise Information</Text>
+            <Text >{dialogText}</Text>
             <View style={{ flexDirection: "row" }}>
               <Text>name:</Text>
               <TextInput placeholder='Type in exercise name.'
-                style={{ backgroundColor: textInputBackgroundColor }}
+                style={{ backgroundColor: textInputBackgroundColor, color: "black" }}
                 value={aExerciseName}
                 onChangeText={setaExerciseName}
                 editable={isEditable}
-              ></TextInput>
+              />
             </View>
             <View style={{ flexDirection: "row" }}>
               <Text>description</Text>
-              <TextInput style={{ backgroundColor: textInputBackgroundColor }}
+              <TextInput style={{ backgroundColor: textInputBackgroundColor, color: "black" }}
                 multiline={true} placeholder='Type in exercise description.'
                 value={aExerciseDescription}
                 onChangeText={setaExerciseDescription}
@@ -170,7 +211,12 @@ export default function App() {
         </TouchableOpacity>
       </Modal>
       <handleResetDBContext.Provider value={handleResetDB}>
-        <ExerciseScreenContext.Provider value={{ exercises: exercises, deleteFunc: handleExerciseCRUDPress }}>
+        <ExerciseScreenContext.Provider value={
+          {
+            exercises: exercises,
+            deleteFunc: handleExerciseCRUDPress,
+            createFunc: showCreateExerciseDialog
+          }}>
           <Tab.Navigator >
             <Tab.Screen name="Plan" component={PlanScreen} />
             <Tab.Screen name="Exercises" component={ExercisesScreen} />
@@ -202,7 +248,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 4,
     elevation: 5,
-    top: '70%',
+    top: '68%',
     justifyContent: 'space-around'
   },
   textInput: {

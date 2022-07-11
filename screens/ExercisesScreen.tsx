@@ -4,15 +4,18 @@ import { ExerciseScreenContext } from '../App';
 import { useContext } from 'react';
 import layoutConstants from '../constants/Layout';
 import { Exercise } from "../types";
+import Layout from "../constants/Layout";
+import Colors from "../constants/Colors";
 
 function ExercisesScreen() {
-let c = useContext(ExerciseScreenContext);
-let exercises:Exercise[] = c.exercises;
-let handleExerciseEvent:Function = c.deleteFunc; 
+  let c = useContext(ExerciseScreenContext);
+  let exercises: Exercise[] = c.exercises;
+  let handleExerciseEvent: Function = c.deleteFunc;
+  let handleCreateExercise: Function = c.createFunc;
   return (
-    <View style={{ flex: 2, alignItems: 'flex-start', justifyContent: 'center' }}>
+    <View style={{ flexDirection: "column", flex: 1, alignItems: 'flex-start', justifyContent: 'center' }}>
       <FlatList
-        style={{ width: '100%' }}
+        style={{ width: '100%', marginBottom: -60 }}
         data={exercises}
         renderItem={
           ({ item, index, separators }) =>
@@ -30,6 +33,21 @@ let handleExerciseEvent:Function = c.deleteFunc;
             </TouchableOpacity>
         }
       />
+      <TouchableOpacity
+        style={{
+          borderRadius: 45,
+          backgroundColor: Colors.light.tint,
+          height: 60, width: 60,
+          bottom: '2%'
+          , start: '80%'
+        }}
+        onPress={() => {
+          handleCreateExercise()
+        }}
+      >
+        <View style={{ backgroundColor: "white", height: 40, width: 5, start: "45%", top: "17%" }}></View>
+        <View style={{ backgroundColor: "white", height: 5, width: 40, start: "15%", bottom: "20%" }}></View>
+      </TouchableOpacity>
     </View>
   );
 }
