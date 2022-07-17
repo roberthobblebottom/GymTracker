@@ -6,13 +6,18 @@
 import { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import { CompositeScreenProps, NavigatorScreenParams } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { DateData } from 'react-native-calendars';
 
 declare global {
   namespace ReactNavigation {
     interface RootParamList extends RootStackParamList { }
   }
 }
-
+declare var Blob: {
+  prototype: Blob;
+  new (name:string,description:string,imagesJson:string): Blob;
+}
+export {Blob};
 export type RootStackParamList = {
   Root: NavigatorScreenParams<RootTabParamList> | undefined;
   Modal: undefined;
@@ -40,13 +45,14 @@ export type Exercise = {
   imagesJson: string
 }
 
-export type SetOfSets = {
-  id: Number,
+export type MajorSet = {
+  id: number,
   exercise: Exercise,
-  rep: Number,
-  percent_complete: Number,
-  sets: Number,
-  duration_in_seconds: Number,
-  weight: Number,
-  notes: string
+  reps: number,
+  percent_complete: number,
+  sets: number,
+  duration_in_seconds: number,
+  weight: number,
+  notes: string,
+  date: DateData
 }

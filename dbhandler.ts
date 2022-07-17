@@ -47,27 +47,29 @@ function resetTables() {
     console.log("resetting tables");
     db.transaction(t => t.executeSql("DROP TABLE if exists exercise"));
     db.transaction(t => t.executeSql('DROP TABLE if exists major_muscle'));
-    db.transaction(t => t.executeSql('DROP TABLE if exists set_of_sets'));
+    db.transaction(t => t.executeSql('DROP TABLE if exists major_sets'));
     db.transaction(t => t.executeSql('DROP TABLE if exists exercise_major_muscle_one_to_many'));
+    
     console.log("droped tables");
     createData(true);
 }
 
 export { resetTables, init, db };//TODO: remove dropTables in production.
 const commands = `
-CREATE TABLE IF NOT EXISTS "set_of_sets" (
+CREATE TABLE IF NOT EXISTS "major_sets" (
 	"id"	INTEGER PRIMARY KEY AUTOINCREMENT,
-	"exercise"	BLOB NOT NULL,
-	"reps"	INTEGER NOT NULL CHECK(reps>0),
+	"exercise"	TEXT NOT NULL,
+	"reps"	INTEGER NOT NULL CHECK(reps>=0),
 	"percent_complete"	INTEGER NOT NULL DEFAULT 0 CHECK((percent_complete>=0 AND percent_complete<=100)),
-	"sets"	INTEGER CHECK(sets>0),
-	"duration_in_seconds"	INTEGER CHECK(duration_in_seconds>0),
-	"weight"	INTEGER,
+	"sets"	INTEGER CHECK(sets>=0),
+	"duration_in_seconds"	INTEGER CHECK(duration_in_seconds>=0),
+	"weight"	INTEGER CHECK(weight>=0),
 	"notes"	TEXT,
+    "date" TEXT,
 	FOREIGN KEY("exercise") REFERENCES "exercise"("name")
 );
 CREATE TABLE IF NOT EXISTS "exercise_major_muscle_one_to_many" (
-	"id"	INTEGER,
+	"id"	INTEGER AUTOINCREMENT,
 	"exercise_name"	TEXT NOT NULL,
 	"major_muscle"	TEXT NOT NULL,
 	FOREIGN KEY("exercise_name") REFERENCES "exercise_major_muscle_one_to_many"("name"),
@@ -149,4 +151,5 @@ INSERT INTO "exercise" VALUES ('Hyperextension','TESTING DESCRIPTION',"{}");
 INSERT INTO "exercise" VALUES ('Leg Press','TESTING DESCRIPTION',"{}");
 INSERT INTO "exercise" VALUES ('Lunge','TESTING DESCRIPTION',"{}");
 INSERT INTO "exercise" VALUES ('Calf Raise','TESTING DESCRIPTION',"{}");
+
 `;

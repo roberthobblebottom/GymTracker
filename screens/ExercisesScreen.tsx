@@ -10,8 +10,8 @@ import Colors from "../constants/Colors";
 function ExercisesScreen() {
   let c = useContext(ExerciseScreenContext);
   let exercises: Exercise[] = c.exercises;
-  let handleExerciseEvent: Function = c.deleteFunc;
-  let handleCreateExercise: Function = c.createFunc;
+  let handleSelected: Function = c.handleSelected;
+  let handleCreate: Function = c.handleCreate;
   return (
     <View style={{ flexDirection: "column", flex: 1, alignItems: 'flex-start', justifyContent: 'center' }}>
       <FlatList
@@ -23,9 +23,7 @@ function ExercisesScreen() {
               alignItems: "flex-start",
               padding: layoutConstants.defaultMargin,
             }}
-              onPress={(event: GestureResponderEvent) => {
-                handleExerciseEvent(item);
-              }}
+              onPress={(event: GestureResponderEvent) => handleSelected(item)}
             >
               <Text style={{ fontSize: layoutConstants.defaultFontSize }}>
                 {item.name}
@@ -42,7 +40,7 @@ function ExercisesScreen() {
           , start: '80%'
         }}
         onPress={() => {
-          handleCreateExercise()
+          handleCreate()
         }}
       >
         <View style={{ backgroundColor: "white", height: 40, width: 5, start: "45%", top: "17%" }}></View>

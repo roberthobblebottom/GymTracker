@@ -10,5 +10,6 @@ export default {
   },
   isSmallDevice: width < 375,
   defaultMargin: 10 ,
-  defaultFontSize:20
+  defaultFontSize:20,
+  dialogSpacingMargin:20,
 };
