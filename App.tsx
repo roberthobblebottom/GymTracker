@@ -6,7 +6,7 @@ import { ExercisesScreen } from './screens/ExercisesScreen';
 import { SettingsScreen } from './screens/SettingsScreen';
 import { PlanScreen } from './screens/PlanScreen';
 import 'react-native-gesture-handler';
-import React, { Dispatch, DispatchWithoutAction, SetStateAction, useState, useRef, useEffect } from 'react';
+import React, { Dispatch, SetStateAction, useState, useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { init, db, resetTables } from './dbhandler';
@@ -17,7 +17,6 @@ import Colors from './constants/Colors';
 import Layout from './constants/Layout';
 import { Calendar } from 'react-native-calendars';
 import DropDownPicker, { ItemType, ValueType } from 'react-native-dropdown-picker';
-import { Blob } from './types';
 LogBox.ignoreLogs(['Require cycle:']);
 const Tab = createBottomTabNavigator();
 const dummyDate = { year: 0, month: 0, day: 0, timestamp: 0, dateString: "" };
@@ -66,66 +65,53 @@ export default function App() {
   const MajorSetInformation = "Information:";
   const EditMajorSetText = "Edit";
   const [isDropDownVisible, setDropDownVisibility] = useState(false);
-  const [dropDowmValue, setDropDownValue] = useState(dummyExercises[0].name);
+  const [dropDownExerciseNameSelected, setDropDownExerciseNameSelected] = useState(dummyExercises[0].name);
   const [currentDate, setCurrentDate] = useState(dummyDate);
   const [changeButtonBackgroundColor, setChangeButtonBackgroundColor] = useState(styles.changeDateButtonDisabled);
   useEffect(() => {
-    if (exercises[0].name == "")
+    if (exercises[0].name == "" || exercises.length <= 0)
       db.transaction(t => t.executeSql(
         "SELECT * from exercise",
         undefined,
         (_, r) => {
+          let tempExercises:Exercise[] = r.rows._array;
           setExercises(r.rows._array);
-          r.rows._array.forEach((elm: Exercise) => {
+          tempExercises.forEach((elm: Exercise) => {
             exercisesForDropDown.push({ label: elm.name, value: elm.name });
           });
+          if (majorSet[0] != undefined)
+            if (majorSet[0].exercise == dummyExercises[0])
+              db.transaction(
+                t => {
+                  t.executeSql("SELECT * FROM major_sets", [],
+                    (_, results) => {
+                      let tempMajorSet: MajorSet[] = results.rows._array;
+                      let a = results.rows._array.slice();
+                      console.log(exercises.length);
+                      tempMajorSet.forEach((ms, index, arr) => {
+                        ms.date = JSON.parse(ms.date.toString());
+                        let t = tempExercises.filter(ex => {
+                          if (ex.name == a[index].exercise) return ex;
+                        })[0];
+                        console.log(t);
+                        tempMajorSet[index].exercise = t;
+                      });
+                      setMajorSet(tempMajorSet);
+                      console.log(majorSet);
+                    },
+                    (_, err) => {
+                      console.log(err)
+                      return true;
+                    });
+                }
+              )
         },
         (_, e) => { console.log(e); return true; }
       ));
-    if (majorSet.length == 1 &&
-      majorSet[0].exercise === dummyExercises[0] &&
-      exercises[0].name != "")
-      db.transaction(
+    // if (majorSet.length <= 1 )
 
-        t => {
-          t.executeSql("SELECT * FROM major_sets", [],
-            (_, results) => {
-              let temp: MajorSet[] = results.rows._array;
-              let a = results.rows._array.slice();
-              temp.forEach((ms, index, arr) => {
-                ms.date = JSON.parse(ms.date.toString());
-                let t = exercises.filter(ex => {
-                  if (ex.name == a[index].exercise) return ex;
-                })[0];
-                temp[index].exercise = t;
-              });
-              setMajorSet(temp);
-            },
-            (_, err) => {
-              console.log(err)
-              return true;
-            });
-        }
-      )
   }, [majorSet, exercises]);
-  ////console.log("before major set retrival" + exercises.length)
-  // const exercises = exercises.slice();
   init();
-  const handleResetDB = () => {
-    resetTables();
-    setExercises(dummyExercises);
-    setMajorSet(dummyMajorSet);
-  }
-
-  const handleExerciseCRUDPress = (exercise: Exercise) => {
-    setEditability(false);
-    setTextInputBackgroundColor(styles.textInputViewOnly);
-    setaExercise(exercise);
-    setOldExerciseName(exercise.name);
-    setDialogText(ExerciseInformationText);
-    setExDialogVisibility(true);
-  }
-
 
   const ButtonSet = () => {
     switch (dialogText) {
@@ -174,7 +160,9 @@ export default function App() {
               setTextInputBackgroundColor(styles.textInputEditable);
               setDialogText(EditMajorSetText);
               setDropDownVisibility(true);
-
+              setAMajorSet(aMajorSet);
+              setDropDownExerciseNameSelected(aMajorSet.exercise.name);
+              setCurrentDate(aMajorSet.date);
             }} />
             <Button title='Cancel' onPress={() => cancelDialog()} />
           </View>
@@ -189,6 +177,22 @@ export default function App() {
         );
     }
   }
+  const handleResetDB = () => {
+    resetTables();
+    setExercises(dummyExercises);
+    setMajorSet(dummyMajorSet);
+  }
+
+  const handleExerciseCRUDPress = (exercise: Exercise) => {
+    setEditability(false);
+    setTextInputBackgroundColor(styles.textInputViewOnly);
+    setaExercise(exercise);
+    setOldExerciseName(exercise.name);
+    setDialogText(ExerciseInformationText);
+    setExDialogVisibility(true);
+  }
+
+
   function cancelDialog() {
     setExDialogVisibility(false);
     setCalendarDialogVisibility(false);
@@ -208,9 +212,9 @@ export default function App() {
     db.transaction(t => t.executeSql("DELETE FROM exercise where name= ?", [exercise.name],
       () => {
         let deletedName = exercise.name;
-        let es: Exercise[] = exercises;
-        es.forEach((e1, i) => {
-          if (e1.name == deletedName) {
+        let es: Exercise[] = exercises.slice();
+        es.forEach((currentExercise, i) => {
+          if (currentExercise.name == deletedName) {
             es.splice(i, 1);
             return;
           }
@@ -230,11 +234,11 @@ export default function App() {
     db.transaction(t => t.executeSql("UPDATE exercise SET name = ?, description = ?,imagesJson=? where name = ?",
       [aExercise.name, aExercise.description, aExercise.imagesJson, oldExerciseName],
       (_, result) => {
-        let e: Exercise = { name: aExercise.name, description: aExercise.description, imagesJson: aExercise.imagesJson }
-        let es: Exercise[] = exercises;
-        es.forEach((e1, i) => {
-          if (e1.name == oldExerciseName) {
-            es.splice(i, 1, e);
+        let exerciseToBeUpdated: Exercise = { name: aExercise.name, description: aExercise.description, imagesJson: aExercise.imagesJson }
+        let es: Exercise[] = exercises.slice();
+        es.forEach((currentExercise, i) => {
+          if (currentExercise.name == oldExerciseName) {
+            es.splice(i, 1, exerciseToBeUpdated);
             return;
           }
         })
@@ -261,7 +265,7 @@ export default function App() {
     db.transaction(t => t.executeSql("INSERT INTO exercise VALUES (?,?,?)",
       [aExercise.name, aExercise.description, aExercise.imagesJson],
       (_, result) => {
-        const es: Exercise[] = exercises;
+        const es: Exercise[] = exercises.slice();
         es.push({ name: aExercise.name, description: aExercise.description, imagesJson: aExercise.imagesJson });
         setExercises([...es]);
         Toast.show("The exercise " + aExercise.name + " is created.");
@@ -279,7 +283,7 @@ export default function App() {
     setAMajorSet(majorSet);
     setDialogText(MajorSetInformation);
     setDropDownVisibility(false);
-    setDropDownValue(majorSet.exercise.name);
+    setDropDownExerciseNameSelected(majorSet.exercise.name);
     setExDialogVisibility(false);
     setPlanDialogVisibility(true);
     setCurrentDate(majorSet.date);
@@ -296,18 +300,16 @@ export default function App() {
   let deleteMajorSet = (id: number) => {
     db.transaction(t => t.executeSql("DELETE FROM major_sets where id= ?", [id],
       () => {
-        console.log("in deleteMajorSet");
-        let s = majorSet.slice();
-        s.forEach((ms1, i) => {
+        let ms = majorSet.slice();
+        ms.forEach((ms1, i) => {
           if (ms1.id == id) {
-            s.splice(i, 1);
+            ms.splice(i, 1);
             return;
           }
         });
         //correct way of removing element from a array for me. Not using delete keyword which leaves a undefined space
         Toast.show("The major set is deleted.");
-        setMajorSet([...s]);
-        // setExercises([...es]);
+        setMajorSet([...ms]);
         cancelDialog();
       },
       (_, err) => {
@@ -317,24 +319,41 @@ export default function App() {
     ));
   }
   const updateMajorSet = () => {
-    //console.log("update operaton function");
-    db.transaction(t => t.executeSql("UPDATE major_set SET name = ?, description = ?,imagesJson=? where name = ?",
-      [aExercise.name, aExercise.description, aExercise.imagesJson, oldExerciseName],
+    if (dropDownExerciseNameSelected == undefined || dropDownExerciseNameSelected == "") {
+      Toast.show("exercise must be selected")
+      return;
+    }
+    let theexercise = exercises.filter((e, i, a) => {
+      if (e.name == dropDownExerciseNameSelected) return e;
+    })[0];
+    console.log(dropDownExerciseNameSelected);
+    console.log(currentDate);
+    db.transaction(t => t.executeSql(`UPDATE major_sets 
+    SET exercise=?,reps=?,percent_complete=?,sets=?,duration_in_seconds=?,weight=?,notes=?,date=? 
+    WHERE id=?`,
+      [dropDownExerciseNameSelected, aMajorSet.reps, aMajorSet.percent_complete, aMajorSet.sets,
+        aMajorSet.duration_in_seconds, aMajorSet.weight,
+        aMajorSet.notes, JSON.stringify(currentDate), aMajorSet.id],
       (_, result) => {
-        let e: Exercise = { name: aExercise.name, description: aExercise.description, imagesJson: aExercise.imagesJson }
-        let es: Exercise[] = exercises;
-        es.forEach((e1, i) => {
-          if (e1.name == oldExerciseName) {
-            es.splice(i, 1, e);
+        let toBeUpdated: MajorSet = {
+          id: aMajorSet.id, exercise: theexercise, reps: aMajorSet.reps,
+          percent_complete: aMajorSet.percent_complete, sets: aMajorSet.sets,
+          duration_in_seconds: aMajorSet.duration_in_seconds,
+          weight: aMajorSet.weight, notes: aMajorSet.notes, date: currentDate
+        }
+        let ms: MajorSet[] = majorSet.slice();
+        ms.forEach((currentMajorSet, i) => {
+          if (currentMajorSet.id == aMajorSet.id) {
+            ms.splice(i, 1, toBeUpdated);
             return;
           }
         })
-        setExercises([...es]);
-        Toast.show("The exercise is updated.")
+        setMajorSet([...ms]);
+        Toast.show("The major set is updated.")
         cancelDialog();
       },
       (_, err) => {
-        //console.log(err)
+        console.log(err)
         return true;
       }))
 
@@ -347,35 +366,33 @@ export default function App() {
     setAMajorSet(dummyMajorSet[0]);
     setDialogText(CreateMajorSetText);
     setPlanDialogVisibility(true);
-    setDropDownValue(exercises[0].name);
+    setDropDownExerciseNameSelected(exercises[0].name);
     let d = new Date();
-    let monthNumber:number = d.getMonth()+1;
+    let monthNumber: number = d.getMonth() + 1;
     let month: string = monthNumber < 10 ? "0" + monthNumber.toString() : monthNumber.toString();
     let day: string = d.getDate() < 10 ? "0" + d.getDate().toString() : d.getDate().toString();
     setCurrentDate({
       year: d.getFullYear(), month: monthNumber, day: d.getDate(), timestamp: 0,
       dateString: d.getFullYear() + "-" + month + "-" + day
     });
-    // console.log(currentDate);
   }
 
   function createMajorSet() {
-    console.log("createMjaorSetr");
     let e1: Exercise;
     exercises.forEach(e => {
-      if (e.name == dropDowmValue) aMajorSet.exercise = e;
+      if (e.name == dropDownExerciseNameSelected) aMajorSet.exercise = e;
     });
     db.transaction(t => {
       t.executeSql(`INSERT INTO major_sets
            (exercise,reps,percent_complete,sets,duration_in_seconds,weight,notes,date)  
            VALUES(?,?,?,?,?,?,?,?);`,
-        [aMajorSet.exercise.name, aMajorSet.reps, aMajorSet.percent_complete, aMajorSet.sets, aMajorSet.duration_in_seconds, aMajorSet.weight,
+        [aMajorSet.exercise.name, aMajorSet.reps, aMajorSet.percent_complete, aMajorSet.sets,
+        aMajorSet.duration_in_seconds, aMajorSet.weight,
         aMajorSet.notes, JSON.stringify(currentDate)],
         (_, r) => {
           aMajorSet.date = currentDate;
           let m = majorSet.slice();
           m.push(aMajorSet);
-
           setMajorSet([...m]);
           cancelDialog();
         },
@@ -399,14 +416,14 @@ export default function App() {
                   exercise:
                 </Text>
                 <DropDownPicker
-                  style={{ width: 200 }}
+                  style={{ width: 200}}
                   containerStyle={{ width: 200 }}
                   disabledStyle={{ borderColor: "white" }}
                   open={isDropDownVisible}
                   items={exercisesForDropDown}
-                  value={dropDowmValue}
+                  value={dropDownExerciseNameSelected}
                   setOpen={setDropDownVisibility}
-                  setValue={setDropDownValue}
+                  setValue={setDropDownExerciseNameSelected}
                   disabled={!isEditable}
                 />
 
@@ -534,15 +551,17 @@ export default function App() {
                       onPress={() => { }}
                       activeOpacity={1}
                     >
-                      <Calendar onDayPress={day => {
-                        console.log(day);
-                        const s = Object.assign({}, aMajorSet);
-                        s.date = day;
-                        setCurrentDate(day);
-                        setAMajorSet(s);
-                        setCalendarDialogVisibility(false);
+                      <Calendar
+                        initialDate={currentDate.dateString}
+                        onDayPress={day => {
+                          console.log(day);
+                          const s = Object.assign({}, aMajorSet);
+                          s.date = day;
+                          setCurrentDate(day);
+                          setAMajorSet(s);
+                          setCalendarDialogVisibility(false);
 
-                      }} />
+                        }} />
                     </TouchableOpacity>
                   </TouchableOpacity>
                 </Modal>

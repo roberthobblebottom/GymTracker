@@ -4,18 +4,21 @@ import Colors from '../constants/Colors';
 import { Agenda, AgendaEntry } from 'react-native-calendars';
 import { MajorSetContext } from '../App';
 import { MajorSet } from '../types';
+import Toast from 'react-native-simple-toast';
 export function PlanScreen() {
   const context = useContext(MajorSetContext);
   const majorSet: MajorSet[] = context.majorSet;
-  console.log("----");
-  console.log(majorSet);
+  // console.log("----");
+  // console.log(majorSet);
+  // console.log("----");
   const a: { [key: string]: AgendaEntry[] } = {}
   if (majorSet.length > 0)
     majorSet.forEach(ms => {
-      a[ms.date.dateString] = [{ name: ms.id.toString(), height: 0, day: "dummy" }];
+      if (a[ms.date.dateString] == undefined) a[ms.date.dateString] = [{ name: ms.id.toString(), height: 0, day: "" }];
+      else a[ms.date.dateString].push({ name: ms.id.toString(), height: 0, day: "" })
     })
-    console.log("plan screen major set:")
-    console.log(a)
+  // console.log("plan screen major set:")
+  // console.log(a)
   const handleCreate: Function = context.handleCreate;
   const handleSelected: Function = context.handleSelected;
   return (
@@ -35,30 +38,26 @@ export function PlanScreen() {
               <Text>There is no plan made for today yet.</Text>
             </View>);
         }}
-        renderDay={(date, item) => {
-          console.log("render day")
-          console.log(date);
-          console.log(item);
-          if(item===undefined)  return(<View></View>);
 
-           let id = Number(item.name);
-           let set: MajorSet = majorSet.filter((element, index, array) => {
-             return element.id == id;
-           })[0];
-           return (
-             <TouchableOpacity onPress={() => { handleSelected(set) }}>
-               <Text>{set.id + " "+set.exercise.name}</Text>
-               <Text>{set.sets}x{set.reps} {set.weight}kg</Text>
-               <Text>{set.percent_complete}% completed</Text>
-             </TouchableOpacity>
-             // <View/>
-           );
-        }}
-        renderKnob={() => { return <View /> }}
-
-        renderItem={(reservation, isFirst) => {
-          console.log("renderKnob");
-  return (<View></View>);
+        renderItem={(item, isFirst) => {
+          // console.log("renderItem item is undefined: "+(item===undefined));
+          // console.log(item);
+          if (item === undefined) return (<View></View>);
+          let id = Number(item.name);
+          let set: MajorSet = majorSet.filter((element, index, array) => {
+            return element.id == id;
+          })[0];
+          if(set.exercise == undefined){
+            Toast.show("Error, there is a major set with undefined exercise");
+            return(<View></View>);
+          }
+          return (
+            <TouchableOpacity onPress={() => { handleSelected(set) }}>
+              <Text>{ set.exercise.name}</Text>
+              <Text>{set.sets}x{set.reps} {set.duration_in_seconds!=0?set.duration_in_seconds:""} {set.weight}kg</Text>
+              <Text>{set.percent_complete}% completed</Text>
+            </TouchableOpacity>
+          );
         }}
 
 
