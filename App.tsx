@@ -1,26 +1,28 @@
 import {
   Modal, StyleSheet, View, Text, Button,
-  TouchableOpacity, Alert, LogBox, TextInput
+  TouchableOpacity, Alert, LogBox, TextInput, Platform
 } from 'react-native';
 import { ExercisesScreen } from './screens/ExercisesScreen';
 import { SettingsScreen } from './screens/SettingsScreen';
 import { PlanScreen } from './screens/PlanScreen';
 import 'react-native-gesture-handler';
-import React, { Dispatch, SetStateAction, useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { init, db, resetTables } from './dbhandler';
-import { Exercise } from './types';
+import { Emm, Exercise, MajorMuscle } from './types';
 import { MajorSet } from './types';
 import Toast from 'react-native-simple-toast';
 import Colors from './constants/Colors';
 import Layout from './constants/Layout';
 import { Calendar } from 'react-native-calendars';
-import DropDownPicker, { ItemType, ValueType } from 'react-native-dropdown-picker';
+import DropDownPicker, { ItemType } from 'react-native-dropdown-picker';
 LogBox.ignoreLogs(['Require cycle:']);
 const Tab = createBottomTabNavigator();
+
+//dummy constant values
 const dummyDate = { year: 0, month: 0, day: 0, timestamp: 0, dateString: "" };
-const dummyExercises: Exercise[] = [{ name: "", description: "", imagesJson: "" }];
+const dummyExercises: Exercise[] = [{ name: "", description: "", imagesJson: "", major_muscles: [] }];
 const dummyMajorSet: MajorSet[] = [{
   id: 0,
   exercise: dummyExercises[0],
@@ -32,6 +34,10 @@ const dummyMajorSet: MajorSet[] = [{
   notes: "",
   date: dummyDate
 }];
+const dummyMajorMuscles: MajorMuscle[] = [{ name: "", notes: "", imageJson: "" }];
+
+const dummyEmm: Emm[] = [{ id: 9999, exercise_name: "", major_muscle_name: "" }];
+//constexts
 export const handleResetDBContext = React.createContext(() => { });
 export const ExerciseScreenContext = React.createContext(
   { exercises: dummyExercises, handleSelected: (exercise: Exercise) => { }, handleCreate: () => { } }
@@ -39,17 +45,14 @@ export const ExerciseScreenContext = React.createContext(
 export const MajorSetContext = React.createContext({
   majorSet: dummyMajorSet, handleSelected: (majorSet: MajorSet) => { }, handleCreate: (majorSet: MajorSet) => { }
 });
+
 export default function App() {
   //for exercise
   const [exercises, setExercises] = useState(dummyExercises);
-  const [exercisesForDropDown, setExercisesForDropDown]: [ItemType<ValueType>[], Dispatch<SetStateAction<ItemType<ValueType>[]>>] =
-    useState([({ label: dummyExercises[0].name, value: dummyExercises[0] } as ItemType<any>)]);
   const [isExDialogVisible, setExDialogVisibility] = useState(false);//Ex = exercise
   const [aExercise, setaExercise] = useState(dummyExercises[0]);
   const [oldExerciseName, setOldExerciseName] = useState("");
-  const ExerciseInformationText = "Exercise Information";
-  const EditExerciseText = "Edit Exercise:";
-  const CreateExerciseText = "Create Exercise:";
+  const [dropDownMajorMuscleNameSelected, setDropDownMajorMuscleNameSelected] = useState([""]);
 
   //shared
   const [dialogText, setDialogText] = useState("");
@@ -61,24 +64,32 @@ export default function App() {
   const [isPlanDialogVisible, setPlanDialogVisibility] = useState(false);
   const [majorSet, setMajorSet] = useState(dummyMajorSet);
   const [aMajorSet, setAMajorSet] = useState(majorSet[0]);
-  const CreateMajorSetText = "Create:";
-  const MajorSetInformation = "Information:";
-  const EditMajorSetText = "Edit";
-  const [isDropDownVisible, setDropDownVisibility] = useState(false);
+  const [isDropDownOpen, setDropDownOpenOrNot] = useState(false);
   const [dropDownExerciseNameSelected, setDropDownExerciseNameSelected] = useState(dummyExercises[0].name);
   const [currentDate, setCurrentDate] = useState(dummyDate);
   const [changeButtonBackgroundColor, setChangeButtonBackgroundColor] = useState(styles.changeDateButtonDisabled);
+  const [majorMuscles, setMajorMuscles] = useState(dummyMajorMuscles);
+  const [emm, setEmm] = useState(dummyEmm);
+
+  //constant strings
+  const ExerciseInformationText = "Exercise Information";
+  const EditExerciseText = "Edit Exercise:";
+  const CreateExerciseText = "Create Exercise:";
+  const CreateMajorSetText = "Create:";
+  const MajorSetInformation = "Information:";
+  const EditMajorSetText = "Edit";
+
   useEffect(() => {
+    let tempExercises: Exercise[];
     if (exercises[0].name == "" || exercises.length <= 0)
       db.transaction(t => t.executeSql(
         "SELECT * from exercise",
         undefined,
         (_, r) => {
-          let tempExercises:Exercise[] = r.rows._array;
-          setExercises(r.rows._array);
-          tempExercises.forEach((elm: Exercise) => {
-            exercisesForDropDown.push({ label: elm.name, value: elm.name });
-          });
+          tempExercises = r.rows._array;
+          tempExercises.forEach(ex3 => {
+            ex3.major_muscles = dummyMajorMuscles;
+          })
           if (majorSet[0] != undefined)
             if (majorSet[0].exercise == dummyExercises[0])
               db.transaction(
@@ -87,17 +98,12 @@ export default function App() {
                     (_, results) => {
                       let tempMajorSet: MajorSet[] = results.rows._array;
                       let a = results.rows._array.slice();
-                      console.log(exercises.length);
-                      tempMajorSet.forEach((ms, index, arr) => {
+                      tempMajorSet.forEach((ms, index) => {
                         ms.date = JSON.parse(ms.date.toString());
-                        let t = tempExercises.filter(ex => {
-                          if (ex.name == a[index].exercise) return ex;
-                        })[0];
-                        console.log(t);
-                        tempMajorSet[index].exercise = t;
+                        let t = tempExercises.find(ex => ex.name == a[index].exercise);
+                        tempMajorSet[index].exercise = t!;
                       });
                       setMajorSet(tempMajorSet);
-                      console.log(majorSet);
                     },
                     (_, err) => {
                       console.log(err)
@@ -105,12 +111,35 @@ export default function App() {
                     });
                 }
               )
+          setExercises(tempExercises);
         },
         (_, e) => { console.log(e); return true; }
       ));
-    // if (majorSet.length <= 1 )
+    if (majorMuscles[0] == dummyMajorMuscles[0]) {
+      let tempMajorMuscles: MajorMuscle[];
+      db.transaction(t => t.executeSql("SELECT * from major_muscle", undefined,
+        (_, results) => {
+          tempMajorMuscles = results.rows._array;
+          setMajorMuscles(results.rows._array);
+        }, (_, err) => { console.log(err); return true; }))
 
-  }, [majorSet, exercises]);
+      db.transaction(t => t.executeSql("SELECT * from exercise_major_muscle_one_to_many;", undefined,
+        (_, results) => {
+          let temp_emm_one_to_many = results.rows._array;
+          setEmm(temp_emm_one_to_many);
+        }, (_, err) => { console.log(err); return true; }))
+    }
+    if (majorMuscles.length > 1 && exercises.length > 1 && emm.length > 1) {
+      let temp = [];
+      emm.forEach(x => {
+        let e2 = exercises.find(e => e.name == x.exercise_name);
+        let mm2 = majorMuscles.find(mm => mm.name == x.major_muscle_name);
+        if (e2!.major_muscles == dummyMajorMuscles) e2!.major_muscles = [mm2!];
+        else e2!.major_muscles.push(mm2!);
+      })
+      setEmm([]);
+    }
+  }, [majorSet, exercises, majorMuscles]);
   init();
 
   const ButtonSet = () => {
@@ -124,6 +153,7 @@ export default function App() {
               setEditability(true);
               setTextInputBackgroundColor(styles.textInputEditable);
               setDialogText(EditExerciseText);
+              setDropDownOpenOrNot(false);
             }} />
             <Button title='Cancel' onPress={() => cancelDialog()} />
           </View>
@@ -157,9 +187,9 @@ export default function App() {
             <Button title='Edit' onPress={() => {
               setChangeButtonBackgroundColor(styles.changeDateButtonEnabled);
               setEditability(true);
+              setDropDownOpenOrNot(false);
               setTextInputBackgroundColor(styles.textInputEditable);
               setDialogText(EditMajorSetText);
-              setDropDownVisibility(true);
               setAMajorSet(aMajorSet);
               setDropDownExerciseNameSelected(aMajorSet.exercise.name);
               setCurrentDate(aMajorSet.date);
@@ -177,16 +207,23 @@ export default function App() {
         );
     }
   }
+
   const handleResetDB = () => {
     resetTables();
     setExercises(dummyExercises);
     setMajorSet(dummyMajorSet);
+    setMajorMuscles(dummyMajorMuscles);
   }
 
   const handleExerciseCRUDPress = (exercise: Exercise) => {
     setEditability(false);
     setTextInputBackgroundColor(styles.textInputViewOnly);
     setaExercise(exercise);
+    let names: string[] = [];
+    console.log(exercise.major_muscles);
+    exercise.major_muscles.forEach(mm => names.push(mm.name));
+    setDropDownOpenOrNot(false);
+    setDropDownMajorMuscleNameSelected(names);
     setOldExerciseName(exercise.name);
     setDialogText(ExerciseInformationText);
     setExDialogVisibility(true);
@@ -204,11 +241,19 @@ export default function App() {
       "Confirmation",
       "Are you sure you want to delete this exercise?",
       [{ text: "Yes", onPress: () => deleteExercise(exercise) },
-      { text: "No", onPress: () => handleExerciseCRUDPress(exercise) }],//warning, recursive
+      { text: "No", onPress: () => handleExerciseCRUDPress(exercise) }],//warning, recursive-
       { cancelable: true }
     )
   };
   let deleteExercise = (exercise: Exercise) => {
+    let selected: MajorMuscle[] = majorMuscles.filter(x => dropDownMajorMuscleNameSelected.includes(x.name));
+    selected.forEach(x =>
+      db.transaction(t => t.executeSql(
+        "DELETE FROM exercise_major_muscle_one_to_many WHERE exercise_name=? AND major_muscle_name=?",
+        [exercise.name, x.name], undefined,
+        (_, err) => { console.log(err); return true; }
+      ))
+    );
     db.transaction(t => t.executeSql("DELETE FROM exercise where name= ?", [exercise.name],
       () => {
         let deletedName = exercise.name;
@@ -231,10 +276,25 @@ export default function App() {
     ));
   }
   const updateExercise = () => {
+    let selected: MajorMuscle[] = majorMuscles.filter(x => dropDownMajorMuscleNameSelected.includes(x.name));
+    let toBeUpdated = selected.filter(x => !aExercise.major_muscles.includes(x));
+    toBeUpdated.forEach(x => {
+      if (toBeUpdated != undefined) db.transaction(t => t.executeSql(
+        "INSERT INTO exercise_major_muscle_one_to_many (exercise_name,major_muscle_name) values (?,?)",
+        [aExercise.name, x.name],
+        undefined, (_, err) => { console.log(err); return true }
+      ))
+    });
+    let toBeDeleted: MajorMuscle[] = selected.filter(x => !aExercise.major_muscles.includes(x));
+    toBeDeleted.forEach(x => db.transaction(t => t.executeSql("DELETE FROM exercise_major_muscle_one_to_many WHERE exercise_name =? AND major_muscle_name=?",
+      [aExercise.name, x.name], undefined, (_, err) => { console.log(err); return true; })));
     db.transaction(t => t.executeSql("UPDATE exercise SET name = ?, description = ?,imagesJson=? where name = ?",
       [aExercise.name, aExercise.description, aExercise.imagesJson, oldExerciseName],
       (_, result) => {
-        let exerciseToBeUpdated: Exercise = { name: aExercise.name, description: aExercise.description, imagesJson: aExercise.imagesJson }
+        let exerciseToBeUpdated: Exercise = {
+          name: aExercise.name, description: aExercise.description, imagesJson: aExercise.imagesJson,
+          major_muscles: selected
+        }
         let es: Exercise[] = exercises.slice();
         es.forEach((currentExercise, i) => {
           if (currentExercise.name == oldExerciseName) {
@@ -255,18 +315,28 @@ export default function App() {
 
   const showCreateExerciseDialog = () => {
     setaExercise(dummyExercises[0]);
+    setDropDownMajorMuscleNameSelected([]);
     setEditability(true);
     setTextInputBackgroundColor(styles.textInputEditable);
     setDialogText(CreateExerciseText);
     setExDialogVisibility(true);
+    setDropDownOpenOrNot(false);
   }
 
   function createExercise() {
+    let selected: MajorMuscle[] = majorMuscles.filter(x => dropDownMajorMuscleNameSelected.includes(x.name));
+    selected.forEach(x =>
+      db.transaction(t => t.executeSql(
+        "INSERT INTO exercise_major_muscle_one_to_many (exercise_name, major_muscle_name)VALUES (?,?)",
+        [aExercise.name, x.name], undefined,
+        (_, err) => { console.log(err); return true; }
+      ))
+    );
     db.transaction(t => t.executeSql("INSERT INTO exercise VALUES (?,?,?)",
       [aExercise.name, aExercise.description, aExercise.imagesJson],
       (_, result) => {
         const es: Exercise[] = exercises.slice();
-        es.push({ name: aExercise.name, description: aExercise.description, imagesJson: aExercise.imagesJson });
+        es.push({ name: aExercise.name, description: aExercise.description, imagesJson: aExercise.imagesJson, major_muscles: selected });
         setExercises([...es]);
         Toast.show("The exercise " + aExercise.name + " is created.");
         cancelDialog();
@@ -282,7 +352,7 @@ export default function App() {
     setTextInputBackgroundColor(styles.textInputViewOnly);
     setAMajorSet(majorSet);
     setDialogText(MajorSetInformation);
-    setDropDownVisibility(false);
+    setDropDownOpenOrNot(false);
     setDropDownExerciseNameSelected(majorSet.exercise.name);
     setExDialogVisibility(false);
     setPlanDialogVisibility(true);
@@ -367,6 +437,7 @@ export default function App() {
     setDialogText(CreateMajorSetText);
     setPlanDialogVisibility(true);
     setDropDownExerciseNameSelected(exercises[0].name);
+    setDropDownOpenOrNot(false);
     let d = new Date();
     let monthNumber: number = d.getMonth() + 1;
     let month: string = monthNumber < 10 ? "0" + monthNumber.toString() : monthNumber.toString();
@@ -416,13 +487,16 @@ export default function App() {
                   exercise:
                 </Text>
                 <DropDownPicker
-                  style={{ width: 200}}
+                  placeholder="Select a exercise"
+                  style={{ width: 200, minHeight: 20, paddingVertical: 3, }}
                   containerStyle={{ width: 200 }}
                   disabledStyle={{ borderColor: "white" }}
-                  open={isDropDownVisible}
-                  items={exercisesForDropDown}
+                  open={isDropDownOpen}
+                  schema={{ label: "name", value: "name" }}
+                  items={exercises as ItemType<string>[]}
+                  itemKey="name"
                   value={dropDownExerciseNameSelected}
-                  setOpen={setDropDownVisibility}
+                  setOpen={setDropDownOpenOrNot}
                   setValue={setDropDownExerciseNameSelected}
                   disabled={!isEditable}
                 />
@@ -432,7 +506,7 @@ export default function App() {
                 <Text style={{ fontSize: Layout.defaultFontSize }}
                 > reps: </Text>
                 <TextInput placeholder='reps'
-                  style={textInputBackgroundColor}
+                  style={{ ...textInputBackgroundColor, marginEnd: 100 }}
                   value={aMajorSet.reps.toString()}
                   onChangeText={text => {
                     const rep = Number(text);
@@ -551,6 +625,7 @@ export default function App() {
                       onPress={() => { }}
                       activeOpacity={1}
                     >
+                      <Text style={{ fontSize: Layout.defaultFontSize, fontWeight: "bold" }} >Select a date</Text>
                       <Calendar
                         initialDate={currentDate.dateString}
                         onDayPress={day => {
@@ -562,6 +637,7 @@ export default function App() {
                           setCalendarDialogVisibility(false);
 
                         }} />
+                      <Button title='Cancel' onPress={() => setCalendarDialogVisibility(false)} />
                     </TouchableOpacity>
                   </TouchableOpacity>
                 </Modal>
@@ -605,6 +681,22 @@ export default function App() {
                   }
                   }
                   editable={isEditable} />
+              </View>
+              <View>
+                <DropDownPicker
+                  style={{ width: 200, minHeight: 20, paddingVertical: 3, }}
+                  containerStyle={{ width: 200 }}
+                  disabledStyle={{ borderColor: "white" }}
+                  schema={{ label: "name", value: "name" }}
+                  items={majorMuscles as ItemType<string>[]}
+                  value={dropDownMajorMuscleNameSelected}
+                  setValue={setDropDownMajorMuscleNameSelected}
+                  open={isDropDownOpen}
+                  setOpen={setDropDownOpenOrNot}
+                  disabled={!isEditable}
+                  multiple={true}
+                  dropDownDirection="TOP"
+                />
               </View>
               {ButtonSet()}
             </TouchableOpacity>
@@ -680,10 +772,41 @@ const styles = StyleSheet.create({
 
   },
   changeDateButtonEnabled: {
-    marginStart: "10%", backgroundColor: Colors.light.tint
+    padding: 6,
+    textAlign: "center", margin: 8,
+    elevation: 4,
+    // Material design blue from https://material.google.com/style/color.html#color-color-palette
+    backgroundColor: '#2196F3',
+    ...Platform.select({
+      ios: {
+        // iOS blue from https://developer.apple.com/ios/human-interface-guidelines/visual-design/color/
+        color: '#007AFF',
+        fontSize: 18,
+      },
+      android: {
+        color: 'white',
+        fontWeight: '700',
+      },
+    }),
+    borderRadius: 2,
   },
   changeDateButtonDisabled: {
-    marginStart: "10%", backgroundColor: Colors.light.altBackground
+    padding: 6,
+    backgroundColor: Colors.light.altBackground, textAlign: "center", margin: 8,
+    elevation: 4,
+    // Material design blue from https://material.google.com/style/color.html#color-color-palette
+    ...Platform.select({
+      ios: {
+        // iOS blue from https://developer.apple.com/ios/human-interface-guidelines/visual-design/color/
+        color: '#007AFF',
+        fontSize: 18,
+      },
+      android: {
+        color: 'white',
+        fontWeight: '700',
+      },
+    }),
+    borderRadius: 2,
   }
 
 });

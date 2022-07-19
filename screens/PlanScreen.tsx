@@ -8,17 +8,12 @@ import Toast from 'react-native-simple-toast';
 export function PlanScreen() {
   const context = useContext(MajorSetContext);
   const majorSet: MajorSet[] = context.majorSet;
-  // console.log("----");
-  // console.log(majorSet);
-  // console.log("----");
   const a: { [key: string]: AgendaEntry[] } = {}
   if (majorSet.length > 0)
     majorSet.forEach(ms => {
       if (a[ms.date.dateString] == undefined) a[ms.date.dateString] = [{ name: ms.id.toString(), height: 0, day: "" }];
       else a[ms.date.dateString].push({ name: ms.id.toString(), height: 0, day: "" })
     })
-  // console.log("plan screen major set:")
-  // console.log(a)
   const handleCreate: Function = context.handleCreate;
   const handleSelected: Function = context.handleSelected;
   return (
@@ -40,8 +35,6 @@ export function PlanScreen() {
         }}
 
         renderItem={(item, isFirst) => {
-          // console.log("renderItem item is undefined: "+(item===undefined));
-          // console.log(item);
           if (item === undefined) return (<View></View>);
           let id = Number(item.name);
           let set: MajorSet = majorSet.filter((element, index, array) => {

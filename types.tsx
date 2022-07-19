@@ -42,7 +42,8 @@ export type RootTabScreenProps<Screen extends keyof RootTabParamList> = Composit
 export type Exercise = {
   name: string,
   description: string,
-  imagesJson: string
+  imagesJson: string,
+  major_muscles: MajorMuscle[] //TODO, uncomment this when the development is ready for it.
 }
 
 export type MajorSet = {
@@ -55,4 +56,16 @@ export type MajorSet = {
   weight: number,
   notes: string,
   date: DateData
+}
+
+export type MajorMuscle = {
+  name:string,
+  notes:string,
+  imageJson:string
+}
+
+export type Emm = {
+  id:number,
+  exercise_name:string,
+  major_muscle_name:string
 }
