@@ -17,6 +17,7 @@ function ExercisesScreen() {
       <FlatList
         style={{ width: '100%', marginBottom: -60 }}
         data={exercises}
+        initialNumToRender={15}
         renderItem={
           ({ item, index, separators }) =>
             <TouchableOpacity style={{

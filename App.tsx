@@ -77,7 +77,8 @@ export default function App() {
   const CreateExerciseText = "Create Exercise:";
   const CreateMajorSetText = "Create:";
   const MajorSetInformation = "Information:";
-  const EditMajorSetText = "Edit";
+  const EditMajorSetText: string = "Edit";
+  const DuplicateMajorSetText: string = "Duplicate:";
 
   useEffect(() => {
     let tempExercises: Exercise[];
@@ -134,6 +135,10 @@ export default function App() {
       emm.forEach(x => {
         let e2 = exercises.find(e => e.name == x.exercise_name);
         let mm2 = majorMuscles.find(mm => mm.name == x.major_muscle_name);
+        if (e2 == undefined) {
+          Toast.show("There is an error is extracting major muscles from each exercises");
+          return;
+        }
         if (e2!.major_muscles == dummyMajorMuscles) e2!.major_muscles = [mm2!];
         else e2!.major_muscles.push(mm2!);
       })
@@ -194,17 +199,34 @@ export default function App() {
               setDropDownExerciseNameSelected(aMajorSet.exercise.name);
               setCurrentDate(aMajorSet.date);
             }} />
+            <Button title="duplicate" onPress={() => {
+              setChangeButtonBackgroundColor(styles.changeDateButtonEnabled);
+              setEditability(true);
+              setDropDownOpenOrNot(false);
+              setTextInputBackgroundColor(styles.textInputEditable);
+              setDialogText(DuplicateMajorSetText);
+              setAMajorSet(aMajorSet);
+              setDropDownExerciseNameSelected(aMajorSet.exercise.name);
+              setCurrentDate(aMajorSet.date);
+            }} />
             <Button title='Cancel' onPress={() => cancelDialog()} />
           </View>
         );
+      case DuplicateMajorSetText:
       case EditMajorSetText:
         return (
           <View style={{ flexDirection: "row", justifyContent: "space-around", marginTop: 20 }}>
-            <Button title='Save' onPress={() => updateMajorSet()}></Button>
+            <Button title='Save' onPress={() => {
+              switch (dialogText) {
+                case EditMajorSetText: updateMajorSet(); break;
+                case DuplicateMajorSetText: createMajorSet(); break;
+              }
+            }}></Button>
             <Button title='Back' onPress={() => handleMajorSetCRUDPress(aMajorSet)} />
             <Button title='Cancel' onPress={() => cancelDialog()} />
           </View>
         );
+
     }
   }
 
@@ -429,26 +451,7 @@ export default function App() {
 
   }
 
-  function showCreateMajorSetDialog() {
-    setChangeButtonBackgroundColor(styles.changeDateButtonEnabled);
-    setEditability(true);
-    setTextInputBackgroundColor(styles.textInputEditable);
-    setAMajorSet(dummyMajorSet[0]);
-    setDialogText(CreateMajorSetText);
-    setPlanDialogVisibility(true);
-    setDropDownExerciseNameSelected(exercises[0].name);
-    setDropDownOpenOrNot(false);
-    let d = new Date();
-    let monthNumber: number = d.getMonth() + 1;
-    let month: string = monthNumber < 10 ? "0" + monthNumber.toString() : monthNumber.toString();
-    let day: string = d.getDate() < 10 ? "0" + d.getDate().toString() : d.getDate().toString();
-    setCurrentDate({
-      year: d.getFullYear(), month: monthNumber, day: d.getDate(), timestamp: 0,
-      dateString: d.getFullYear() + "-" + month + "-" + day
-    });
-  }
-
-  function createMajorSet() {
+  function duplicateMajorSet() {
     let e1: Exercise;
     exercises.forEach(e => {
       if (e.name == dropDownExerciseNameSelected) aMajorSet.exercise = e;
@@ -475,22 +478,71 @@ export default function App() {
       )
     });
   }
+  function showCreateMajorSetDialog() {
+    setChangeButtonBackgroundColor(styles.changeDateButtonEnabled);
+    setEditability(true);
+    setTextInputBackgroundColor(styles.textInputEditable);
+    setAMajorSet(dummyMajorSet[0]);
+    setDialogText(CreateMajorSetText);
+    setPlanDialogVisibility(true);
+    setDropDownExerciseNameSelected(exercises[0].name);
+    setDropDownOpenOrNot(false);
+    let d = new Date();
+    let monthNumber: number = d.getMonth() + 1;
+    let month: string = monthNumber < 10 ? "0" + monthNumber.toString() : monthNumber.toString();
+    let day: string = d.getDate() < 10 ? "0" + d.getDate().toString() : d.getDate().toString();
+    setCurrentDate({
+      year: d.getFullYear(), month: monthNumber, day: d.getDate(), timestamp: 0,
+      dateString: d.getFullYear() + "-" + month + "-" + day
+    });
+  }
+
+  function createMajorSet() {
+    let e1: Exercise;
+    exercises.forEach(e => {
+      if (e.name == dropDownExerciseNameSelected) aMajorSet.exercise = e;
+    });
+    // console.log(aMajorSet );
+    db.transaction(t => {
+      t.executeSql(`INSERT INTO major_sets
+           (exercise,reps,percent_complete,sets,duration_in_seconds,weight,notes,date)  
+           VALUES(?,?,?,?,?,?,?,?);`,
+        [aMajorSet.exercise.name, aMajorSet.reps, aMajorSet.percent_complete, aMajorSet.sets,
+        aMajorSet.duration_in_seconds, aMajorSet.weight,
+        aMajorSet.notes, JSON.stringify(currentDate)],
+        (_, r) => {
+          //  aMajorSet.id =  r.rows.item(0).id;
+          aMajorSet.id = r.insertId!;
+          aMajorSet.date = currentDate;
+          let tempMajorSet = Object.assign({}, aMajorSet);
+          console.log(tempMajorSet.id);
+          let m = majorSet.slice();
+          m.push(tempMajorSet);
+
+          setMajorSet([...m]);
+          cancelDialog();
+        },
+        (_, e) => {
+          console.log(e);
+          cancelDialog();
+          return true;
+        }
+      )
+    });
+  }
   return (
     <>
       <NavigationContainer>
         <Modal visible={isPlanDialogVisible} animationType="fade" transparent={true}>
-          <TouchableOpacity style={{ flex: 1 }} onPressIn={() => setPlanDialogVisibility(false)}>
-            <TouchableOpacity style={styles.innerTouchableOpacity2} activeOpacity={1}>
+          <TouchableOpacity style={{ flex: 1, display: 'flex', justifyContent: 'flex-end' }} onPressIn={() => setPlanDialogVisibility(false)}>
+            <TouchableOpacity style={{ ...styles.innerTouchableOpacity2 }} activeOpacity={1} onPress={() => setDropDownOpenOrNot(false)}>
               <Text style={{ fontSize: Layout.defaultFontSize, fontWeight: "bold" }}>{dialogText}</Text>
-              <View style={{ flexDirection: "row", marginTop: 20 }}>
-                <Text style={{ fontSize: Layout.defaultFontSize }}>
-                  exercise:
+              <View style={{ flexDirection: "row", marginTop: 20, marginLeft: "1%" }}>
+                <Text style={{ fontSize: Layout.defaultFontSize, marginRight: "1%" }}>
+                  Exercise:
                 </Text>
                 <DropDownPicker
                   placeholder="Select a exercise"
-                  style={{ width: 200, minHeight: 20, paddingVertical: 3, }}
-                  containerStyle={{ width: 200 }}
-                  disabledStyle={{ borderColor: "white" }}
                   open={isDropDownOpen}
                   schema={{ label: "name", value: "name" }}
                   items={exercises as ItemType<string>[]}
@@ -499,14 +551,38 @@ export default function App() {
                   setOpen={setDropDownOpenOrNot}
                   setValue={setDropDownExerciseNameSelected}
                   disabled={!isEditable}
+                  dropDownContainerStyle={{
+                    marginTop: -5, backgroundColor: Colors.light.altBackground,
+                    borderWidth: 0, width: 200, minHeight: 300, borderRadius: 0
+                  }}
+                  selectedItemContainerStyle={{
+                    backgroundColor: Colors.light.altBackground,
+                    borderColor: "white"
+                  }}
+                  style={{
+                    // display: 'flex',
+                    // flexDirection: "row",
+                    // // alignItems:"stretch",
+                    justifyContent: "flex-end",
+                    marginTop: -5, minHeight: 30, paddingVertical: 3,
+                    backgroundColor: Colors.light.altBackground,
+                    borderWidth: 0, borderRadius: 0,
+                    width: "75%"
+                  }}
+                  textStyle={{ fontSize: Layout.defaultFontSize }}
+                  disabledStyle={{ backgroundColor: "white" }}
+                  searchTextInputStyle={{ borderWidth: 0 }}
+                  searchable={true}
+                  closeAfterSelecting={true}
+                  closeOnBackPressed={true}
                 />
 
               </View>
               <View style={{ flexDirection: "row", marginTop: 20 }}>
                 <Text style={{ fontSize: Layout.defaultFontSize }}
-                > reps: </Text>
+                > Reps: </Text>
                 <TextInput placeholder='reps'
-                  style={{ ...textInputBackgroundColor, marginEnd: 100 }}
+                  style={{ ...textInputBackgroundColor }}
                   value={aMajorSet.reps.toString()}
                   onChangeText={text => {
                     const rep = Number(text);
@@ -520,11 +596,11 @@ export default function App() {
                   editable={isEditable}
                   keyboardType="numeric" />
               </View>
-              <View style={{ flexDirection: "row", marginTop: 20 }}>
+              <View style={{ flexDirection: "row", marginTop: 20, }}>
                 <Text style={{ fontSize: Layout.defaultFontSize }}
                 > percentage complete: </Text>
                 <TextInput placeholder='percentage complete'
-                  style={textInputBackgroundColor}
+                  style={{ ...textInputBackgroundColor }}
                   value={aMajorSet.percent_complete.toString()}
                   onChangeText={text => {
                     const p = Number(text);
@@ -542,7 +618,7 @@ export default function App() {
               </View>
               <View style={{ flexDirection: "row", marginTop: 20 }}>
                 <Text style={{ fontSize: Layout.defaultFontSize }}
-                > sets: </Text>
+                > Sets: </Text>
                 <TextInput placeholder='sets'
                   style={textInputBackgroundColor}
                   value={aMajorSet.sets.toString()}
@@ -560,9 +636,9 @@ export default function App() {
               </View>
               <View style={{ flexDirection: "row", marginTop: 20 }}>
                 <Text style={{ fontSize: Layout.defaultFontSize }}
-                > duration: </Text>
+                > Duration: </Text>
                 <TextInput placeholder='seconds'
-                  style={textInputBackgroundColor}
+                  style={{ ...textInputBackgroundColor, width: 30 }}
                   value={aMajorSet.duration_in_seconds.toString()}
                   onChangeText={text => {
                     const duration = Number(text);
@@ -578,7 +654,7 @@ export default function App() {
               </View>
               <View style={{ flexDirection: "row", marginTop: 20 }}>
                 <Text style={{ fontSize: Layout.defaultFontSize }}
-                > weight: </Text>
+                > Weight: </Text>
                 <TextInput placeholder='kg'
                   style={textInputBackgroundColor}
                   value={aMajorSet.weight.toString()}
@@ -610,17 +686,19 @@ export default function App() {
 
               </View>
               <View style={{ flexDirection: "row", marginTop: 20 }}>
-                <Text style={{ fontSize: Layout.defaultFontSize }}> date: </Text>
-                <Text>{currentDate.dateString}</Text>
+                <Text style={{ fontSize: Layout.defaultFontSize }}> date: {currentDate.dateString}</Text>
                 <TouchableOpacity
-                  style={changeButtonBackgroundColor}
+                  style={{
+                    ...changeButtonBackgroundColor,
+                    justifyContent: "flex-end", flex: 1, alignSelf: "flex-end", paddingRight: 5
+                  }}
                   disabled={!isEditable} onPress={() => {
                     setCalendarDialogVisibility(true);
                   }} >
-                  <Text style={{ color: "white" }}>Change Date</Text>
+                  <Text style={{ color: "white", textAlign: "right", fontWeight: "600" }}>CHANGE DATE</Text>
                 </TouchableOpacity>
                 <Modal visible={isCalendarDialogVisible} animationType="fade" transparent={true} >
-                  <TouchableOpacity style={{ flex: 1 }} onPressIn={() => setCalendarDialogVisibility(false)}>
+                  <TouchableOpacity style={{ flex: 1, display: "flex", justifyContent: "flex-end" }} onPressIn={() => setCalendarDialogVisibility(false)}>
                     <TouchableOpacity style={styles.innerTouchableOpacity2}
                       onPress={() => { }}
                       activeOpacity={1}
@@ -648,15 +726,15 @@ export default function App() {
           </TouchableOpacity>
         </Modal>
         <Modal visible={isExDialogVisible} animationType="fade" transparent={true}>
-          <TouchableOpacity style={{ flex: 1 }} onPressIn={() => setExDialogVisibility(false)}>
-            <TouchableOpacity style={styles.innerTouchableOpacity}
-              onPress={() => { }}
+          <TouchableOpacity style={{ flex: 1, display: "flex", justifyContent: "flex-end" }} onPressIn={() => setExDialogVisibility(false)}>
+            <TouchableOpacity style={{ ...styles.innerTouchableOpacity }}
+              onPress={() => { setDropDownOpenOrNot(false) }}
               activeOpacity={1}
             >
               <Text style={{ fontSize: Layout.defaultFontSize, fontWeight: "bold" }}>{dialogText}</Text>
               <View style={{ flexDirection: "row", marginTop: 20 }}>
                 <Text style={{ fontSize: Layout.defaultFontSize }}
-                >name: </Text>
+                >Name: </Text>
                 <TextInput placeholder='Type in exercise name.'
                   style={textInputBackgroundColor}
                   value={aExercise.name}
@@ -670,8 +748,8 @@ export default function App() {
               <View style={{ flexDirection: "row", marginTop: 20 }}>
                 <Text
                   style={{ fontSize: Layout.defaultFontSize }}
-                >description: </Text>
-                <TextInput style={textInputBackgroundColor}
+                >Description: </Text>
+                <TextInput style={{ ...textInputBackgroundColor, fontSize: Layout.defaultFontSize }}
                   multiline={true} placeholder='Type in exercise description.'
                   value={aExercise.description}
                   onChangeText={text => {
@@ -682,11 +760,22 @@ export default function App() {
                   }
                   editable={isEditable} />
               </View>
-              <View>
+              <View style={{ flexDirection: "row", marginTop: 20 }}>
                 <DropDownPicker
-                  style={{ width: 200, minHeight: 20, paddingVertical: 3, }}
-                  containerStyle={{ width: 200 }}
-                  disabledStyle={{ borderColor: "white" }}
+
+                  style={{
+                    width: "100%", minHeight: 30,
+                    backgroundColor: Colors.light.altBackground, borderWidth: 0, borderRadius: 0
+                  }}
+                  disabledStyle={{ borderWidth: 0, backgroundColor: "white" }}
+                  dropDownContainerStyle={{
+                    backgroundColor: Colors.light.altBackground, borderWidth: 0,
+                    borderRadius: 0, minHeight: 500,
+                  }}
+                  textStyle={{ fontSize: Layout.defaultFontSize }}
+                  searchTextInputStyle={{ borderWidth: 0 }}
+                  placeholderStyle={{ color: "#9E9E9E" }}
+                  showBadgeDot={false}
                   schema={{ label: "name", value: "name" }}
                   items={majorMuscles as ItemType<string>[]}
                   value={dropDownMajorMuscleNameSelected}
@@ -696,6 +785,12 @@ export default function App() {
                   disabled={!isEditable}
                   multiple={true}
                   dropDownDirection="TOP"
+                  searchable={true}
+                  closeOnBackPressed={true}
+                  placeholder='Select Muscle Group(s).'
+                  mode="BADGE"
+                  extendableBadgeContainer={true}
+                  badgeProps={{ disabled: !isEditable }}
                 />
               </View>
               {ButtonSet()}
@@ -725,88 +820,77 @@ export default function App() {
     </>
   );
 }
+const bases = StyleSheet.create({
+  textInputBase: {
+    fontSize: Layout.defaultFontSize,
+    color: "black", marginTop: -5, justifyContent: "flex-end", flex: 1, textAlign: "right", paddingRight: 5
+  },
 
+  changeDateButtonBase: {
+    padding: Layout.defaultMargin,
+    // textAlign: "right",
+    // margin:Layout.defaultMargin,
+    marginStart: 7,
+    marginBottom: 7,
+    elevation: 4,
+    // Material design blue from https://material.google.com/style/color.html#color-color-palette
+    ...Platform.select({
+      ios: {
+        // iOS blue from https://developer.apple.com/ios/human-interface-guidelines/visual-design/color/
+        color: '#007AFF',
+        fontSize: 18,
+      },
+      android: {
+        color: 'white',
+        fontWeight: '700',
+      },
+    }),
+    borderRadius: 2,
+
+  },
+  innerTouchableOpacityBase: {
+    flex: 0,
+    margin: Layout.dialogSpacingMargin,
+    backgroundColor: "white",
+    padding: 35,
+    justifyContent: 'flex-end',
+    display: 'flex',
+    flexDirection: 'column',
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  }
+})
 const styles = StyleSheet.create({
   innerTouchableOpacity2: {
-    flex: 0,
-    margin: Layout.dialogSpacingMargin,
-    backgroundColor: "white",
-    padding: 35,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
-    top: '20%',
-    flexDirection: "column",
+    // top: '20%',
+    ...bases.innerTouchableOpacityBase
   },
   innerTouchableOpacity: {
-    flex: 0,
-    margin: Layout.dialogSpacingMargin,
-    backgroundColor: "white",
-    padding: 35,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
-    top: '60%',
-    flexDirection: "column",
+    ...bases.innerTouchableOpacityBase,
+    // top: '60%',
   },
   textInputEditable: {
     backgroundColor: Colors.light.altBackground,
-    fontSize: Layout.defaultFontSize,
-    color: "black", marginTop: -5
+    ...bases.textInputBase
   },
   textInputViewOnly: {
     backgroundColor: "white",
-    fontSize: Layout.defaultFontSize,
-    color: "black", marginTop: -5
-
-
+    ...bases.textInputBase
   },
+
   changeDateButtonEnabled: {
-    padding: 6,
-    textAlign: "center", margin: 8,
-    elevation: 4,
-    // Material design blue from https://material.google.com/style/color.html#color-color-palette
     backgroundColor: '#2196F3',
-    ...Platform.select({
-      ios: {
-        // iOS blue from https://developer.apple.com/ios/human-interface-guidelines/visual-design/color/
-        color: '#007AFF',
-        fontSize: 18,
-      },
-      android: {
-        color: 'white',
-        fontWeight: '700',
-      },
-    }),
-    borderRadius: 2,
+    ...bases.changeDateButtonBase
   },
   changeDateButtonDisabled: {
-    padding: 6,
-    backgroundColor: Colors.light.altBackground, textAlign: "center", margin: 8,
-    elevation: 4,
-    // Material design blue from https://material.google.com/style/color.html#color-color-palette
-    ...Platform.select({
-      ios: {
-        // iOS blue from https://developer.apple.com/ios/human-interface-guidelines/visual-design/color/
-        color: '#007AFF',
-        fontSize: 18,
-      },
-      android: {
-        color: 'white',
-        fontWeight: '700',
-      },
-    }),
-    borderRadius: 2,
+    backgroundColor: Colors.light.altBackground,
+    ...bases.changeDateButtonBase
   }
 
 });
