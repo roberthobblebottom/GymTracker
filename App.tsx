@@ -17,13 +17,14 @@ import Colors from './constants/Colors';
 import Layout from './constants/Layout';
 import { Calendar } from 'react-native-calendars';
 import DropDownPicker, { ItemType } from 'react-native-dropdown-picker';
+import { Ionicons, MaterialCommunityIcons, } from '@expo/vector-icons';
 LogBox.ignoreLogs(['Require cycle:']);
 const Tab = createBottomTabNavigator();
 
 //dummy constant values
-const dummyDate = { year: 0, month: 0, day: 0, timestamp: 0, dateString: "" };
-const dummyExercises: Exercise[] = [{ name: "", description: "", imagesJson: "", major_muscles: [] }];
-const dummyMajorSet: MajorSet[] = [{
+export const dummyDate = { year: 0, month: 0, day: 0, timestamp: 0, dateString: "" };
+export const dummyExercises: Exercise[] = [{ name: "", description: "", imagesJson: "", major_muscles: [] }];
+export const dummyMajorSet: MajorSet[] = [{
   id: 0,
   exercise: dummyExercises[0],
   reps: 0,
@@ -40,19 +41,28 @@ const dummyEmm: Emm[] = [{ id: 9999, exercise_name: "", major_muscle_name: "" }]
 //constexts
 export const handleResetDBContext = React.createContext(() => { });
 export const ExerciseScreenContext = React.createContext(
-  { exercises: dummyExercises, handleSelected: (exercise: Exercise) => { }, handleCreate: () => { } }
+  {
+    exercises: dummyExercises, handleSelected: (exercise: Exercise) => { }, handleCreate: () => { },
+    handleFilterExercises: (keyword: string) => { },
+    filteredKeyword: ""
+  }
 );
 export const MajorSetContext = React.createContext({
-  majorSet: dummyMajorSet, handleSelected: (majorSet: MajorSet) => { }, handleCreate: (majorSet: MajorSet) => { }
+  majorSet: dummyMajorSet, handleSelected: (majorSet: MajorSet) => { },
+  handleCreate: (majorSet: MajorSet) => { },
+  handleFilterMajorSet: (keyword: string) => { },
+  filteredKeyword: "",
 });
 
 export default function App() {
   //for exercise
   const [exercises, setExercises] = useState(dummyExercises);
   const [isExDialogVisible, setExDialogVisibility] = useState(false);//Ex = exercise
-  const [aExercise, setaExercise] = useState(dummyExercises[0]);
+  const [aExercise, setAExercise] = useState(dummyExercises[0]);
   const [oldExerciseName, setOldExerciseName] = useState("");
   const [dropDownMajorMuscleNameSelected, setDropDownMajorMuscleNameSelected] = useState([""]);
+  const [filteredExercises, setFilteredExercises] = useState(dummyExercises);
+  const [filteredExerciseKeyword, setFilteredExerciseKeyword] = useState("");
 
   //shared
   const [dialogText, setDialogText] = useState("");
@@ -62,12 +72,16 @@ export default function App() {
   //for majorSet
   const [isCalendarDialogVisible, setCalendarDialogVisibility] = useState(false);
   const [isPlanDialogVisible, setPlanDialogVisibility] = useState(false);
-  const [majorSet, setMajorSet] = useState(dummyMajorSet);
-  const [aMajorSet, setAMajorSet] = useState(majorSet[0]);
+  const [majorSets, setMajorSets] = useState(dummyMajorSet);
+  const [aMajorSet, setAMajorSet] = useState(majorSets[0]);
   const [isDropDownOpen, setDropDownOpenOrNot] = useState(false);
   const [dropDownExerciseNameSelected, setDropDownExerciseNameSelected] = useState(dummyExercises[0].name);
   const [currentDate, setCurrentDate] = useState(dummyDate);
   const [changeButtonBackgroundColor, setChangeButtonBackgroundColor] = useState(styles.changeDateButtonDisabled);
+  const [filteredMajorSets, setFilteredMajorSets] = useState(dummyMajorSet);
+  const [filtredMajorSetsKeyword, setFitleredMajorSetsKeywords] = useState("");
+
+  //for major muscles
   const [majorMuscles, setMajorMuscles] = useState(dummyMajorMuscles);
   const [emm, setEmm] = useState(dummyEmm);
 
@@ -88,11 +102,11 @@ export default function App() {
         undefined,
         (_, r) => {
           tempExercises = r.rows._array;
-          tempExercises.forEach(ex3 => {
-            ex3.major_muscles = dummyMajorMuscles;
+          tempExercises.forEach(ex => {
+            ex.major_muscles = dummyMajorMuscles;
           })
-          if (majorSet[0] != undefined)
-            if (majorSet[0].exercise == dummyExercises[0])
+          if (majorSets[0] != undefined)
+            if (majorSets[0].exercise == dummyExercises[0])
               db.transaction(
                 t => {
                   t.executeSql("SELECT * FROM major_sets", [],
@@ -104,7 +118,8 @@ export default function App() {
                         let t = tempExercises.find(ex => ex.name == a[index].exercise);
                         tempMajorSet[index].exercise = t!;
                       });
-                      setMajorSet(tempMajorSet);
+                      setMajorSets(tempMajorSet);
+                      setFilteredMajorSets(tempMajorSet);
                     },
                     (_, err) => {
                       console.log(err)
@@ -113,6 +128,7 @@ export default function App() {
                 }
               )
           setExercises(tempExercises);
+          setFilteredExercises(tempExercises);
         },
         (_, e) => { console.log(e); return true; }
       ));
@@ -123,28 +139,30 @@ export default function App() {
           tempMajorMuscles = results.rows._array;
           setMajorMuscles(results.rows._array);
         }, (_, err) => { console.log(err); return true; }))
-
+    }
+    if (emm[0] == dummyEmm[0])
       db.transaction(t => t.executeSql("SELECT * from exercise_major_muscle_one_to_many;", undefined,
         (_, results) => {
           let temp_emm_one_to_many = results.rows._array;
           setEmm(temp_emm_one_to_many);
         }, (_, err) => { console.log(err); return true; }))
-    }
-    if (majorMuscles.length > 1 && exercises.length > 1 && emm.length > 1) {
-      let temp = [];
+
+    if (majorMuscles.length > 1 && exercises.length > 1 && emm.length > 1 && filteredExercises.length>0) {
       emm.forEach(x => {
-        let e2 = exercises.find(e => e.name == x.exercise_name);
+        let ex = exercises.find(e => e.name == x.exercise_name);
+        let fe = filteredExercises.find(e => e.name == x.exercise_name);
         let mm2 = majorMuscles.find(mm => mm.name == x.major_muscle_name);
-        if (e2 == undefined) {
+        if (ex == undefined )  {
           Toast.show("There is an error is extracting major muscles from each exercises");
           return;
         }
-        if (e2!.major_muscles == dummyMajorMuscles) e2!.major_muscles = [mm2!];
-        else e2!.major_muscles.push(mm2!);
+        if (ex!.major_muscles == dummyMajorMuscles) ex!.major_muscles = [mm2!];
+        else ex!.major_muscles.push(mm2!);
+
       })
       setEmm([]);
     }
-  }, [majorSet, exercises, majorMuscles]);
+  }, [majorSets, exercises, majorMuscles, filteredExercises]);
   init();
 
   const ButtonSet = () => {
@@ -233,29 +251,28 @@ export default function App() {
   const handleResetDB = () => {
     resetTables();
     setExercises(dummyExercises);
-    setMajorSet(dummyMajorSet);
+    setMajorSets(dummyMajorSet);
     setMajorMuscles(dummyMajorMuscles);
   }
+  function cancelDialog() {
+    setExDialogVisibility(false);
+    setCalendarDialogVisibility(false);
+    setPlanDialogVisibility(false);
+  }
 
+
+  // Exercises Functions:
   const handleExerciseCRUDPress = (exercise: Exercise) => {
     setEditability(false);
     setTextInputBackgroundColor(styles.textInputViewOnly);
-    setaExercise(exercise);
+    setAExercise(exercise);
     let names: string[] = [];
-    console.log(exercise.major_muscles);
     exercise.major_muscles.forEach(mm => names.push(mm.name));
     setDropDownOpenOrNot(false);
     setDropDownMajorMuscleNameSelected(names);
     setOldExerciseName(exercise.name);
     setDialogText(ExerciseInformationText);
     setExDialogVisibility(true);
-  }
-
-
-  function cancelDialog() {
-    setExDialogVisibility(false);
-    setCalendarDialogVisibility(false);
-    setPlanDialogVisibility(false);
   }
 
   let deleteExerciseConfirmation = (exercise: Exercise) => {
@@ -289,6 +306,8 @@ export default function App() {
         //correct way of removing element from a array for me. Not using delete keyword which leaves a undefined space
         Toast.show("The exercise " + deletedName + " has is deleted.");
         setExercises([...es]);
+        setFilteredExercises([...es]);
+        setFilteredExerciseKeyword("");
         setExDialogVisibility(false);
       },
       (_, err) => {
@@ -325,6 +344,8 @@ export default function App() {
           }
         })
         setExercises([...es]);
+        setFilteredExercises([...es]);
+        setFilteredExerciseKeyword("");
         Toast.show("The exercise is updated.")
         setExDialogVisibility(false);
       },
@@ -336,7 +357,7 @@ export default function App() {
   }
 
   const showCreateExerciseDialog = () => {
-    setaExercise(dummyExercises[0]);
+    setAExercise(dummyExercises[0]);
     setDropDownMajorMuscleNameSelected([]);
     setEditability(true);
     setTextInputBackgroundColor(styles.textInputEditable);
@@ -360,6 +381,8 @@ export default function App() {
         const es: Exercise[] = exercises.slice();
         es.push({ name: aExercise.name, description: aExercise.description, imagesJson: aExercise.imagesJson, major_muscles: selected });
         setExercises([...es]);
+        setFilteredExercises([...es]);
+        setFilteredExerciseKeyword("");
         Toast.show("The exercise " + aExercise.name + " is created.");
         cancelDialog();
       },
@@ -368,6 +391,22 @@ export default function App() {
         return true;
       }))
   }
+
+
+  function handleFilterExercies(keyword: string) {
+    setFilteredExercises(exercises.filter(e => (
+      e.name.includes(keyword)
+      || e.major_muscles.filter(
+        mm => mm.name.includes(keyword)
+      ).length > 0
+    )));
+    setFilteredExerciseKeyword(keyword);
+  }
+
+
+
+  //Major Set Functions:
+
   function handleMajorSetCRUDPress(majorSet: MajorSet) {
     setChangeButtonBackgroundColor(styles.changeDateButtonDisabled);
     setEditability(false);
@@ -392,7 +431,7 @@ export default function App() {
   let deleteMajorSet = (id: number) => {
     db.transaction(t => t.executeSql("DELETE FROM major_sets where id= ?", [id],
       () => {
-        let ms = majorSet.slice();
+        let ms = majorSets.slice();
         ms.forEach((ms1, i) => {
           if (ms1.id == id) {
             ms.splice(i, 1);
@@ -401,7 +440,9 @@ export default function App() {
         });
         //correct way of removing element from a array for me. Not using delete keyword which leaves a undefined space
         Toast.show("The major set is deleted.");
-        setMajorSet([...ms]);
+        setMajorSets([...ms]);
+        setFilteredMajorSets({...ms});
+        setFilteredExerciseKeyword("");
         cancelDialog();
       },
       (_, err) => {
@@ -433,14 +474,16 @@ export default function App() {
           duration_in_seconds: aMajorSet.duration_in_seconds,
           weight: aMajorSet.weight, notes: aMajorSet.notes, date: currentDate
         }
-        let ms: MajorSet[] = majorSet.slice();
+        let ms: MajorSet[] = majorSets.slice();
         ms.forEach((currentMajorSet, i) => {
           if (currentMajorSet.id == aMajorSet.id) {
             ms.splice(i, 1, toBeUpdated);
             return;
           }
         })
-        setMajorSet([...ms]);
+        setMajorSets([...ms]);
+        setFilteredMajorSets([...ms]);
+        setFilteredExerciseKeyword("");
         Toast.show("The major set is updated.")
         cancelDialog();
       },
@@ -451,33 +494,6 @@ export default function App() {
 
   }
 
-  function duplicateMajorSet() {
-    let e1: Exercise;
-    exercises.forEach(e => {
-      if (e.name == dropDownExerciseNameSelected) aMajorSet.exercise = e;
-    });
-    db.transaction(t => {
-      t.executeSql(`INSERT INTO major_sets
-           (exercise,reps,percent_complete,sets,duration_in_seconds,weight,notes,date)  
-           VALUES(?,?,?,?,?,?,?,?);`,
-        [aMajorSet.exercise.name, aMajorSet.reps, aMajorSet.percent_complete, aMajorSet.sets,
-        aMajorSet.duration_in_seconds, aMajorSet.weight,
-        aMajorSet.notes, JSON.stringify(currentDate)],
-        (_, r) => {
-          aMajorSet.date = currentDate;
-          let m = majorSet.slice();
-          m.push(aMajorSet);
-          setMajorSet([...m]);
-          cancelDialog();
-        },
-        (_, e) => {
-          console.log(e);
-          cancelDialog();
-          return true;
-        }
-      )
-    });
-  }
   function showCreateMajorSetDialog() {
     setChangeButtonBackgroundColor(styles.changeDateButtonEnabled);
     setEditability(true);
@@ -502,7 +518,6 @@ export default function App() {
     exercises.forEach(e => {
       if (e.name == dropDownExerciseNameSelected) aMajorSet.exercise = e;
     });
-    // console.log(aMajorSet );
     db.transaction(t => {
       t.executeSql(`INSERT INTO major_sets
            (exercise,reps,percent_complete,sets,duration_in_seconds,weight,notes,date)  
@@ -511,15 +526,16 @@ export default function App() {
         aMajorSet.duration_in_seconds, aMajorSet.weight,
         aMajorSet.notes, JSON.stringify(currentDate)],
         (_, r) => {
-          //  aMajorSet.id =  r.rows.item(0).id;
           aMajorSet.id = r.insertId!;
           aMajorSet.date = currentDate;
           let tempMajorSet = Object.assign({}, aMajorSet);
           console.log(tempMajorSet.id);
-          let m = majorSet.slice();
+          let m = majorSets.slice();
           m.push(tempMajorSet);
 
-          setMajorSet([...m]);
+          setMajorSets([...m]);
+          setFilteredMajorSets([...m]);
+          setFitleredMajorSetsKeywords("");
           cancelDialog();
         },
         (_, e) => {
@@ -529,6 +545,19 @@ export default function App() {
         }
       )
     });
+  }
+  function handleFilterMajorSet(keyword: string) {
+    setFilteredMajorSets(majorSets.filter(mm => (
+      (mm.percent_complete, toString()+"%").includes(keyword)
+      || mm.id.toString().includes(keyword)
+      || (mm.weight.toString() + "kg").includes(keyword)
+      || (mm.sets.toString() + "x" + mm.reps.toString()).includes(keyword)
+      || mm.exercise.name.includes(keyword)
+      || mm.exercise.major_muscles.filter(
+        mm => mm.name.includes(keyword)
+      ).length > 0
+    )));
+    setFitleredMajorSetsKeywords(keyword);
   }
   return (
     <>
@@ -740,8 +769,15 @@ export default function App() {
                   value={aExercise.name}
                   onChangeText={text => {
                     const e = Object.assign({}, aExercise);
-                    e.name = text;
-                    setaExercise(e);
+                    let parts: string[] = text.split(" ");
+                    let formattedText: string = "";
+                    parts.forEach(part => {
+                      let formatedWord = part.charAt(0).toUpperCase() + part.slice(1)
+                      formattedText = formattedText + " " + formatedWord;
+                    }
+                    );
+                    e.name = formattedText;
+                    setAExercise(e);
                   }}
                   editable={isEditable} />
               </View>
@@ -755,9 +791,8 @@ export default function App() {
                   onChangeText={text => {
                     const e = Object.assign({}, aExercise);
                     e.description = text;
-                    setaExercise(e);
-                  }
-                  }
+                    setAExercise(e);
+                  }}
                   editable={isEditable} />
               </View>
               <View style={{ flexDirection: "row", marginTop: 20 }}>
@@ -799,16 +834,45 @@ export default function App() {
         </Modal>
         <handleResetDBContext.Provider value={handleResetDB}>
           <ExerciseScreenContext.Provider value={{
-            exercises: exercises,
+            exercises: filteredExercises,
             handleSelected: handleExerciseCRUDPress,
-            handleCreate: showCreateExerciseDialog
+            handleCreate: showCreateExerciseDialog,
+            filteredKeyword: filteredExerciseKeyword,
+            handleFilterExercises: handleFilterExercies
           }}>
             <MajorSetContext.Provider value={{
-              majorSet: majorSet,
+              majorSet: filteredMajorSets,
               handleSelected: handleMajorSetCRUDPress,
-              handleCreate: showCreateMajorSetDialog
+              handleCreate: showCreateMajorSetDialog,
+              handleFilterMajorSet: handleFilterMajorSet,
+              filteredKeyword: filtredMajorSetsKeyword
             }}>
-              <Tab.Navigator>
+              <Tab.Navigator
+                screenOptions={({ route }) =>
+                ({
+                  tabBarIcon: ({ focused, color, size }) => {
+                    let iconName;
+                    switch (route.name) {
+                      case 'Plan':
+                        iconName = focused
+                          ? 'clipboard-list'
+                          : 'clipboard-list-outline';
+                        return <MaterialCommunityIcons name={iconName} size={size} color={color} />;
+                      case 'Exercises':
+                        iconName = focused
+                          ? 'arm-flex'
+                          : 'arm-flex-outline';
+                        return <MaterialCommunityIcons name={iconName} size={size} color={color} />;
+                      case 'Settings':
+                        iconName = focused
+                          ? 'settings'
+                          : 'settings-outline';
+                        return <Ionicons name={iconName} size={size} color={color} />;
+                    }
+                  },
+                  tabBarActiveTintColor: Colors.light.tint
+                })
+                }>
                 <Tab.Screen name="Plan" component={PlanScreen} />
                 <Tab.Screen name="Exercises" component={ExercisesScreen} />
                 <Tab.Screen name="Settings" component={SettingsScreen} />

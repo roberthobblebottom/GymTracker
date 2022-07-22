@@ -1,8 +1,8 @@
-import { Modal, Text, TouchableOpacity, View, StyleSheet } from 'react-native';
+import { Modal, Text, TouchableOpacity, View, StyleSheet, TextInput } from 'react-native';
 import React, { useContext } from 'react';
 import Colors from '../constants/Colors';
 import { Agenda, AgendaEntry, DateData } from 'react-native-calendars';
-import { MajorSetContext } from '../App';
+import { MajorSetContext, dummyMajorSet, dummyDate, dummyExercises } from '../App';
 import { MajorSet } from '../types';
 import Toast from 'react-native-simple-toast';
 import Layout from '../constants/Layout';
@@ -10,29 +10,41 @@ export function PlanScreen() {
   const context = useContext(MajorSetContext);
   const majorSet: MajorSet[] = context.majorSet;
   const a: { [key: string]: AgendaEntry[] } = {}
+  // console.log("=======");
+  // console.log(majorSet)
+  // console.log("=======");
   if (majorSet.length > 0)
     majorSet.forEach(ms => {
-      if (a[ms.date.dateString] == undefined) a[ms.date.dateString] = [{ name: ms.id.toString(), height: 0, day: "" }];
+      // console.log(ms.date == dummyDate);
+      if (ms == undefined) return;
+      if (ms.date == dummyDate) return;
+      if (a[ms.date.dateString] == undefined) a[ms.date.dateString] =
+        [{ name: ms.id.toString(), height: 0, day: "" }];
       else a[ms.date.dateString].push({ name: ms.id.toString(), height: 0, day: "" })
     })
   const handleCreate: Function = context.handleCreate;
   const handleSelected: Function = context.handleSelected;
+  const fitlerMajorSet: Function = context.handleFilterMajorSet;
+  const majorSetKeyword: string = context.filteredKeyword;
   return (
     <View style={{
       flexDirection: "column", flex: 1,
       justifyContent: 'flex-end', display: "flex"
     }}>
-      <Agenda items={a} 
-      initialNumToRender={10}
-      style={{
-        width: '100%',
-        transform: [{ rotateX: "180deg" }]
-      }}
-        // headerStyle={}
-        // calendarStyle={{transform:[{rotateX:"180deg"}]}}
+      <Agenda items={a}
+        initialNumToRender={10}
+        style={{
+          width: '100%',
+          // marginBottom: '-4%',
+          // paddingBottom: "17%",
+          transform: [{ rotateX: "180deg" }]
+        }}
+
         contentContainerStyle={{ margin: Layout.defaultMargin }}
         staticHeader={false}
-        hideKnob={false} showClosingKnob={true} renderEmptyDate={() => {
+        hideKnob={false}
+        showClosingKnob={true}
+        renderEmptyDate={() => {
           return (
             <View style={styles.listStyle}>
               <Text>
@@ -53,6 +65,7 @@ export function PlanScreen() {
         renderItem={(item, isFirst) => {
           if (item === undefined) return (<View><Text></Text></View>);
           let header;
+          let footer;
           let id = Number(item.name);
           let set: MajorSet | undefined = majorSet.find(element => {
             return element.id == id;
@@ -65,14 +78,17 @@ export function PlanScreen() {
             Toast.show("Error, there is a major set with undefined exercise");
             return (<View><Text>2</Text></View>);
           }
-          if (isFirst)
+          if (isFirst) {
+
+
             header = (<View><Text style={{
               fontSize: Layout.defaultFontSize * 1.5,
               color: Colors.light.tint,
               marginTop: Layout.defaultMargin
             }}>{set.date.day + "/" + set.date.month}</Text></View>);
+          }
           // console.log(set.exercise.name);
-          let labelToShow =set.id+ set.exercise.name + " \n" +
+          let labelToShow = set.id + " " + set.exercise.name + " \n" +
             +set.sets + "x" + set.reps + " " +
             set.weight + "kg "
             + ((set.duration_in_seconds != 0) ? set.duration_in_seconds + " seconds " : "") +
@@ -82,12 +98,33 @@ export function PlanScreen() {
               {header}
               <TouchableOpacity style={{
               }} onPress={() => { handleSelected(set) }}>
-                <Text style={{fontSize:Layout.defaultFontSize}}>{labelToShow}</Text>
-              </TouchableOpacity></View>
+                <Text style={{ fontSize: Layout.defaultFontSize }}>{labelToShow}</Text>
+              </TouchableOpacity>
+            </View>
           );
         }}
 
 
+      />
+      <TextInput
+        style={{
+          display: 'flex',
+          justifyContent: 'flex-end',
+          width: "100%",
+          paddingHorizontal: Layout.defaultMargin,
+          paddingBottom: Layout.defaultMargin + 5,
+          paddingTop: Layout.defaultMargin - 5,
+          // : Layout.defaultMargin,
+          fontSize: Layout.defaultFontSize,
+          marginBottom: "2%",
+          // height:Layout.defaultFontSize,
+          // borderTopWidth: 1,
+          // borderTopColor: "lightgray",
+          backgroundColor: "white",
+        }}
+        placeholder="Type here to filter major set..."
+        onChange={text => fitlerMajorSet(text.nativeEvent.text)}
+        value={majorSetKeyword}
       />
 
       <TouchableOpacity
@@ -96,8 +133,8 @@ export function PlanScreen() {
           backgroundColor: Colors.light.tint,
           height: 60, width: 60,
           bottom: '25%',
-          start: '80%'
-          , marginBottom: "-20%"
+          start: '80%',
+           marginBottom: "-20%"
 
         }}
         onPress={() => { handleCreate() }}
@@ -115,11 +152,11 @@ export function PlanScreen() {
   );
 
 }
-  const styles = StyleSheet.create({
-    listStyle:{
+const styles = StyleSheet.create({
+  listStyle: {
     width: "100%", transform: [{ rotateX: "180deg" }],
-              marginHorizontal: Layout.defaultMargin,
-              marginTop: Layout.defaultMargin*2
-     
-    }
-  });
+    marginHorizontal: Layout.defaultMargin,
+    // marginTop: Layout.defaultMargin * 2
+
+  }
+});
