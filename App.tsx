@@ -1,6 +1,6 @@
 import {
   Modal, StyleSheet, View, Text, Button,
-  TouchableOpacity, Alert, LogBox, TextInput, Platform
+  TouchableOpacity, Alert, LogBox, TextInput, Platform, Pressable
 } from 'react-native';
 import { ExercisesScreen } from './screens/ExercisesScreen';
 import { SettingsScreen } from './screens/SettingsScreen';
@@ -18,6 +18,7 @@ import Layout from './constants/Layout';
 import { Calendar } from 'react-native-calendars';
 import DropDownPicker, { ItemType } from 'react-native-dropdown-picker';
 import { Ionicons, MaterialCommunityIcons, } from '@expo/vector-icons';
+import { isEntityName } from 'typescript';
 LogBox.ignoreLogs(['Require cycle:']);
 const Tab = createBottomTabNavigator();
 
@@ -36,8 +37,8 @@ export const dummyMajorSet: MajorSet[] = [{
   date: dummyDate
 }];
 const dummyMajorMuscles: MajorMuscle[] = [{ name: "", notes: "", imageJson: "" }];
-
 const dummyEmm: Emm[] = [{ id: 9999, exercise_name: "", major_muscle_name: "" }];
+
 //constexts
 export const handleResetDBContext = React.createContext(() => { });
 export const ExerciseScreenContext = React.createContext(
@@ -79,7 +80,8 @@ export default function App() {
   const [currentDate, setCurrentDate] = useState(dummyDate);
   const [changeButtonBackgroundColor, setChangeButtonBackgroundColor] = useState(styles.changeDateButtonDisabled);
   const [filteredMajorSets, setFilteredMajorSets] = useState(dummyMajorSet);
-  const [filtredMajorSetsKeyword, setFitleredMajorSetsKeywords] = useState("");
+  const [filteredMajorSetKeyword, setfilteredMajorSetsKeywords] = useState("");
+  const [numberInputBackgroundColor, setNumberInputBackgroundColor] = useState(styles.numberInputViewOnly);
 
   //for major muscles
   const [majorMuscles, setMajorMuscles] = useState(dummyMajorMuscles);
@@ -119,6 +121,7 @@ export default function App() {
                         tempMajorSet[index].exercise = t!;
                       });
                       setMajorSets(tempMajorSet);
+                      console.log("this part ran");
                       setFilteredMajorSets(tempMajorSet);
                     },
                     (_, err) => {
@@ -147,12 +150,11 @@ export default function App() {
           setEmm(temp_emm_one_to_many);
         }, (_, err) => { console.log(err); return true; }))
 
-    if (majorMuscles.length > 1 && exercises.length > 1 && emm.length > 1 && filteredExercises.length>0) {
+    if (majorMuscles.length > 1 && exercises.length > 1 && emm.length > 1) {
       emm.forEach(x => {
         let ex = exercises.find(e => e.name == x.exercise_name);
-        let fe = filteredExercises.find(e => e.name == x.exercise_name);
         let mm2 = majorMuscles.find(mm => mm.name == x.major_muscle_name);
-        if (ex == undefined )  {
+        if (ex == undefined) {
           Toast.show("There is an error is extracting major muscles from each exercises");
           return;
         }
@@ -411,6 +413,7 @@ export default function App() {
     setChangeButtonBackgroundColor(styles.changeDateButtonDisabled);
     setEditability(false);
     setTextInputBackgroundColor(styles.textInputViewOnly);
+    setNumberInputBackgroundColor(styles.numberInputViewOnly);
     setAMajorSet(majorSet);
     setDialogText(MajorSetInformation);
     setDropDownOpenOrNot(false);
@@ -441,7 +444,7 @@ export default function App() {
         //correct way of removing element from a array for me. Not using delete keyword which leaves a undefined space
         Toast.show("The major set is deleted.");
         setMajorSets([...ms]);
-        setFilteredMajorSets({...ms});
+        setFilteredMajorSets({ ...ms });
         setFilteredExerciseKeyword("");
         cancelDialog();
       },
@@ -452,6 +455,7 @@ export default function App() {
     ));
   }
   const updateMajorSet = () => {
+    console.log(aMajorSet.duration_in_seconds)
     if (dropDownExerciseNameSelected == undefined || dropDownExerciseNameSelected == "") {
       Toast.show("exercise must be selected")
       return;
@@ -498,6 +502,7 @@ export default function App() {
     setChangeButtonBackgroundColor(styles.changeDateButtonEnabled);
     setEditability(true);
     setTextInputBackgroundColor(styles.textInputEditable);
+    setNumberInputBackgroundColor(styles.numberInputEditable);
     setAMajorSet(dummyMajorSet[0]);
     setDialogText(CreateMajorSetText);
     setPlanDialogVisibility(true);
@@ -532,10 +537,9 @@ export default function App() {
           console.log(tempMajorSet.id);
           let m = majorSets.slice();
           m.push(tempMajorSet);
-
           setMajorSets([...m]);
           setFilteredMajorSets([...m]);
-          setFitleredMajorSetsKeywords("");
+          setfilteredMajorSetsKeywords("");
           cancelDialog();
         },
         (_, e) => {
@@ -547,17 +551,29 @@ export default function App() {
     });
   }
   function handleFilterMajorSet(keyword: string) {
-    setFilteredMajorSets(majorSets.filter(mm => (
-      (mm.percent_complete, toString()+"%").includes(keyword)
-      || mm.id.toString().includes(keyword)
-      || (mm.weight.toString() + "kg").includes(keyword)
-      || (mm.sets.toString() + "x" + mm.reps.toString()).includes(keyword)
-      || mm.exercise.name.includes(keyword)
-      || mm.exercise.major_muscles.filter(
-        mm => mm.name.includes(keyword)
-      ).length > 0
-    )));
-    setFitleredMajorSetsKeywords(keyword);
+    console.log("handleFilterMajorSet");
+    let filtered = majorSets.filter(mm => {
+      //  console.log(mm.exercise.name +"   "+keyword)
+      return ((mm.percent_complete, toString() + "%").includes(keyword)
+        || mm.id.toString().includes(keyword)
+        || (mm.weight.toString() + "kg").includes(keyword)
+        || (mm.sets.toString() + "x" + mm.reps.toString()).includes(keyword)
+        || mm.exercise.name.includes(keyword)
+        || mm.exercise.major_muscles.filter(
+          mm => mm.name.includes(keyword)
+        ).length > 0
+      )
+    }
+    );
+    // console.log("===============")
+    // console.log("Keyword is :" + keyword);
+    // filtered.forEach(f => {
+    //   console.log(f.exercise.name);
+
+    // })
+    // console.log("===============")
+    setFilteredMajorSets(filtered);
+    setfilteredMajorSetsKeywords(keyword);
   }
   return (
     <>
@@ -566,7 +582,7 @@ export default function App() {
           <TouchableOpacity style={{ flex: 1, display: 'flex', justifyContent: 'flex-end' }} onPressIn={() => setPlanDialogVisibility(false)}>
             <TouchableOpacity style={{ ...styles.innerTouchableOpacity2 }} activeOpacity={1} onPress={() => setDropDownOpenOrNot(false)}>
               <Text style={{ fontSize: Layout.defaultFontSize, fontWeight: "bold" }}>{dialogText}</Text>
-              <View style={{ flexDirection: "row", marginTop: 20, marginLeft: "1%" }}>
+              <View style={{ marginLeft: "1%", ...bases.numberCRUD }}>
                 <Text style={{ fontSize: Layout.defaultFontSize, marginRight: "1%" }}>
                   Exercise:
                 </Text>
@@ -589,9 +605,6 @@ export default function App() {
                     borderColor: "white"
                   }}
                   style={{
-                    // display: 'flex',
-                    // flexDirection: "row",
-                    // // alignItems:"stretch",
                     justifyContent: "flex-end",
                     marginTop: -5, minHeight: 30, paddingVertical: 3,
                     backgroundColor: Colors.light.altBackground,
@@ -607,104 +620,202 @@ export default function App() {
                 />
 
               </View>
-              <View style={{ flexDirection: "row", marginTop: 20 }}>
+              <View style={bases.numberCRUD}>
                 <Text style={{ fontSize: Layout.defaultFontSize }}
                 > Reps: </Text>
-                <TextInput placeholder='reps'
-                  style={{ ...textInputBackgroundColor }}
-                  value={aMajorSet.reps.toString()}
-                  onChangeText={text => {
-                    const rep = Number(text);
-                    const s = Object.assign({}, aMajorSet);
-                    if (Number.isNaN(rep)) {
-                      Toast.show("Symbols other than numeric ones are not allow.");
-                      s.reps = 0;
-                    } else s.reps = rep;
-                    setAMajorSet(s);
-                  }}
-                  editable={isEditable}
-                  keyboardType="numeric" />
-              </View>
-              <View style={{ flexDirection: "row", marginTop: 20, }}>
-                <Text style={{ fontSize: Layout.defaultFontSize }}
-                > percentage complete: </Text>
-                <TextInput placeholder='percentage complete'
-                  style={{ ...textInputBackgroundColor }}
-                  value={aMajorSet.percent_complete.toString()}
-                  onChangeText={text => {
-                    const p = Number(text);
-                    const s = Object.assign({}, aMajorSet);
-                    if (Number.isNaN(p) || p > 100) {
-                      Toast.show("Percentage cannot go above 100% and symbols other than numeric ones are not allow.");
-                      s.percent_complete = 0;
+                <View style={{ flexDirection: "row", justifyContent: "space-evenly", }}>
+                  <Pressable style={changeButtonBackgroundColor} disabled={!isEditable} onPress={() => {
+                    aMajorSet.reps--
+                    if (aMajorSet.reps < 0) {
+                      aMajorSet.reps = 0
+                      return
                     }
-                    else s.percent_complete = p;
-                    setAMajorSet(s);
+                    setAMajorSet(Object.assign({}, aMajorSet))
+                  }
+                  } >
+                    <Text style={bases.incrementButton}>-</Text></Pressable>
+                  <TextInput placeholder='reps'
+                    style={{ ...numberInputBackgroundColor, width: 30 }}
+                    value={aMajorSet.reps.toString()}
+                    onChangeText={text => {
+                      const rep = Number(text);
+                      const s = Object.assign({}, aMajorSet);
+                      if (Number.isNaN(rep)) {
+                        Toast.show("Symbols other than numeric ones are not allow.");
+                        s.reps = 0;
+                      } else s.reps = rep;
+                      setAMajorSet(s);
+                    }}
+                    editable={isEditable}
+                    keyboardType="numeric" />
 
-                  }}
-                  editable={isEditable}
-                  keyboardType="numeric" />
+                  <Pressable style={{ ...changeButtonBackgroundColor, marginLeft: 0 }} disabled={!isEditable} onPress={() => {
+                    aMajorSet.reps++
+                    setAMajorSet(Object.assign({}, aMajorSet))
+                  }} >
+                    <Text style={bases.incrementButton}>+</Text></Pressable>
+
+                </View>
               </View>
-              <View style={{ flexDirection: "row", marginTop: 20 }}>
+              <View style={bases.numberCRUD}>
+                <Text style={{ fontSize: Layout.defaultFontSize }}
+                > complete(%): </Text>
+                <View style={{ flexDirection: "row", justifyContent: "space-evenly", }}>
+                  <Pressable style={changeButtonBackgroundColor} disabled={!isEditable} onPress={() => {
+                    aMajorSet.percent_complete--
+                    if (aMajorSet.percent_complete < 0) {
+                      aMajorSet.percent_complete = 0
+                      return
+                    }
+                    setAMajorSet(Object.assign({}, aMajorSet))
+                  }
+                  } >
+                    <Text style={bases.incrementButton}>-</Text>
+                  </Pressable>
+                  <TextInput placeholder='percentage complete'
+                    style={{ ...numberInputBackgroundColor, width: 30 }}
+                    value={aMajorSet.percent_complete.toString()}
+                    onChangeText={text => {
+                      const p = Number(text);
+                      const s = Object.assign({}, aMajorSet);
+                      if (Number.isNaN(p) || p > 100) {
+                        Toast.show("Percentage cannot go above 100% and symbols other than numeric ones are not allow.");
+                        s.percent_complete = 0;
+                      }
+                      else s.percent_complete = p;
+                      setAMajorSet(s);
+                    }}
+                    editable={isEditable}
+                    keyboardType="numeric" />
+                  <Pressable style={{ ...changeButtonBackgroundColor, marginLeft: 0 }} disabled={!isEditable} onPress={() => {
+                    aMajorSet.percent_complete++
+                    setAMajorSet(Object.assign({}, aMajorSet))
+                  }}>
+                    <Text style={bases.incrementButton}>+</Text>
+                  </Pressable>
+                </View>
+              </View>
+              <View style={bases.numberCRUD}>
                 <Text style={{ fontSize: Layout.defaultFontSize }}
                 > Sets: </Text>
-                <TextInput placeholder='sets'
-                  style={textInputBackgroundColor}
-                  value={aMajorSet.sets.toString()}
-                  onChangeText={text => {
-                    const sets = Number(text);
-                    const s = Object.assign({}, aMajorSet);
-                    if (Number.isNaN(sets)) {
-                      Toast.show("Symbol other than numeric ones are not allow.");
-                      s.sets = 0;
-                    } else s.sets = sets;
-                    setAMajorSet(s);
-                  }}
-                  editable={isEditable}
-                  keyboardType="numeric" />
+                <View style={{ flexDirection: "row", justifyContent: "space-evenly", }}>
+                  <Pressable style={changeButtonBackgroundColor} disabled={!isEditable} onPress={() => {
+                    aMajorSet.sets--
+                    if (aMajorSet.sets < 0) {
+                      aMajorSet.sets = 0
+                      return
+                    }
+                    setAMajorSet(Object.assign({}, aMajorSet))
+                  }
+                  } >
+                    <Text style={bases.incrementButton}>-</Text>
+                  </Pressable>
+                  <TextInput placeholder='sets'
+                    style={{ ...numberInputBackgroundColor, width: 30 }}
+                    value={aMajorSet.sets.toString()}
+                    onChangeText={text => {
+                      const sets = Number(text);
+                      const s = Object.assign({}, aMajorSet);
+                      if (Number.isNaN(sets)) {
+                        Toast.show("Symbol other than numeric ones are not allow.");
+                        s.sets = 0;
+                      } else s.sets = sets;
+                      setAMajorSet(s);
+                    }}
+                    editable={isEditable}
+                    keyboardType="numeric" />
+                  <Pressable style={{ ...changeButtonBackgroundColor, marginLeft: 0 }} disabled={!isEditable} onPress={() => {
+                    aMajorSet.sets++
+                    setAMajorSet(Object.assign({}, aMajorSet))
+                  }}>
+                    <Text style={bases.incrementButton}>+</Text>
+                  </Pressable>
+                </View>
               </View>
-              <View style={{ flexDirection: "row", marginTop: 20 }}>
+              <View style={bases.numberCRUD}>
                 <Text style={{ fontSize: Layout.defaultFontSize }}
-                > Duration: </Text>
-                <TextInput placeholder='seconds'
-                  style={{ ...textInputBackgroundColor, width: 30 }}
-                  value={aMajorSet.duration_in_seconds.toString()}
-                  onChangeText={text => {
-                    const duration = Number(text);
-                    const s = Object.assign({}, aMajorSet);
-                    if (Number.isNaN(duration)) {
-                      Toast.show("Symbol other than numeric ones are not allow.");
-                      s.duration_in_seconds = 0;
-                    } else s.duration_in_seconds = duration;
-                    setAMajorSet(s);
-                  }}
-                  editable={isEditable}
-                  keyboardType="numeric" />
-              </View>
-              <View style={{ flexDirection: "row", marginTop: 20 }}>
-                <Text style={{ fontSize: Layout.defaultFontSize }}
-                > Weight: </Text>
-                <TextInput placeholder='kg'
-                  style={textInputBackgroundColor}
-                  value={aMajorSet.weight.toString()}
-                  onChangeText={text => {
-                    const weight = Number(text);
-                    const s = Object.assign({}, aMajorSet);
-                    if (Number.isNaN(weight)) {
-                      Toast.show("Symbol other than numeric ones are not allow.");
-                      s.weight = 0;
-                    } else s.weight = weight;
-                    setAMajorSet(s);
+                > Duration (sec): </Text>
+                <View style={{ flexDirection: "row", justifyContent: "space-evenly", }}>
+                  <Pressable style={changeButtonBackgroundColor} disabled={!isEditable} onPress={() => {
+                    aMajorSet.duration_in_seconds--
+                    if (aMajorSet.duration_in_seconds < 0) {
+                      aMajorSet.duration_in_seconds = 0
+                      return
+                    }
+                    setAMajorSet(Object.assign({}, aMajorSet))
+                  }
+                  } >
+                    <Text style={bases.incrementButton}>-</Text>
+                  </Pressable>
 
-                  }}
-                  editable={isEditable}
-                  keyboardType="numeric" />
+                  <TextInput placeholder='seconds'
+
+                    style={{ ...numberInputBackgroundColor, width: 30 }}
+                    value={aMajorSet.duration_in_seconds.toString()}
+                    onChangeText={text => {
+                      const duration = Number(text);
+                      const s = Object.assign({}, aMajorSet);
+                      if (Number.isNaN(duration)) {
+                        Toast.show("Symbol other than numeric ones are not allow.");
+                        s.duration_in_seconds = 0;
+                      } else s.duration_in_seconds = duration;
+                      setAMajorSet(s);
+                    }}
+                    editable={isEditable}
+                    keyboardType="numeric" />
+                  <Pressable style={{ ...changeButtonBackgroundColor, marginLeft: 0 }} disabled={!isEditable} onPress={() => {
+                    aMajorSet.duration_in_seconds++
+                    setAMajorSet(Object.assign({}, aMajorSet))
+                  }}>
+                    <Text style={bases.incrementButton}>+</Text>
+                  </Pressable>
+
+                </View>
               </View>
-              <View style={{ flexDirection: "row", marginTop: 20 }}>
+              <View style={bases.numberCRUD}>
+                <Text style={{ fontSize: Layout.defaultFontSize }}
+                > Weight (kg): </Text>
+                <View style={{ flexDirection: "row", justifyContent: "space-evenly", }}>
+                  <Pressable style={changeButtonBackgroundColor} disabled={!isEditable} onPress={() => {
+                    let s = Object.assign({},aMajorSet)
+                    s.weight--
+                    if (s.weight < 0) {
+                      s.weight = 0
+                      return
+                    }
+                    setAMajorSet(Object.assign({}, s))
+                  }
+                  } >
+                    <Text style={bases.incrementButton}>-</Text>
+                  </Pressable>
+                  <TextInput placeholder='kg'
+                    style={{ ...numberInputBackgroundColor, width: 30 }}
+                    value={aMajorSet.weight.toString()}
+                    onChangeText={text => {
+                      const weight = Number(text);
+                      const s = Object.assign({}, aMajorSet);
+                      if (Number.isNaN(weight)) {
+                        Toast.show("Symbol other than numeric ones are not allow.");
+                        s.weight = 0;
+                      } else s.weight = weight;
+                      setAMajorSet(s);
+
+                    }}
+                    editable={isEditable}
+                    keyboardType="numeric" />
+                  <Pressable style={{ ...changeButtonBackgroundColor, marginLeft: 0 }} disabled={!isEditable} onPress={() => {
+                    aMajorSet.weight++
+                    setAMajorSet(Object.assign({}, aMajorSet))
+                  }}>
+                    <Text style={bases.incrementButton}>+</Text>
+                  </Pressable>
+                </View>
+              </View>
+              <View style={{ flexDirection: "row", marginTop: 20, display: 'flex', justifyContent: "space-between" }}>
                 <Text style={{ fontSize: Layout.defaultFontSize }}
                 > notes: </Text>
                 <TextInput placeholder='notes'
-                  style={textInputBackgroundColor}
+                  style={{ ...textInputBackgroundColor, flexGrow: 1 }}
                   value={aMajorSet.notes.toString()}
                   onChangeText={text => {
                     const s = Object.assign({}, aMajorSet);
@@ -714,18 +825,24 @@ export default function App() {
                   editable={isEditable} />
 
               </View>
-              <View style={{ flexDirection: "row", marginTop: 20 }}>
+
+
+
+              <View style={{ flexDirection: "row", marginTop: 10, display: 'flex', justifyContent: "space-between" }}>
                 <Text style={{ fontSize: Layout.defaultFontSize }}> date: {currentDate.dateString}</Text>
-                <TouchableOpacity
+                <Pressable
                   style={{
                     ...changeButtonBackgroundColor,
-                    justifyContent: "flex-end", flex: 1, alignSelf: "flex-end", paddingRight: 5
+                    paddingVertical: Layout.defaultMargin * 1.5,
                   }}
                   disabled={!isEditable} onPress={() => {
                     setCalendarDialogVisibility(true);
                   }} >
-                  <Text style={{ color: "white", textAlign: "right", fontWeight: "600" }}>CHANGE DATE</Text>
-                </TouchableOpacity>
+                  <Text style={{
+                    color: "white", fontWeight: "600", flexDirection: "column", flex: 1,
+                    marginTop: "-5%",
+                  }}>CHANGE DATE</Text>
+                </Pressable>
                 <Modal visible={isCalendarDialogVisible} animationType="fade" transparent={true} >
                   <TouchableOpacity style={{ flex: 1, display: "flex", justifyContent: "flex-end" }} onPressIn={() => setCalendarDialogVisibility(false)}>
                     <TouchableOpacity style={styles.innerTouchableOpacity2}
@@ -748,7 +865,6 @@ export default function App() {
                     </TouchableOpacity>
                   </TouchableOpacity>
                 </Modal>
-
               </View>
               {ButtonSet()}
             </TouchableOpacity>
@@ -800,16 +916,19 @@ export default function App() {
 
                   style={{
                     width: "100%", minHeight: 30,
+                    transform: [{ rotateX: "180deg" }],
                     backgroundColor: Colors.light.altBackground, borderWidth: 0, borderRadius: 0
                   }}
                   disabledStyle={{ borderWidth: 0, backgroundColor: "white" }}
                   dropDownContainerStyle={{
+                    transform: [{ rotateX: "180deg" }],
                     backgroundColor: Colors.light.altBackground, borderWidth: 0,
                     borderRadius: 0, minHeight: 500,
                   }}
-                  textStyle={{ fontSize: Layout.defaultFontSize }}
-                  searchTextInputStyle={{ borderWidth: 0 }}
+                  textStyle={{ fontSize: Layout.defaultFontSize, transform: [{ rotateX: "180deg" }] }}
+                  searchTextInputStyle={{ borderWidth: 0, zIndex: -1 }}
                   placeholderStyle={{ color: "#9E9E9E" }}
+
                   showBadgeDot={false}
                   schema={{ label: "name", value: "name" }}
                   items={majorMuscles as ItemType<string>[]}
@@ -826,6 +945,7 @@ export default function App() {
                   mode="BADGE"
                   extendableBadgeContainer={true}
                   badgeProps={{ disabled: !isEditable }}
+
                 />
               </View>
               {ButtonSet()}
@@ -841,11 +961,11 @@ export default function App() {
             handleFilterExercises: handleFilterExercies
           }}>
             <MajorSetContext.Provider value={{
-              majorSet: filteredMajorSets,
+              majorSet: majorSets,
               handleSelected: handleMajorSetCRUDPress,
               handleCreate: showCreateMajorSetDialog,
               handleFilterMajorSet: handleFilterMajorSet,
-              filteredKeyword: filtredMajorSetsKeyword
+              filteredKeyword: filteredMajorSetKeyword
             }}>
               <Tab.Navigator
                 screenOptions={({ route }) =>
@@ -887,11 +1007,20 @@ export default function App() {
 const bases = StyleSheet.create({
   textInputBase: {
     fontSize: Layout.defaultFontSize,
-    color: "black", marginTop: -5, justifyContent: "flex-end", flex: 1, textAlign: "right", paddingRight: 5
+    color: "black", marginTop: -5,
+    justifyContent: "flex-end", flex: 1, textAlign: "right", paddingRight: 5
   },
+  numberTextInput: {
+    height: 30,
+    fontSize: Layout.defaultFontSize,
+    color: "black", marginTop: 0,
+    width: 50, textAlign: "center"
 
+  },
   changeDateButtonBase: {
-    padding: Layout.defaultMargin,
+    paddingHorizontal: Layout.defaultMargin,
+    paddingTop: 10,
+    height: 30,
     // textAlign: "right",
     // margin:Layout.defaultMargin,
     marginStart: 7,
@@ -928,8 +1057,14 @@ const bases = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 4,
     elevation: 5,
-  }
+  },
+  numberCRUD: {
+    flexDirection: "row", marginTop: 20, display: 'flex', justifyContent: "space-between", maxHeight: 40
+  }, incrementButton:
+    { color: "white", fontSize: Layout.defaultFontSize, marginTop: -7 }
+
 })
+
 const styles = StyleSheet.create({
   innerTouchableOpacity2: {
     // top: '20%',
@@ -939,6 +1074,14 @@ const styles = StyleSheet.create({
     ...bases.innerTouchableOpacityBase,
     // top: '60%',
   },
+  numberInputEditable: {
+    backgroundColor: Colors.light.altBackground,
+    ...bases.numberTextInput
+  },
+  numberInputViewOnly: {
+    backgroundColor: "white",
+    ...bases.numberTextInput
+  },
   textInputEditable: {
     backgroundColor: Colors.light.altBackground,
     ...bases.textInputBase
@@ -947,7 +1090,6 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     ...bases.textInputBase
   },
-
   changeDateButtonEnabled: {
     backgroundColor: '#2196F3',
     ...bases.changeDateButtonBase

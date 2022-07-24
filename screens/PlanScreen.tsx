@@ -6,12 +6,22 @@ import { MajorSetContext, dummyMajorSet, dummyDate, dummyExercises } from '../Ap
 import { MajorSet } from '../types';
 import Toast from 'react-native-simple-toast';
 import Layout from '../constants/Layout';
+/*
+Note:
+this.renderWeekDayNames is commented out from line 325 of ./node_modules/react-native-calendars/src/agenda/index.js
+due to the fact it is rendering the week day names upside-down.
+
+and shouldUpdateComponent is commented out from ./nodes/react-native-calendars/src/agenda/reservation-list/reservation.js
+due to this issue: https://github.com/wix/react-native-calendars/issues/1589#issuecomment-995414073
+*/
 export function PlanScreen() {
   const context = useContext(MajorSetContext);
   const majorSet: MajorSet[] = context.majorSet;
   const a: { [key: string]: AgendaEntry[] } = {}
   // console.log("=======");
-  // console.log(majorSet)
+  // console.log("majorSet passed from App to PlanScreen")
+  // // console.log(majorSet)
+  // majorSet.forEach(r => console.log(r.exercise.name))
   // console.log("=======");
   if (majorSet.length > 0)
     majorSet.forEach(ms => {
@@ -32,17 +42,17 @@ export function PlanScreen() {
       justifyContent: 'flex-end', display: "flex"
     }}>
       <Agenda items={a}
-        initialNumToRender={10}
+        showOnlySelectedDayItems={true}
+        initialNumToRender={2}
         style={{
           width: '100%',
           // marginBottom: '-4%',
           // paddingBottom: "17%",
           transform: [{ rotateX: "180deg" }]
         }}
-
-        contentContainerStyle={{ margin: Layout.defaultMargin }}
-        staticHeader={false}
-        hideKnob={false}
+        showScrollIndicator={true}
+        // contentContainerStyle={{ margin: Layout.defaultMargin }}
+        // calendarStyle={ }}
         showClosingKnob={true}
         renderEmptyDate={() => {
           return (
@@ -58,14 +68,37 @@ export function PlanScreen() {
               <Text>There is no plan made for today yet.</Text>
             </View>);
         }}
-        renderDay={(date: DateData, _) => {
-          return (<View style={{ backgroundColor: "red" }}></View>);
+        renderDay={(date:DateData, item) => {
+
+          if (item === undefined||date===undefined) return (<View><Text></Text></View>);
+          let id = Number(item.name);
+          let set: MajorSet | undefined = majorSet.find(element => {
+            return element.id == id;
+          });
+          if(set==undefined) return (<View></View>);
+          let labelToShow = set.id + " " + set.exercise.name + " \n" +
+            +set.sets + "x" + set.reps + " " +
+            set.weight + "kg "
+            + ((set.duration_in_seconds != 0) ? set.duration_in_seconds + " seconds " : "") +
+            +set.percent_complete + "%"
+          let dateString = String(date);
+          let dateParts:string[]=dateString.split(" ");
+          let dateLabelToShow = dateParts[1]+" "+dateParts[2]
+          console.log(String(date))
+          return (
+            <View style={{ ...styles.listStyle ,flexDirection:"row"}}>
+              <TouchableOpacity style={{
+              }} onPress={() => { handleSelected(set) }}>
+                <Text style={{ fontSize: Layout.defaultFontSize }}>{labelToShow}</Text>
+              </TouchableOpacity>
+              {/* <Text style={{fontSize:Layout.defaultFontSize* 2,bottom:"100%"}}>{dateLabelToShow}</Text> */}
+            </View>
+          );
         }}
 
         renderItem={(item, isFirst) => {
-          if (item === undefined) return (<View><Text></Text></View>);
+          if (item === undefined || isFirst) return (<View><Text></Text></View>);
           let header;
-          let footer;
           let id = Number(item.name);
           let set: MajorSet | undefined = majorSet.find(element => {
             return element.id == id;
@@ -78,15 +111,13 @@ export function PlanScreen() {
             Toast.show("Error, there is a major set with undefined exercise");
             return (<View><Text>2</Text></View>);
           }
-          if (isFirst) {
-
-
-            header = (<View><Text style={{
-              fontSize: Layout.defaultFontSize * 1.5,
-              color: Colors.light.tint,
-              marginTop: Layout.defaultMargin
-            }}>{set.date.day + "/" + set.date.month}</Text></View>);
-          }
+          // if (isFirst) {
+          //   header = (<View><Text style={{
+          //     fontSize: Layout.defaultFontSize * 1.5,
+          //     color: Colors.light.tint,
+          //     marginTop: Layout.defaultMargin
+          //   }}>{set.date.day + "/" + set.date.month}</Text></View>);
+          // }
           // console.log(set.exercise.name);
           let labelToShow = set.id + " " + set.exercise.name + " \n" +
             +set.sets + "x" + set.reps + " " +
@@ -94,8 +125,8 @@ export function PlanScreen() {
             + ((set.duration_in_seconds != 0) ? set.duration_in_seconds + " seconds " : "") +
             +set.percent_complete + "%"
           return (
-            <View style={styles.listStyle}>
-              {header}
+            <View style={{ ...styles.listStyle }}>
+              {/* {header} */}
               <TouchableOpacity style={{
               }} onPress={() => { handleSelected(set) }}>
                 <Text style={{ fontSize: Layout.defaultFontSize }}>{labelToShow}</Text>
@@ -106,7 +137,7 @@ export function PlanScreen() {
 
 
       />
-      <TextInput
+      {/* <TextInput
         style={{
           display: 'flex',
           justifyContent: 'flex-end',
@@ -125,7 +156,7 @@ export function PlanScreen() {
         placeholder="Type here to filter major set..."
         onChange={text => fitlerMajorSet(text.nativeEvent.text)}
         value={majorSetKeyword}
-      />
+      /> */}
 
       <TouchableOpacity
         style={{
@@ -134,7 +165,7 @@ export function PlanScreen() {
           height: 60, width: 60,
           bottom: '25%',
           start: '80%',
-           marginBottom: "-20%"
+          marginBottom: "-20%"
 
         }}
         onPress={() => { handleCreate() }}

@@ -16,9 +16,9 @@ function ExercisesScreen() {
   let filteredKeyword: string = c.filteredKeyword;
   let filteredExercises: Function = c.handleFilterExercises;
   return (
-    <View style={{ flexDirection: "column", flex: 1, alignItems: 'flex-start', justifyContent: 'center' }}>
+    <View style={{flexDirection: "column", flex: 1, alignItems: 'flex-start', justifyContent: 'center' }}>
       <FlatList
-        style={{ width: '100%' }}
+        style={{ width: '100%'  ,transform:[{rotateX:"180deg"}],}}
         data={exercises}
         initialNumToRender={15}
         renderItem={
@@ -29,7 +29,7 @@ function ExercisesScreen() {
             }}
               onPress={(event: GestureResponderEvent) => handleSelected(item)}
             >
-              <Text style={{ fontSize: layoutConstants.defaultFontSize }}>
+              <Text style={{  transform:[{rotateX:"180deg"}],fontSize: layoutConstants.defaultFontSize }}>
                 {item.name}
               </Text >
             </TouchableOpacity>
