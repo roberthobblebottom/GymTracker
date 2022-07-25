@@ -38,15 +38,16 @@ export type RootTabScreenProps<Screen extends keyof RootTabParamList> = Composit
   BottomTabScreenProps<RootTabParamList, Screen>,
   NativeStackScreenProps<RootStackParamList>
 >;
-
+export enum PushPullEnum {Push="Push",Pull="Pull"}
 export type Exercise = {
   name: string,
   description: string,
   imagesJson: string,
   major_muscles: MajorMuscle[] //TODO, uncomment this when the development is ready for it.
+  push_or_pull: PushPullEnum
 }
 
-export type MajorSet = {
+export type ScheduledItem = {
   id: number,
   exercise: Exercise,
   reps: number,

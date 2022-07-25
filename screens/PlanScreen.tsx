@@ -2,8 +2,8 @@ import { Modal, Text, TouchableOpacity, View, StyleSheet, TextInput } from 'reac
 import React, { useContext } from 'react';
 import Colors from '../constants/Colors';
 import { Agenda, AgendaEntry, DateData } from 'react-native-calendars';
-import { MajorSetContext, dummyMajorSet, dummyDate, dummyExercises } from '../App';
-import { MajorSet } from '../types';
+import { ScheduledItemContext, dummyScheduledItem, dummyDate, dummyExercises } from '../App';
+import { ScheduledItem } from '../types';
 import Toast from 'react-native-simple-toast';
 import Layout from '../constants/Layout';
 /*
@@ -15,8 +15,8 @@ and shouldUpdateComponent is commented out from ./nodes/react-native-calendars/s
 due to this issue: https://github.com/wix/react-native-calendars/issues/1589#issuecomment-995414073
 */
 export function PlanScreen() {
-  const context = useContext(MajorSetContext);
-  const majorSet: MajorSet[] = context.majorSet;
+  const context = useContext(ScheduledItemContext);
+  const majorSet: ScheduledItem[] = context.majorSet;
   const a: { [key: string]: AgendaEntry[] } = {}
   // console.log("=======");
   // console.log("majorSet passed from App to PlanScreen")
@@ -34,7 +34,7 @@ export function PlanScreen() {
     })
   const handleCreate: Function = context.handleCreate;
   const handleSelected: Function = context.handleSelected;
-  const fitlerMajorSet: Function = context.handleFilterMajorSet;
+  const fitlerScheduledItem: Function = context.handleFilterScheduledItem;
   const majorSetKeyword: string = context.filteredKeyword;
   return (
     <View style={{
@@ -72,7 +72,7 @@ export function PlanScreen() {
 
           if (item === undefined||date===undefined) return (<View><Text></Text></View>);
           let id = Number(item.name);
-          let set: MajorSet | undefined = majorSet.find(element => {
+          let set: ScheduledItem | undefined = majorSet.find(element => {
             return element.id == id;
           });
           if(set==undefined) return (<View></View>);
@@ -100,7 +100,7 @@ export function PlanScreen() {
           if (item === undefined || isFirst) return (<View><Text></Text></View>);
           let header;
           let id = Number(item.name);
-          let set: MajorSet | undefined = majorSet.find(element => {
+          let set: ScheduledItem | undefined = majorSet.find(element => {
             return element.id == id;
           });
           if (set == undefined) {
@@ -154,7 +154,7 @@ export function PlanScreen() {
           backgroundColor: "white",
         }}
         placeholder="Type here to filter major set..."
-        onChange={text => fitlerMajorSet(text.nativeEvent.text)}
+        onChange={text => fitlerScheduledItem(text.nativeEvent.text)}
         value={majorSetKeyword}
       /> */}
 
