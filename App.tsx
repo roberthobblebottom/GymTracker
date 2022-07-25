@@ -95,7 +95,6 @@ export default function App() {
   const [currentDate, setCurrentDate] = useState(dummyDate);
   const [filteredScheduledItems, setFilteredScheduledItems] = useState(dummyScheduledItem);
   const [filteredScheduledItemKeyword, setfilteredScheduledItemsKeywords] = useState("");
-  console.log(d.getDate())
   const [planHeader, SetPlanHeader] = useState("Plan " + d.getDate() + "-" + (d.getMonth()+1)+"-"+d.getFullYear());
 
   //for major muscles
@@ -140,7 +139,6 @@ export default function App() {
                         tempScheduledItem[index].exercise = t!;
                       });
                       setScheduledItems(tempScheduledItem);
-                      console.log("this part ran");
                       setFilteredScheduledItems(tempScheduledItem);
                     },
                     (_, err) => {
@@ -544,7 +542,7 @@ export default function App() {
     setDropDownOpenOrNot(false);
     let parts:string[] = planHeader.split(" ")[1].split("-")
     let monthNumber: number = Number(parts[1]);
-    let month: string = monthNumber < 10 ? "0" + monthNumber.toString() : monthNumber.toString();e
+    let month: string = monthNumber < 10 ? "0" + monthNumber.toString() : monthNumber.toString()
     let day: string = Number(parts[0]) < 10 ? "0" + parts[0] : parts[0];
     console.log(parts)
     setCurrentDate({
@@ -592,9 +590,7 @@ export default function App() {
     })
   }
   function handleFilterScheduledItem(keyword: string) {
-    console.log("handleFilterScheduledItem");
     let filtered = scheduledItems.filter(mm => {
-      //  console.log(mm.exercise.name +"   "+keyword)
       return ((mm.percent_complete, toString() + "%").includes(keyword)
         || mm.id.toString().includes(keyword)
         || (mm.weight.toString() + "kg").includes(keyword)
@@ -945,7 +941,6 @@ export default function App() {
                       <Calendar
                         initialDate={currentDate.dateString}
                         onDayPress={day => {
-                          console.log(day);
                           const s = Object.assign({}, aScheduledItem);
                           s.date = day;
                           setCurrentDate(day);
@@ -1084,7 +1079,7 @@ export default function App() {
             handleFilterExercises: handleFilterExercies
           }}>
             <ScheduledItemContext.Provider value={{
-              majorSet: scheduledItems,
+              majorSet: filteredScheduledItems,
               handleSelected: handleScheduledItemCRUDPress,
               handleCreate: showCreateScheduledItemDialog,
               handleFilterScheduledItem: handleFilterScheduledItem,

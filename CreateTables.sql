@@ -1,50 +1,3 @@
-import * as SQLite from 'expo-sqlite';
-import Toast from 'react-native-simple-toast';
-import FileSystem from 'expo-file-system';
-import * as Asset from 'expo-asset';
-const db = SQLite. openDatabase('GymTracker.db');
-function init() {
-    // resetTables();
-    db.transaction(t =>
-        t.executeSql('SELECT 1 FROM sqlite_master WHERE type = ? AND name = ?',
-            ['table', 'exercise'],
-            (_, r) => {
-                if (r.rows.item(0) === undefined) createData(false);
-                // else console.log("init(): tables and data are already present");
-            }
-        ));
-}
- function createData(showResetAlert: boolean) {
-    console.log("creating tables and inserting data");
-    let splittedCommands: Array<string> = commands.split(";");
-    splittedCommands.forEach(c => db.transaction(t => t.executeSql(c, undefined, undefined,
-        (_, e) => { console.log(e); return true }
-    )))
-    if (showResetAlert) Toast.show("Database had been reset.");
-}
-function resetTables() {
-    console.log("resetting tables");
-    db.transaction(t => t.executeSql("DROP TABLE if exists exercise"));
-    db.transaction(t => t.executeSql('DROP TABLE if exists major_muscle'));
-    db.transaction(t => t.executeSql('DROP TABLE if exists scheduled_item'));
-    db.transaction(t => t.executeSql('DROP TABLE if exists exercise_major_muscle_one_to_many'));
-
-    console.log("droped tables");
-    createData(true);
-}
-// async function openDatabase()) {
-//     if (!(await FileSystem.getInfoAsync(FileSystem.documentDirectory + 'SQLite')).exists) {
-//       await FileSystem.makeDirectoryAsync(FileSystem.documentDirectory + 'SQLite');
-//     }
-//     await FileSystem.downloadAsync(
-//       Asset.Asset.fromModule(require())).uri,
-//       FileSystem.documentDirectory + 'SQLite/GymTracker.db'
-//     );
-//     // return SQLite.openDatabase('GymTracker.db');
-//   }
-  
-export { resetTables, init, db };//TODO: remove dropTables in production.
-const commands = `
 CREATE TABLE IF NOT EXISTS "scheduled_item" (
 	"id"	INTEGER PRIMARY KEY AUTOINCREMENT,
 	"exercise"	TEXT NOT NULL,
@@ -210,4 +163,3 @@ INSERT INTO "exercise" VALUES ('Leg Press',"Push",'TESTING DESCRIPTION',"{}");
 INSERT INTO "exercise" VALUES ('Lunge',"Push",'TESTING DESCRIPTION',"{}");
 INSERT INTO "exercise" VALUES ('Calf Raise',"Push",'TESTING DESCRIPTION',"{}");
 
-`;

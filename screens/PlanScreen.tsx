@@ -130,7 +130,7 @@ export function PlanScreen() {
 
 
       />
-      {/* <TextInput
+      <TextInput
         style={{
           display: 'flex',
           justifyContent: 'flex-end',
@@ -138,18 +138,14 @@ export function PlanScreen() {
           paddingHorizontal: Layout.defaultMargin,
           paddingBottom: Layout.defaultMargin + 5,
           paddingTop: Layout.defaultMargin - 5,
-          // : Layout.defaultMargin,
           fontSize: Layout.defaultFontSize,
           marginBottom: "2%",
-          // height:Layout.defaultFontSize,
-          // borderTopWidth: 1,
-          // borderTopColor: "lightgray",
           backgroundColor: "white",
         }}
-        placeholder="Type here to filter major set..."
+        placeholder="Type here to filter items per day..."
         onChange={text => fitlerScheduledItem(text.nativeEvent.text)}
         value={majorSetKeyword}
-      /> */}
+      />
 
       <TouchableOpacity
         style={{
