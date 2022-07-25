@@ -68,25 +68,25 @@ export function PlanScreen() {
               <Text>There is no plan made for today yet.</Text>
             </View>);
         }}
-        renderDay={(date:DateData, item) => {
+        renderDay={(date: DateData, item) => {
 
-          if (item === undefined||date===undefined) return (<View><Text></Text></View>);
+          if (item === undefined || date === undefined) return (<View><Text></Text></View>);
           let id = Number(item.name);
           let set: ScheduledItem | undefined = majorSet.find(element => {
             return element.id == id;
           });
-          if(set==undefined) return (<View></View>);
+          if (set == undefined) return (<View></View>);
           let labelToShow = set.id + " " + set.exercise.name + " \n" +
             +set.sets + "x" + set.reps + " " +
             set.weight + "kg "
             + ((set.duration_in_seconds != 0) ? set.duration_in_seconds + " seconds " : "") +
             +set.percent_complete + "%"
           let dateString = String(date);
-          let dateParts:string[]=dateString.split(" ");
-          let dateLabelToShow = dateParts[1]+" "+dateParts[2]
+          let dateParts: string[] = dateString.split(" ");
+          let dateLabelToShow = dateParts[1] + " " + dateParts[2]
           console.log(String(date))
           return (
-            <View style={{ ...styles.listStyle ,flexDirection:"row"}}>
+            <View style={{ ...styles.listStyle, flexDirection: "row" }}>
               <TouchableOpacity style={{
               }} onPress={() => { handleSelected(set) }}>
                 <Text style={{ fontSize: Layout.defaultFontSize }}>{labelToShow}</Text>
@@ -122,7 +122,9 @@ export function PlanScreen() {
           let labelToShow = set.id + " " + set.exercise.name + " \n" +
             +set.sets + "x" + set.reps + " " +
             set.weight + "kg "
-            + ((set.duration_in_seconds != 0) ? set.duration_in_seconds + " seconds " : "") +
+            + ((set.duration_in_seconds != 0)
+              ? Math.floor(set.duration_in_seconds / 60) + " minutes " + set.duration_in_seconds % 60 + " seconds "
+              : "") +
             +set.percent_complete + "%"
           return (
             <View style={{ ...styles.listStyle }}>

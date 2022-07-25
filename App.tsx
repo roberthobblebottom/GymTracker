@@ -643,7 +643,43 @@ export default function App() {
                   closeAfterSelecting={true}
                   closeOnBackPressed={true}
                 />
-
+              </View>
+              <View style={bases.numberCRUD}>
+                <Text style={{ fontSize: Layout.defaultFontSize }}
+                > Sets: </Text>
+                <View style={{ flexDirection: "row", justifyContent: "space-evenly", }}>
+                  <Pressable style={buttonStyle} disabled={!isEditable} onPress={() => {
+                    aScheduledItem.sets--
+                    if (aScheduledItem.sets < 0) {
+                      aScheduledItem.sets = 0
+                      return
+                    }
+                    setAScheduledItem(Object.assign({}, aScheduledItem))
+                  }
+                  } >
+                    <Text style={bases.incrementButton}>-</Text>
+                  </Pressable>
+                  <TextInput placeholder='sets'
+                    style={{ ...numberInputStyle, width: 30 }}
+                    value={aScheduledItem.sets.toString()}
+                    onChangeText={text => {
+                      const sets = Number(text);
+                      const s = Object.assign({}, aScheduledItem);
+                      if (Number.isNaN(sets)) {
+                        Toast.show("Symbol other than numeric ones are not allow.");
+                        s.sets = 0;
+                      } else s.sets = sets;
+                      setAScheduledItem(s);
+                    }}
+                    editable={isEditable}
+                    keyboardType="numeric" />
+                  <Pressable style={{ ...buttonStyle, marginLeft: 0 }} disabled={!isEditable} onPress={() => {
+                    aScheduledItem.sets++
+                    setAScheduledItem(Object.assign({}, aScheduledItem))
+                  }}>
+                    <Text style={bases.incrementButton}>+</Text>
+                  </Pressable>
+                </View>
               </View>
               <View style={bases.numberCRUD}>
                 <Text style={{ fontSize: Layout.defaultFontSize }}
@@ -725,43 +761,7 @@ export default function App() {
                   </Pressable>
                 </View>
               </View>
-              <View style={bases.numberCRUD}>
-                <Text style={{ fontSize: Layout.defaultFontSize }}
-                > Sets: </Text>
-                <View style={{ flexDirection: "row", justifyContent: "space-evenly", }}>
-                  <Pressable style={buttonStyle} disabled={!isEditable} onPress={() => {
-                    aScheduledItem.sets--
-                    if (aScheduledItem.sets < 0) {
-                      aScheduledItem.sets = 0
-                      return
-                    }
-                    setAScheduledItem(Object.assign({}, aScheduledItem))
-                  }
-                  } >
-                    <Text style={bases.incrementButton}>-</Text>
-                  </Pressable>
-                  <TextInput placeholder='sets'
-                    style={{ ...numberInputStyle, width: 30 }}
-                    value={aScheduledItem.sets.toString()}
-                    onChangeText={text => {
-                      const sets = Number(text);
-                      const s = Object.assign({}, aScheduledItem);
-                      if (Number.isNaN(sets)) {
-                        Toast.show("Symbol other than numeric ones are not allow.");
-                        s.sets = 0;
-                      } else s.sets = sets;
-                      setAScheduledItem(s);
-                    }}
-                    editable={isEditable}
-                    keyboardType="numeric" />
-                  <Pressable style={{ ...buttonStyle, marginLeft: 0 }} disabled={!isEditable} onPress={() => {
-                    aScheduledItem.sets++
-                    setAScheduledItem(Object.assign({}, aScheduledItem))
-                  }}>
-                    <Text style={bases.incrementButton}>+</Text>
-                  </Pressable>
-                </View>
-              </View>
+
               <View style={bases.numberCRUD}>
                 <Text style={{ fontSize: Layout.defaultFontSize }}
                 > Duration  min: </Text>
@@ -829,11 +829,11 @@ export default function App() {
                     value={aExerciseSeconds.toString()}
                     onChangeText={text => {
                       const min = Number(text);
-                      if (min< 0) {
+                      if (min < 0) {
                         setAExerciseSeconds(0);
                         Toast.show("Seconds cannot be negative");
                       }
-                      else if (isNaN(min)){
+                      else if (isNaN(min)) {
                         setAExerciseSeconds(0);
                         Toast.show("Seconds must be a number.")
                       }
