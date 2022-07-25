@@ -21,8 +21,8 @@ import { Ionicons, MaterialCommunityIcons, } from '@expo/vector-icons';
 import { isEntityName } from 'typescript';
 import { Header } from 'react-native/Libraries/NewAppScreen';
 import _default from 'babel-plugin-transform-typescript-metadata';
-LogBox.ignoreLogs(['Require cycle:']);
-const Tab = createBottomTabNavigator();
+LogBox.ignoreLogs(['Require cycle:'])
+const Tab = createBottomTabNavigator()
 
 //dummy constant values
 export const dummyDate = { year: 0, month: 0, day: 0, timestamp: 0, dateString: "" };
@@ -41,65 +41,65 @@ export const dummyScheduledItem: ScheduledItem[] = [{
 const dummyMajorMuscles: MajorMuscle[] = [{ name: "", notes: "", imageJson: "" }];
 const dummyEmm: Emm[] = [{ id: 9999, exercise_name: "", major_muscle_name: "" }];
 
-let d: Date = new Date();
+let d: Date = new Date()
 //constexts
-export const handleResetDBContext = React.createContext(() => { });
+export const handleResetDBContext = React.createContext(() => { })
 export const ExerciseScreenContext = React.createContext(
   {
     exercises: dummyExercises, handleSelected: (exercise: Exercise) => { }, handleCreate: () => { },
     handleFilterExercises: (keyword: string) => { },
     filteredKeyword: ""
   }
-);
+)
 export const ScheduledItemContext = React.createContext({
   majorSet: dummyScheduledItem, handleSelected: (majorSet: ScheduledItem) => { },
   handleCreate: (majorSet: ScheduledItem) => { },
   handleFilterScheduledItem: (keyword: string) => { },
   filteredKeyword: "",
   handlePlanHeader: (date: DateData) => { }
-});
+})
 
 export default function App() {
   //for exercise
-  const [exercises, setExercises] = useState(dummyExercises);
-  const [isExDialogVisible, setExDialogVisibility] = useState(false);//Ex = exercise
-  const [aExercise, setAExercise] = useState(dummyExercises[0]);
-  const [oldExerciseName, setOldExerciseName] = useState("");
-  const [dropDownMajorMuscleNameSelected, setDropDownMajorMuscleNameSelected] = useState([""]);
-  const [filteredExercises, setFilteredExercises] = useState(dummyExercises);
-  const [filteredExerciseKeyword, setFilteredExerciseKeyword] = useState("");
-  const [openPushPullDropDown, setOpenPushPullDropDown] = useState(false);
-  const [pushPullDropDownValue, setPushPullDropDownValue] = useState(PushPullEnum.Push);
+  const [exercises, setExercises] = useState(dummyExercises)
+  const [isExDialogVisible, setExDialogVisibility] = useState(false)//Ex = exercise
+  const [aExercise, setAExercise] = useState(dummyExercises[0])
+  const [oldExerciseName, setOldExerciseName] = useState("")
+  const [dropDownMajorMuscleNameSelected, setDropDownMajorMuscleNameSelected] = useState([""])
+  const [filteredExercises, setFilteredExercises] = useState(dummyExercises)
+  const [filteredExerciseKeyword, setFilteredExerciseKeyword] = useState("")
+  const [openPushPullDropDown, setOpenPushPullDropDown] = useState(false)
+  const [pushPullDropDownValue, setPushPullDropDownValue] = useState(PushPullEnum.Push)
   const [pushPullDropDownList, setPushPullDropDownList] = useState(
     [
       { label: PushPullEnum.Push, value: PushPullEnum.Push },
       { label: PushPullEnum.Pull, value: PushPullEnum.Pull }
     ]
-  );
-  const [aExerciseMinutes, setAExerciseMinutes] = useState(0);
+  )
+  const [aExerciseMinutes, setAExerciseMinutes] = useState(0)
 
-  const [aExerciseSeconds, setAExerciseSeconds] = useState(0);
+  const [aExerciseSeconds, setAExerciseSeconds] = useState(0)
 
   //shared
-  const [dialogText, setDialogText] = useState("");
-  // const [textInputStyle, setTextInputBackgroundColor] = useState(styles.textInputViewOnly);
-  const [isEditable, setEditability] = useState(false);
+  const [dialogText, setDialogText] = useState("")
+  // const [textInputStyle, setTextInputBackgroundColor] = useState(styles.textInputViewOnly)
+  const [isEditable, setEditability] = useState(false)
 
   //for majorSet
-  const [isCalendarDialogVisible, setCalendarDialogVisibility] = useState(false);
-  const [isPlanDialogVisible, setPlanDialogVisibility] = useState(false);
-  const [scheduledItems, setScheduledItems] = useState(dummyScheduledItem);
-  const [aScheduledItem, setAScheduledItem] = useState(scheduledItems[0]);
-  const [isDropDownOpen, setDropDownOpenOrNot] = useState(false);
-  const [dropDownExerciseNameSelected, setDropDownExerciseNameSelected] = useState(dummyExercises[0].name);
-  const [currentDate, setCurrentDate] = useState(dummyDate);
-  const [filteredScheduledItems, setFilteredScheduledItems] = useState(dummyScheduledItem);
-  const [filteredScheduledItemKeyword, setfilteredScheduledItemsKeywords] = useState("");
-  const [planHeader, SetPlanHeader] = useState("Plan " + d.getDate() + "-" + (d.getMonth()+1)+"-"+d.getFullYear());
+  const [isCalendarDialogVisible, setCalendarDialogVisibility] = useState(false)
+  const [isPlanDialogVisible, setPlanDialogVisibility] = useState(false)
+  const [scheduledItems, setScheduledItems] = useState(dummyScheduledItem)
+  const [aScheduledItem, setAScheduledItem] = useState(scheduledItems[0])
+  const [isDropDownOpen, setDropDownOpenOrNot] = useState(false)
+  const [dropDownExerciseNameSelected, setDropDownExerciseNameSelected] = useState(dummyExercises[0].name)
+  const [currentDate, setCurrentDate] = useState(dummyDate)
+  const [filteredScheduledItems, setFilteredScheduledItems] = useState(dummyScheduledItem)
+  const [filteredScheduledItemKeyword, setfilteredScheduledItemsKeywords] = useState("")
+  const [planHeader, SetPlanHeader] = useState("Plan " + d.getDate() + "-" + (d.getMonth() + 1) + "-" + d.getFullYear())
 
   //for major muscles
-  const [majorMuscles, setMajorMuscles] = useState(dummyMajorMuscles);
-  const [emm, setEmm] = useState(dummyEmm);
+  const [majorMuscles, setMajorMuscles] = useState(dummyMajorMuscles)
+  const [emm, setEmm] = useState(dummyEmm)
 
   //constant strings
   const ExerciseInformationText = "Exercise Information";
@@ -111,7 +111,7 @@ export default function App() {
   const DuplicateScheduledItemText: string = "Duplicate:";
 
   function handlePlanHeader(date: DateData) {
-    SetPlanHeader("Plan " + date.day + "-" + date.month+"-"+date.year)
+    SetPlanHeader("Plan " + date.day + "-" + date.month + "-" + date.year)
   }
 
   useEffect(() => {
@@ -129,60 +129,60 @@ export default function App() {
             if (scheduledItems[0].exercise == dummyExercises[0])
               db.transaction(
                 t => {
-                  t.executeSql("SELECT * FROM major_sets", [],
+                  t.executeSql("SELECT * FROM scheduled_item", [],
                     (_, results) => {
                       let tempScheduledItem: ScheduledItem[] = results.rows._array;
-                      let a = results.rows._array.slice();
+                      let a = results.rows._array.slice()
                       tempScheduledItem.forEach((ms, index) => {
-                        ms.date = JSON.parse(ms.date.toString());
-                        let t = tempExercises.find(ex => ex.name == a[index].exercise);
+                        ms.date = JSON.parse(ms.date.toString())
+                        let t = tempExercises.find(ex => ex.name == a[index].exercise)
                         tempScheduledItem[index].exercise = t!;
-                      });
-                      setScheduledItems(tempScheduledItem);
-                      setFilteredScheduledItems(tempScheduledItem);
+                      })
+                      setScheduledItems(tempScheduledItem)
+                      setFilteredScheduledItems(tempScheduledItem)
                     },
                     (_, err) => {
                       console.log(err)
                       return true;
-                    });
+                    })
                 }
               )
-          setExercises(tempExercises);
-          setFilteredExercises(tempExercises);
+          setExercises(tempExercises)
+          setFilteredExercises(tempExercises)
         },
         (_, e) => { console.log(e); return true; }
-      ));
+      ))
     if (majorMuscles[0] == dummyMajorMuscles[0]) {
       let tempMajorMuscles: MajorMuscle[];
       db.transaction(t => t.executeSql("SELECT * from major_muscle", undefined,
         (_, results) => {
           tempMajorMuscles = results.rows._array;
-          setMajorMuscles(results.rows._array);
+          setMajorMuscles(results.rows._array)
         }, (_, err) => { console.log(err); return true; }))
     }
     if (emm[0] == dummyEmm[0])
       db.transaction(t => t.executeSql("SELECT * from exercise_major_muscle_one_to_many;", undefined,
         (_, results) => {
           let temp_emm_one_to_many = results.rows._array;
-          setEmm(temp_emm_one_to_many);
+          setEmm(temp_emm_one_to_many)
         }, (_, err) => { console.log(err); return true; }))
 
     if (majorMuscles.length > 1 && exercises.length > 1 && emm.length > 1) {
       emm.forEach(x => {
-        let ex = exercises.find(e => e.name == x.exercise_name);
-        let mm2 = majorMuscles.find(mm => mm.name == x.major_muscle_name);
+        let ex = exercises.find(e => e.name == x.exercise_name)
+        let mm2 = majorMuscles.find(mm => mm.name == x.major_muscle_name)
         if (ex == undefined) {
-          Toast.show("There is an error is extracting major muscles from each exercises");
+          Toast.show("There is an error is extracting major muscles from each exercises")
           return;
         }
         if (ex!.major_muscles == dummyMajorMuscles) ex!.major_muscles = [mm2!];
-        else ex!.major_muscles.push(mm2!);
+        else ex!.major_muscles.push(mm2!)
 
       })
-      setEmm([]);
+      setEmm([])
     }
-  }, [scheduledItems, exercises, majorMuscles, filteredExercises]);
-  init();
+  }, [scheduledItems, exercises, majorMuscles, filteredExercises])
+  init()
 
   let textInputStyle, numberInputStyle, buttonStyle;
   if (isEditable) {
@@ -201,22 +201,22 @@ export default function App() {
           <View style={{ flexDirection: "row", justifyContent: "space-around", marginTop: 20 }}>
             <Button title="delete" onPress={() => deleteExerciseConfirmation(aExercise)} />
             <Button title='Edit' onPress={() => {
-              setOldExerciseName(oldExerciseName);
-              setEditability(true);
+              setOldExerciseName(oldExerciseName)
+              setEditability(true)
               textInputStyle = styles.textInputEditable;
-              setDialogText(EditExerciseText);
-              setDropDownOpenOrNot(false);
+              setDialogText(EditExerciseText)
+              setDropDownOpenOrNot(false)
             }} />
             <Button title='Cancel' onPress={() => cancelDialog()} />
           </View>
-        );
+        )
       case CreateExerciseText:
         return (
           <View style={{ flexDirection: "row", justifyContent: "space-around", marginTop: 20 }}>
             <Button title='Save' onPress={() => createExercise()}></Button>
             <Button title='Cancel' onPress={() => cancelDialog()} />
           </View>
-        );
+        )
       case EditExerciseText:
         return (
           <View style={{ flexDirection: "row", justifyContent: "space-around", marginTop: 20 }}>
@@ -224,93 +224,97 @@ export default function App() {
             <Button title='Back' onPress={() => handleExerciseCRUDPress(aExercise)} />
             <Button title='Cancel' onPress={() => cancelDialog()} />
           </View>
-        );
+        )
       case CreateScheduledItemText:
         return (
           <View style={{ flexDirection: "row", justifyContent: "space-around", marginTop: 20 }}>
             <Button title='Save' onPress={() => createScheduledItem()}></Button>
             <Button title='Cancel' onPress={() => cancelDialog()} />
           </View>
-        );
+        )
       case ScheduledItemInformation:
         return (
           <View style={{ flexDirection: "row", justifyContent: "space-around", marginTop: 20 }}>
             <Button title="delete" onPress={() => deleteScheduledItemConfirmation(aScheduledItem)} />
             <Button title='Edit' onPress={() => {
               buttonStyle = styles.changeDateButtonEnabled;
-              setEditability(true);
-              setDropDownOpenOrNot(false);
+              setEditability(true)
+              setDropDownOpenOrNot(false)
               textInputStyle = styles.textInputEditable;
-              setDialogText(EditScheduledItemText);
-              setAScheduledItem(aScheduledItem);
-              setDropDownExerciseNameSelected(aScheduledItem.exercise.name);
-              setCurrentDate(aScheduledItem.date);
+              setDialogText(EditScheduledItemText)
+              setAScheduledItem(aScheduledItem)
+              setDropDownExerciseNameSelected(aScheduledItem.exercise.name)
+              setCurrentDate(aScheduledItem.date)
             }} />
             <Button title="duplicate" onPress={() => {
               buttonStyle = styles.changeDateButtonEnabled;
-              setEditability(true);
-              setDropDownOpenOrNot(false);
+              setEditability(true)
+              setDropDownOpenOrNot(false)
               textInputStyle = styles.textInputEditable;
-              setDialogText(DuplicateScheduledItemText);
-              setAScheduledItem(aScheduledItem);
-              setDropDownExerciseNameSelected(aScheduledItem.exercise.name);
-              setCurrentDate(aScheduledItem.date);
+              setDialogText(DuplicateScheduledItemText)
+              setAScheduledItem(aScheduledItem)
+              setDropDownExerciseNameSelected(aScheduledItem.exercise.name)
+              setCurrentDate(aScheduledItem.date)
             }} />
             <Button title='Cancel' onPress={() => cancelDialog()} />
           </View>
-        );
+        )
       case DuplicateScheduledItemText:
       case EditScheduledItemText:
         return (
           <View style={{ flexDirection: "row", justifyContent: "space-around", marginTop: 20 }}>
             <Button title='Save' onPress={() => {
               switch (dialogText) {
-                case EditScheduledItemText: updateScheduledItem(); break;
-                case DuplicateScheduledItemText: createScheduledItem(); break;
+                case EditScheduledItemText:
+                  updateScheduledItem()
+                  break
+                case DuplicateScheduledItemText:
+                  createScheduledItem()
+                  break
               }
             }}></Button>
             <Button title='Back' onPress={() => handleScheduledItemCRUDPress(aScheduledItem)} />
             <Button title='Cancel' onPress={() => cancelDialog()} />
           </View>
-        );
+        )
 
     }
   }
 
   const handleResetDB = () => {
-    resetTables();
-    setExercises(dummyExercises);
-    setScheduledItems(dummyScheduledItem);
-    setMajorMuscles(dummyMajorMuscles);
+    resetTables()
+    setExercises(dummyExercises)
+    setScheduledItems(dummyScheduledItem)
+    setMajorMuscles(dummyMajorMuscles)
   }
   function cancelDialog() {
-    setExDialogVisibility(false);
-    setCalendarDialogVisibility(false);
-    setPlanDialogVisibility(false);
+    setExDialogVisibility(false)
+    setCalendarDialogVisibility(false)
+    setPlanDialogVisibility(false)
   }
 
 
   // Exercises Functions:
   const commonExercisesCRUD = (es: Exercise[]) => {
-    setExercises([...es]);
-    setFilteredExercises([...es]);
-    setFilteredExerciseKeyword("");
+    setExercises([...es])
+    setFilteredExercises([...es])
+    setFilteredExerciseKeyword("")
 
-    cancelDialog();
+    cancelDialog()
   }
   const handleExerciseCRUDPress = (exercise: Exercise) => {
-    setEditability(false);
+    setEditability(false)
     textInputStyle = styles.textInputViewOnly;
-    setAExercise(exercise);
+    setAExercise(exercise)
     let names: string[] = [];
-    exercise.major_muscles.forEach(mm => names.push(mm.name));
-    setDropDownOpenOrNot(false);
-    setDropDownMajorMuscleNameSelected(names);
-    setOldExerciseName(exercise.name);
-    setDialogText(ExerciseInformationText);
-    setExDialogVisibility(true);
-    setPushPullDropDownValue(exercise.push_or_pull);
-    setOpenPushPullDropDown(false);
+    exercise.major_muscles.forEach(mm => names.push(mm.name))
+    setDropDownOpenOrNot(false)
+    setDropDownMajorMuscleNameSelected(names)
+    setOldExerciseName(exercise.name)
+    setDialogText(ExerciseInformationText)
+    setExDialogVisibility(true)
+    setPushPullDropDownValue(exercise.push_or_pull)
+    setOpenPushPullDropDown(false)
   }
 
   let deleteExerciseConfirmation = (exercise: Exercise) => {
@@ -323,47 +327,47 @@ export default function App() {
     )
   };
   let deleteExercise = (exercise: Exercise) => {
-    let selected: MajorMuscle[] = majorMuscles.filter(x => dropDownMajorMuscleNameSelected.includes(x.name));
+    let selected: MajorMuscle[] = majorMuscles.filter(x => dropDownMajorMuscleNameSelected.includes(x.name))
     selected.forEach(x =>
       db.transaction(t => t.executeSql(
         "DELETE FROM exercise_major_muscle_one_to_many WHERE exercise_name=? AND major_muscle_name=?",
         [exercise.name, x.name], undefined,
         (_, err) => { console.log(err); return true; }
       ))
-    );
+    )
     db.transaction(t => t.executeSql("DELETE FROM exercise where name= ?", [exercise.name],
       () => {
         let deletedName = exercise.name;
-        let es: Exercise[] = exercises.slice();
+        let es: Exercise[] = exercises.slice()
         es.forEach((currentExercise, i) => {
           if (currentExercise.name == deletedName) {
-            es.splice(i, 1);
+            es.splice(i, 1)
             return;
           }
-        });
+        })
         //correct way of removing element from a array for me. Not using delete keyword which leaves a undefined space
-        Toast.show("The exercise " + deletedName + " has is deleted.");
-        commonExercisesCRUD(es);
+        Toast.show("The exercise " + deletedName + " has is deleted.")
+        commonExercisesCRUD(es)
       },
       (_, err) => {
-        console.log(err);
+        console.log(err)
         return true;
       }
-    ));
+    ))
   }
   const updateExercise = () => {
-    let selected: MajorMuscle[] = majorMuscles.filter(x => dropDownMajorMuscleNameSelected.includes(x.name));
-    let toBeUpdated = selected.filter(x => !aExercise.major_muscles.includes(x));
+    let selected: MajorMuscle[] = majorMuscles.filter(x => dropDownMajorMuscleNameSelected.includes(x.name))
+    let toBeUpdated = selected.filter(x => !aExercise.major_muscles.includes(x))
     toBeUpdated.forEach(x => {
       if (toBeUpdated != undefined) db.transaction(t => t.executeSql(
         "INSERT INTO exercise_major_muscle_one_to_many (exercise_name,major_muscle_name) values (?,?)",
         [aExercise.name, x.name],
         undefined, (_, err) => { console.log(err); return true }
       ))
-    });
-    let toBeDeleted: MajorMuscle[] = selected.filter(x => !aExercise.major_muscles.includes(x));
+    })
+    let toBeDeleted: MajorMuscle[] = selected.filter(x => !aExercise.major_muscles.includes(x))
     toBeDeleted.forEach(x => db.transaction(t => t.executeSql("DELETE FROM exercise_major_muscle_one_to_many WHERE exercise_name =? AND major_muscle_name=?",
-      [aExercise.name, x.name], undefined, (_, err) => { console.log(err); return true; })));
+      [aExercise.name, x.name], undefined, (_, err) => { console.log(err); return true; })))
     db.transaction(t => t.executeSql("UPDATE exercise SET name = ?, description = ?,imagesJson=?,push_or_pull=? where name = ?",
       [aExercise.name, aExercise.description, aExercise.imagesJson, pushPullDropDownValue, oldExerciseName],
       (_, result) => {
@@ -371,10 +375,10 @@ export default function App() {
           name: aExercise.name, description: aExercise.description, imagesJson: aExercise.imagesJson,
           major_muscles: selected, push_or_pull: pushPullDropDownValue
         }
-        let es: Exercise[] = exercises.slice();
+        let es: Exercise[] = exercises.slice()
         es.forEach((currentExercise, i) => {
           if (currentExercise.name == oldExerciseName) {
-            es.splice(i, 1, exerciseToBeUpdated);
+            es.splice(i, 1, exerciseToBeUpdated)
             return;
           }
         })
@@ -389,36 +393,36 @@ export default function App() {
   }
 
   const showCreateExerciseDialog = () => {
-    setAExercise(dummyExercises[0]);
-    setDropDownMajorMuscleNameSelected([]);
-    setEditability(true);
+    setAExercise(dummyExercises[0])
+    setDropDownMajorMuscleNameSelected([])
+    setEditability(true)
     textInputStyle = styles.textInputEditable;
-    setDialogText(CreateExerciseText);
-    setExDialogVisibility(true);
-    setDropDownOpenOrNot(false);
-    setPushPullDropDownValue(PushPullEnum.Push);
-    setOpenPushPullDropDown(false);
+    setDialogText(CreateExerciseText)
+    setExDialogVisibility(true)
+    setDropDownOpenOrNot(false)
+    setPushPullDropDownValue(PushPullEnum.Push)
+    setOpenPushPullDropDown(false)
   }
 
   function createExercise() {
-    let selected: MajorMuscle[] = majorMuscles.filter(x => dropDownMajorMuscleNameSelected.includes(x.name));
+    let selected: MajorMuscle[] = majorMuscles.filter(x => dropDownMajorMuscleNameSelected.includes(x.name))
     selected.forEach(x =>
       db.transaction(t => t.executeSql(
         "INSERT INTO exercise_major_muscle_one_to_many (exercise_name, major_muscle_name)VALUES (?,?)",
         [aExercise.name, x.name], undefined,
         (_, err) => { console.log(err); return true; }
       ))
-    );
+    )
     db.transaction(t => t.executeSql("INSERT INTO exercise VALUES (?,?,?,?)",
       [aExercise.name, aExercise.description, aExercise.imagesJson, pushPullDropDownValue],
       (_, result) => {
-        const es: Exercise[] = exercises.slice();
+        const es: Exercise[] = exercises.slice()
         es.push({
           name: aExercise.name, description: aExercise.description, imagesJson: aExercise.imagesJson, major_muscles: selected,
           push_or_pull: pushPullDropDownValue
         })
         commonExercisesCRUD(es)
-        Toast.show("The exercise " + aExercise.name + " is created.");
+        Toast.show("The exercise " + aExercise.name + " is created.")
       },
       (_, err) => {
         console.log(err)
@@ -433,26 +437,31 @@ export default function App() {
       || e.major_muscles.filter(
         mm => mm.name.includes(keyword)
       ).length > 0
-    )));
-    setFilteredExerciseKeyword(keyword);
+    )))
+    setFilteredExerciseKeyword(keyword)
   }
 
 
 
-  //Major Set Functions:
-
+  //Scheduled Item Functions:
+  function commonScheduledItemCRUD(si: ScheduledItem[]) {
+    setScheduledItems([...si])
+    setFilteredScheduledItems([...si])
+    setFilteredExerciseKeyword("")
+    cancelDialog()
+  }
   function handleScheduledItemCRUDPress(scheduledItem: ScheduledItem) {
     buttonStyle = styles.changeDateButtonDisabled;
-    setEditability(false);
+    setEditability(false)
     textInputStyle = styles.textInputViewOnly;
     numberInputStyle = styles.numberInputViewOnly;
-    setAScheduledItem(scheduledItem);
-    setDialogText(ScheduledItemInformation);
-    setDropDownOpenOrNot(false);
-    setDropDownExerciseNameSelected(scheduledItem.exercise.name);
-    setExDialogVisibility(false);
-    setPlanDialogVisibility(true);
-    setCurrentDate(scheduledItem.date);
+    setAScheduledItem(scheduledItem)
+    setDialogText(ScheduledItemInformation)
+    setDropDownOpenOrNot(false)
+    setDropDownExerciseNameSelected(scheduledItem.exercise.name)
+    setExDialogVisibility(false)
+    setPlanDialogVisibility(true)
+    setCurrentDate(scheduledItem.date)
     setAExerciseMinutes(Math.floor(scheduledItem.duration_in_seconds / 60))
     setAExerciseSeconds(scheduledItem.duration_in_seconds % 60)
   }
@@ -466,27 +475,24 @@ export default function App() {
     )
   };
   let deleteScheduledItem = (id: number) => {
-    db.transaction(t => t.executeSql("DELETE FROM major_sets where id= ?", [id],
+    db.transaction(t => t.executeSql("DELETE FROM scheduled_item where id= ?", [id],
       () => {
-        let ms = scheduledItems.slice();
-        ms.forEach((ms1, i) => {
+        let si = scheduledItems.slice()
+        si.forEach((ms1, i) => {
           if (ms1.id == id) {
-            ms.splice(i, 1);
+            si.splice(i, 1)
             return;
           }
-        });
+        })
         //correct way of removing element from a array for me. Not using delete keyword which leaves a undefined space
-        Toast.show("The major set is deleted.");
-        setScheduledItems([...ms]);
-        setFilteredScheduledItems({ ...ms });
-        setFilteredExerciseKeyword("");
-        cancelDialog();
+        Toast.show("The major set is deleted.")
+        commonScheduledItemCRUD(si)
       },
       (_, err) => {
-        console.log(err);
+        console.log(err)
         return true;
       }
-    ));
+    ))
   }
   const updateScheduledItem = () => {
     let duration = aExerciseMinutes * 60 + aExerciseSeconds
@@ -497,7 +503,7 @@ export default function App() {
     let theexercise = exercises.filter((e, i, a) => {
       if (e.name == dropDownExerciseNameSelected) return e;
     })[0];
-    db.transaction(t => t.executeSql(`UPDATE major_sets 
+    db.transaction(t => t.executeSql(`UPDATE scheduled_item 
     SET exercise=?,reps=?,percent_complete=?,sets=?,duration_in_seconds=?,weight=?,notes=?,date=? 
     WHERE id=?`,
       [dropDownExerciseNameSelected, aScheduledItem.reps, aScheduledItem.percent_complete, aScheduledItem.sets,
@@ -510,18 +516,18 @@ export default function App() {
           duration_in_seconds: duration,
           weight: aScheduledItem.weight, notes: aScheduledItem.notes, date: currentDate
         }
-        let ms: ScheduledItem[] = scheduledItems.slice();
+        let ms: ScheduledItem[] = scheduledItems.slice()
         ms.forEach((currentScheduledItem, i) => {
           if (currentScheduledItem.id == aScheduledItem.id) {
-            ms.splice(i, 1, toBeUpdated);
+            ms.splice(i, 1, toBeUpdated)
             return;
           }
         })
-        setScheduledItems([...ms]);
-        setFilteredScheduledItems([...ms]);
-        setFilteredExerciseKeyword("");
+        setScheduledItems([...ms])
+        setFilteredScheduledItems([...ms])
+        setFilteredExerciseKeyword("")
         Toast.show("The major set is updated.")
-        cancelDialog();
+        cancelDialog()
       },
       (_, err) => {
         console.log(err)
@@ -532,25 +538,25 @@ export default function App() {
 
   function showCreateScheduledItemDialog() {
     buttonStyle = styles.changeDateButtonEnabled;
-    setEditability(true);
+    setEditability(true)
     textInputStyle = styles.textInputEditable;
     numberInputStyle = styles.numberInputEditable;
-    setAScheduledItem(dummyScheduledItem[0]);
-    setDialogText(CreateScheduledItemText);
-    setPlanDialogVisibility(true);
-    setDropDownExerciseNameSelected(exercises[0].name);
-    setDropDownOpenOrNot(false);
-    let parts:string[] = planHeader.split(" ")[1].split("-")
-    let monthNumber: number = Number(parts[1]);
+    setAScheduledItem(dummyScheduledItem[0])
+    setDialogText(CreateScheduledItemText)
+    setPlanDialogVisibility(true)
+    setDropDownExerciseNameSelected(exercises[0].name)
+    setDropDownOpenOrNot(false)
+    let parts: string[] = planHeader.split(" ")[1].split("-")
+    let monthNumber: number = Number(parts[1])
     let month: string = monthNumber < 10 ? "0" + monthNumber.toString() : monthNumber.toString()
     let day: string = Number(parts[0]) < 10 ? "0" + parts[0] : parts[0];
     console.log(parts)
     setCurrentDate({
-      year: Number(parts[2]), month: monthNumber, day:Number(parts[0]), timestamp: 0,
+      year: Number(parts[2]), month: monthNumber, day: Number(parts[0]), timestamp: 0,
       dateString: parts[2] + "-" + month + "-" + day
-    });
-    setAExerciseMinutes(0);
-    setAExerciseSeconds(0);
+    })
+    setAExerciseMinutes(0)
+    setAExerciseSeconds(0)
   }
 
   function createScheduledItem() {
@@ -560,26 +566,26 @@ export default function App() {
 
     exercises.forEach(e => {
       if (e.name == dropDownExerciseNameSelected) aScheduledItem.exercise = e
-    });
+    })
     db.transaction(t => {
-      t.executeSql(`INSERT INTO major_sets
+      t.executeSql(`INSERT INTO scheduled_item
            (exercise,reps,percent_complete,sets,duration_in_seconds,weight,notes,date)  
-           VALUES(?,?,?,?,?,?,?,?);`,
+           VALUES(?,?,?,?,?,?,?,?)`,
         [aScheduledItem.exercise.name, aScheduledItem.reps, aScheduledItem.percent_complete, aScheduledItem.sets,
           duration, aScheduledItem.weight,
         aScheduledItem.notes, JSON.stringify(currentDate)],
         (_, r) => {
-          aScheduledItem.id = r.insertId!
-          aScheduledItem.date = currentDate
-          aScheduledItem.duration_in_seconds = duration
+          // aScheduledItem.id = r.insertId!
           let tempScheduledItem = Object.assign({}, aScheduledItem)
+          tempScheduledItem.id = r.insertId!
+          tempScheduledItem.date = currentDate
+          tempScheduledItem.duration_in_seconds = duration
+
           console.log(tempScheduledItem.id)
           let m = scheduledItems.slice()
           m.push(tempScheduledItem)
-          setScheduledItems([...m])
-          setFilteredScheduledItems([...m])
-          setfilteredScheduledItemsKeywords("")
-          cancelDialog()
+          commonScheduledItemCRUD(m);
+          Toast.show("Scheduled item created.")
         },
         (_, e) => {
           console.log(e)
@@ -601,9 +607,9 @@ export default function App() {
         ).length > 0
       )
     }
-    );
-    setFilteredScheduledItems(filtered);
-    setfilteredScheduledItemsKeywords(keyword);
+    )
+    setFilteredScheduledItems(filtered)
+    setfilteredScheduledItemsKeywords(keyword)
   }
   return (
     <>
@@ -668,13 +674,13 @@ export default function App() {
                     style={{ ...numberInputStyle, width: 30 }}
                     value={aScheduledItem.sets.toString()}
                     onChangeText={text => {
-                      const sets = Number(text);
-                      const s = Object.assign({}, aScheduledItem);
+                      const sets = Number(text)
+                      const s = Object.assign({}, aScheduledItem)
                       if (Number.isNaN(sets)) {
-                        Toast.show("Symbol other than numeric ones are not allow.");
+                        Toast.show("Symbol other than numeric ones are not allow.")
                         s.sets = 0;
                       } else s.sets = sets;
-                      setAScheduledItem(s);
+                      setAScheduledItem(s)
                     }}
                     editable={isEditable}
                     keyboardType="numeric" />
@@ -704,13 +710,13 @@ export default function App() {
                     style={{ ...numberInputStyle, width: 30 }}
                     value={aScheduledItem.reps.toString()}
                     onChangeText={text => {
-                      const rep = Number(text);
-                      const s = Object.assign({}, aScheduledItem);
+                      const rep = Number(text)
+                      const s = Object.assign({}, aScheduledItem)
                       if (Number.isNaN(rep)) {
-                        Toast.show("Symbols other than numeric ones are not allow.");
+                        Toast.show("Symbols other than numeric ones are not allow.")
                         s.reps = 0;
                       } else s.reps = rep;
-                      setAScheduledItem(s);
+                      setAScheduledItem(s)
                     }}
                     editable={isEditable}
                     keyboardType="numeric" />
@@ -742,14 +748,14 @@ export default function App() {
                     style={{ ...numberInputStyle, width: 30 }}
                     value={aScheduledItem.percent_complete.toString()}
                     onChangeText={text => {
-                      const p = Number(text);
-                      const s = Object.assign({}, aScheduledItem);
+                      const p = Number(text)
+                      const s = Object.assign({}, aScheduledItem)
                       if (Number.isNaN(p) || p > 100) {
-                        Toast.show("Percentage cannot go above 100% and symbols other than numeric ones are not allow.");
+                        Toast.show("Percentage cannot go above 100% and symbols other than numeric ones are not allow.")
                         s.percent_complete = 100;
                       }
                       else s.percent_complete = p;
-                      setAScheduledItem(s);
+                      setAScheduledItem(s)
                     }}
                     editable={isEditable}
                     keyboardType="numeric" />
@@ -758,7 +764,7 @@ export default function App() {
                     aScheduledItem.percent_complete++
                     if (aScheduledItem.percent_complete > 100) {
                       aScheduledItem.percent_complete = 100;
-                      Toast.show("Percentage cannot go above 100% and symbols other than numeric ones are not allow.");
+                      Toast.show("Percentage cannot go above 100% and symbols other than numeric ones are not allow.")
                     }
                     setAScheduledItem(Object.assign({}, aScheduledItem))
                   }}>
@@ -776,7 +782,7 @@ export default function App() {
                     a--
                     if (a < 0) {
                       setAExerciseMinutes(0)
-                      Toast.show("Minutes cannot be less than 0.");
+                      Toast.show("Minutes cannot be less than 0.")
                       return
                     } else setAExerciseMinutes(a)
                   }
@@ -789,22 +795,22 @@ export default function App() {
                     style={{ ...numberInputStyle, width: 30 }}
                     value={aExerciseMinutes.toString()}
                     onChangeText={text => {
-                      const min = Number(text);
+                      const min = Number(text)
                       if (min < 0) {
-                        setAExerciseMinutes(0);
-                        Toast.show("Minutes cannot be negative");
+                        setAExerciseMinutes(0)
+                        Toast.show("Minutes cannot be negative")
                       } else if (isNaN(min)) {
-                        setAExerciseMinutes(0);
-                        Toast.show("Minutes must be a number");
+                        setAExerciseMinutes(0)
+                        Toast.show("Minutes must be a number")
                       }
-                      else setAExerciseMinutes(min);
+                      else setAExerciseMinutes(min)
                     }}
                     editable={isEditable}
                     keyboardType="numeric" />
                   <Pressable style={{ ...buttonStyle, marginLeft: 0 }} disabled={!isEditable} onPress={() => {
                     let a: number = aExerciseMinutes;
                     a++
-                    setAExerciseMinutes(a);
+                    setAExerciseMinutes(a)
                   }}>
                     <Text style={bases.incrementButton}>+</Text>
                   </Pressable>
@@ -820,7 +826,7 @@ export default function App() {
                     a--
                     if (a < 0) {
                       setAExerciseSeconds(0)
-                      Toast.show("Seconds cannot be negative");
+                      Toast.show("Seconds cannot be negative")
                       return
                     }
                     else setAExerciseSeconds(a)
@@ -833,16 +839,16 @@ export default function App() {
                     style={{ ...numberInputStyle, width: 30 }}
                     value={aExerciseSeconds.toString()}
                     onChangeText={text => {
-                      const min = Number(text);
+                      const min = Number(text)
                       if (min < 0) {
-                        setAExerciseSeconds(0);
-                        Toast.show("Seconds cannot be negative");
+                        setAExerciseSeconds(0)
+                        Toast.show("Seconds cannot be negative")
                       }
                       else if (isNaN(min)) {
-                        setAExerciseSeconds(0);
+                        setAExerciseSeconds(0)
                         Toast.show("Seconds must be a number.")
                       }
-                      else setAExerciseSeconds(min);
+                      else setAExerciseSeconds(min)
                     }}
                     editable={isEditable}
                     keyboardType="numeric" />
@@ -851,9 +857,9 @@ export default function App() {
                     a++
                     if (a > 59) {
                       setAExerciseSeconds(59)
-                      Toast.show("Seconds cannot be more than 59");
+                      Toast.show("Seconds cannot be more than 59")
                       return
-                    } else setAExerciseSeconds(a);
+                    } else setAExerciseSeconds(a)
                   }}>
                     <Text style={bases.incrementButton}>+</Text>
                   </Pressable>
@@ -880,13 +886,13 @@ export default function App() {
                     style={{ ...numberInputStyle, width: 30 }}
                     value={aScheduledItem.weight.toString()}
                     onChangeText={text => {
-                      const weight = Number(text);
-                      const s = Object.assign({}, aScheduledItem);
+                      const weight = Number(text)
+                      const s = Object.assign({}, aScheduledItem)
                       if (Number.isNaN(weight)) {
-                        Toast.show("Symbol other than numeric ones are not allow.");
+                        Toast.show("Symbol other than numeric ones are not allow.")
                         s.weight = 0;
                       } else s.weight = weight;
-                      setAScheduledItem(s);
+                      setAScheduledItem(s)
 
                     }}
                     editable={isEditable}
@@ -906,9 +912,9 @@ export default function App() {
                   style={{ ...textInputStyle, flexGrow: 1 }}
                   value={aScheduledItem.notes.toString()}
                   onChangeText={text => {
-                    const s = Object.assign({}, aScheduledItem);
+                    const s = Object.assign({}, aScheduledItem)
                     s.notes = text;
-                    setAScheduledItem(s);
+                    setAScheduledItem(s)
                   }}
                   editable={isEditable} />
 
@@ -917,14 +923,14 @@ export default function App() {
 
 
               <View style={{ flexDirection: "row", marginTop: 10, display: 'flex', justifyContent: "space-between" }}>
-                <Text style={{ fontSize: Layout.defaultFontSize }}> date: {currentDate.day+"-"+currentDate.month+"-"+currentDate.year}</Text>
+                <Text style={{ fontSize: Layout.defaultFontSize }}> date: {currentDate.day + "-" + currentDate.month + "-" + currentDate.year}</Text>
                 <Pressable
                   style={{
                     ...buttonStyle,
                     paddingVertical: Layout.defaultMargin * 1.5,
                   }}
                   disabled={!isEditable} onPress={() => {
-                    setCalendarDialogVisibility(true);
+                    setCalendarDialogVisibility(true)
                   }} >
                   <Text style={{
                     color: "white", fontWeight: "600", flexDirection: "column", flex: 1,
@@ -941,11 +947,11 @@ export default function App() {
                       <Calendar
                         initialDate={currentDate.dateString}
                         onDayPress={day => {
-                          const s = Object.assign({}, aScheduledItem);
+                          const s = Object.assign({}, aScheduledItem)
                           s.date = day;
-                          setCurrentDate(day);
-                          setAScheduledItem(s);
-                          setCalendarDialogVisibility(false);
+                          setCurrentDate(day)
+                          setAScheduledItem(s)
+                          setCalendarDialogVisibility(false)
 
                         }} />
                       <Button title='Cancel' onPress={() => setCalendarDialogVisibility(false)} />
@@ -971,16 +977,16 @@ export default function App() {
                   style={textInputStyle}
                   value={aExercise.name}
                   onChangeText={text => {
-                    const e = Object.assign({}, aExercise);
-                    let parts: string[] = text.split(" ");
+                    const e = Object.assign({}, aExercise)
+                    let parts: string[] = text.split(" ")
                     let formattedText: string = "";
                     parts.forEach(part => {
                       let formatedWord = part.charAt(0).toUpperCase() + part.slice(1)
                       formattedText = formattedText + " " + formatedWord;
                     }
-                    );
+                    )
                     e.name = formattedText;
-                    setAExercise(e);
+                    setAExercise(e)
                   }}
                   editable={isEditable} />
               </View>
@@ -992,9 +998,9 @@ export default function App() {
                   multiline={true} placeholder='Type in exercise description.'
                   value={aExercise.description}
                   onChangeText={text => {
-                    const e = Object.assign({}, aExercise);
+                    const e = Object.assign({}, aExercise)
                     e.description = text;
-                    setAExercise(e);
+                    setAExercise(e)
                   }}
                   editable={isEditable} />
               </View>
@@ -1124,7 +1130,7 @@ export default function App() {
         </handleResetDBContext.Provider>
       </NavigationContainer >
     </>
-  );
+  )
 }
 const bases = StyleSheet.create({
   textInputBase: {
@@ -1221,4 +1227,4 @@ const styles = StyleSheet.create({
     ...bases.changeDateButtonBase
   }
 
-});
+})
