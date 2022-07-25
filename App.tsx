@@ -596,14 +596,18 @@ export default function App() {
     })
   }
   function handleFilterScheduledItem(keyword: string) {
-    let filtered = scheduledItems.filter(mm => {
-      return ((mm.percent_complete, toString() + "%").includes(keyword)
-        || mm.id.toString().includes(keyword)
-        || (mm.weight.toString() + "kg").includes(keyword)
-        || (mm.sets.toString() + "x" + mm.reps.toString()).includes(keyword)
-        || mm.exercise.name.includes(keyword)
-        || mm.exercise.major_muscles.filter(
-          mm => mm.name.includes(keyword)
+    let filtered = scheduledItems.filter(si => {
+      let sec = si.duration_in_seconds%60;
+      let min = Math.floor(si.duration_in_seconds/60)
+      return ((si.percent_complete.toString() + "%").includes(keyword)
+        || si.id.toString().includes(keyword)
+        || (si.weight.toString() + "kg").includes(keyword)
+        || (si.sets.toString() + "x" + si.reps.toString()).includes(keyword)
+        || (min+" minutes").includes(keyword)
+        || (sec+" seconds").includes(keyword)
+        || si.exercise.name.includes(keyword)
+        || si.exercise.major_muscles.filter(
+          si => si.name.includes(keyword)
         ).length > 0
       )
     }

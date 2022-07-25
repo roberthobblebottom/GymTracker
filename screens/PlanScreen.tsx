@@ -79,7 +79,9 @@ export function PlanScreen() {
           let labelToShow = set.id + " " + set.exercise.name + " \n" +
             +set.sets + "x" + set.reps + " " +
             set.weight + "kg "
-            + ((set.duration_in_seconds != 0) ? set.duration_in_seconds + " seconds " : "") +
+            + ((set.duration_in_seconds != 0)
+              ? Math.floor(set.duration_in_seconds / 60) + " minutes " + set.duration_in_seconds % 60 + " seconds "
+              : "") +
             +set.percent_complete + "%"
           let dateString = String(date);
           let dateParts: string[] = dateString.split(" ");
@@ -96,8 +98,8 @@ export function PlanScreen() {
         }}
 
         renderItem={(item, isFirst) => {
-          if (item === undefined || isFirst) return (<View><Text></Text></View>);
           let header;
+          if (item === undefined || isFirst) return (<View><Text></Text></View>);
           let id = Number(item.name);
           let set: ScheduledItem | undefined = majorSet.find(element => {
             return element.id == id;
