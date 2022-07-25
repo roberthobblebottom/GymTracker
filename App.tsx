@@ -67,7 +67,7 @@ export default function App() {
 
   //shared
   const [dialogText, setDialogText] = useState("");
-  const [textInputBackgroundColor, setTextInputBackgroundColor] = useState(styles.textInputViewOnly);
+  // const [textInputStyle, setTextInputBackgroundColor] = useState(styles.textInputViewOnly);
   const [isEditable, setEditability] = useState(false);
 
   //for majorSet
@@ -78,10 +78,10 @@ export default function App() {
   const [isDropDownOpen, setDropDownOpenOrNot] = useState(false);
   const [dropDownExerciseNameSelected, setDropDownExerciseNameSelected] = useState(dummyExercises[0].name);
   const [currentDate, setCurrentDate] = useState(dummyDate);
-  const [changeButtonBackgroundColor, setChangeButtonBackgroundColor] = useState(styles.changeDateButtonDisabled);
+  // const [buttonStyle, setChangeButtonBackgroundColor] = useState(styles.changeDateButtonDisabled);
   const [filteredMajorSets, setFilteredMajorSets] = useState(dummyMajorSet);
   const [filteredMajorSetKeyword, setfilteredMajorSetsKeywords] = useState("");
-  const [numberInputBackgroundColor, setNumberInputBackgroundColor] = useState(styles.numberInputViewOnly);
+  // const [numberInputStyle, setNumberInputBackgroundColor] = useState(styles.numberInputViewOnly);
 
   //for major muscles
   const [majorMuscles, setMajorMuscles] = useState(dummyMajorMuscles);
@@ -167,6 +167,16 @@ export default function App() {
   }, [majorSets, exercises, majorMuscles, filteredExercises]);
   init();
 
+  let textInputStyle, numberInputStyle, buttonStyle;
+  if (isEditable) {
+    textInputStyle = styles.textInputEditable
+    numberInputStyle = styles.numberInputEditable
+    buttonStyle = styles.changeDateButtonEnabled
+  } else {
+    textInputStyle = styles.textInputViewOnly
+    numberInputStyle = styles.numberInputViewOnly
+    buttonStyle = styles.changeDateButtonDisabled
+  }
   const ButtonSet = () => {
     switch (dialogText) {
       case ExerciseInformationText:
@@ -176,7 +186,7 @@ export default function App() {
             <Button title='Edit' onPress={() => {
               setOldExerciseName(oldExerciseName);
               setEditability(true);
-              setTextInputBackgroundColor(styles.textInputEditable);
+              textInputStyle = styles.textInputEditable;
               setDialogText(EditExerciseText);
               setDropDownOpenOrNot(false);
             }} />
@@ -210,20 +220,20 @@ export default function App() {
           <View style={{ flexDirection: "row", justifyContent: "space-around", marginTop: 20 }}>
             <Button title="delete" onPress={() => deleteMajorSetConfirmation(aMajorSet)} />
             <Button title='Edit' onPress={() => {
-              setChangeButtonBackgroundColor(styles.changeDateButtonEnabled);
+              buttonStyle = styles.changeDateButtonEnabled;
               setEditability(true);
               setDropDownOpenOrNot(false);
-              setTextInputBackgroundColor(styles.textInputEditable);
+              textInputStyle = styles.textInputEditable;
               setDialogText(EditMajorSetText);
               setAMajorSet(aMajorSet);
               setDropDownExerciseNameSelected(aMajorSet.exercise.name);
               setCurrentDate(aMajorSet.date);
             }} />
             <Button title="duplicate" onPress={() => {
-              setChangeButtonBackgroundColor(styles.changeDateButtonEnabled);
+              buttonStyle = styles.changeDateButtonEnabled;
               setEditability(true);
               setDropDownOpenOrNot(false);
-              setTextInputBackgroundColor(styles.textInputEditable);
+              textInputStyle = styles.textInputEditable;
               setDialogText(DuplicateMajorSetText);
               setAMajorSet(aMajorSet);
               setDropDownExerciseNameSelected(aMajorSet.exercise.name);
@@ -264,9 +274,16 @@ export default function App() {
 
 
   // Exercises Functions:
+  const commonExercisesCRUD = (es: Exercise[]) => {
+    setExercises([...es]);
+    setFilteredExercises([...es]);
+    setFilteredExerciseKeyword("");
+
+    cancelDialog();
+  }
   const handleExerciseCRUDPress = (exercise: Exercise) => {
     setEditability(false);
-    setTextInputBackgroundColor(styles.textInputViewOnly);
+    textInputStyle = styles.textInputViewOnly;
     setAExercise(exercise);
     let names: string[] = [];
     exercise.major_muscles.forEach(mm => names.push(mm.name));
@@ -307,10 +324,7 @@ export default function App() {
         });
         //correct way of removing element from a array for me. Not using delete keyword which leaves a undefined space
         Toast.show("The exercise " + deletedName + " has is deleted.");
-        setExercises([...es]);
-        setFilteredExercises([...es]);
-        setFilteredExerciseKeyword("");
-        setExDialogVisibility(false);
+        commonExercisesCRUD(es);
       },
       (_, err) => {
         console.log(err);
@@ -345,11 +359,8 @@ export default function App() {
             return;
           }
         })
-        setExercises([...es]);
-        setFilteredExercises([...es]);
-        setFilteredExerciseKeyword("");
+        commonExercisesCRUD(es)
         Toast.show("The exercise is updated.")
-        setExDialogVisibility(false);
       },
       (_, err) => {
         console.log(err)
@@ -362,7 +373,7 @@ export default function App() {
     setAExercise(dummyExercises[0]);
     setDropDownMajorMuscleNameSelected([]);
     setEditability(true);
-    setTextInputBackgroundColor(styles.textInputEditable);
+    textInputStyle = styles.textInputEditable;
     setDialogText(CreateExerciseText);
     setExDialogVisibility(true);
     setDropDownOpenOrNot(false);
@@ -381,12 +392,9 @@ export default function App() {
       [aExercise.name, aExercise.description, aExercise.imagesJson],
       (_, result) => {
         const es: Exercise[] = exercises.slice();
-        es.push({ name: aExercise.name, description: aExercise.description, imagesJson: aExercise.imagesJson, major_muscles: selected });
-        setExercises([...es]);
-        setFilteredExercises([...es]);
-        setFilteredExerciseKeyword("");
+        es.push({ name: aExercise.name, description: aExercise.description, imagesJson: aExercise.imagesJson, major_muscles: selected })
+        commonExercisesCRUD(es)
         Toast.show("The exercise " + aExercise.name + " is created.");
-        cancelDialog();
       },
       (_, err) => {
         console.log(err)
@@ -410,10 +418,10 @@ export default function App() {
   //Major Set Functions:
 
   function handleMajorSetCRUDPress(majorSet: MajorSet) {
-    setChangeButtonBackgroundColor(styles.changeDateButtonDisabled);
+    buttonStyle = styles.changeDateButtonDisabled;
     setEditability(false);
-    setTextInputBackgroundColor(styles.textInputViewOnly);
-    setNumberInputBackgroundColor(styles.numberInputViewOnly);
+    textInputStyle = styles.textInputViewOnly;
+    numberInputStyle = styles.numberInputViewOnly;
     setAMajorSet(majorSet);
     setDialogText(MajorSetInformation);
     setDropDownOpenOrNot(false);
@@ -499,10 +507,10 @@ export default function App() {
   }
 
   function showCreateMajorSetDialog() {
-    setChangeButtonBackgroundColor(styles.changeDateButtonEnabled);
+    buttonStyle = styles.changeDateButtonEnabled;
     setEditability(true);
-    setTextInputBackgroundColor(styles.textInputEditable);
-    setNumberInputBackgroundColor(styles.numberInputEditable);
+    textInputStyle = styles.textInputEditable;
+    numberInputStyle = styles.numberInputEditable;
     setAMajorSet(dummyMajorSet[0]);
     setDialogText(CreateMajorSetText);
     setPlanDialogVisibility(true);
@@ -565,13 +573,6 @@ export default function App() {
       )
     }
     );
-    // console.log("===============")
-    // console.log("Keyword is :" + keyword);
-    // filtered.forEach(f => {
-    //   console.log(f.exercise.name);
-
-    // })
-    // console.log("===============")
     setFilteredMajorSets(filtered);
     setfilteredMajorSetsKeywords(keyword);
   }
@@ -624,7 +625,7 @@ export default function App() {
                 <Text style={{ fontSize: Layout.defaultFontSize }}
                 > Reps: </Text>
                 <View style={{ flexDirection: "row", justifyContent: "space-evenly", }}>
-                  <Pressable style={changeButtonBackgroundColor} disabled={!isEditable} onPress={() => {
+                  <Pressable style={buttonStyle} disabled={!isEditable} onPress={() => {
                     aMajorSet.reps--
                     if (aMajorSet.reps < 0) {
                       aMajorSet.reps = 0
@@ -635,7 +636,7 @@ export default function App() {
                   } >
                     <Text style={bases.incrementButton}>-</Text></Pressable>
                   <TextInput placeholder='reps'
-                    style={{ ...numberInputBackgroundColor, width: 30 }}
+                    style={{ ...numberInputStyle, width: 30 }}
                     value={aMajorSet.reps.toString()}
                     onChangeText={text => {
                       const rep = Number(text);
@@ -649,7 +650,7 @@ export default function App() {
                     editable={isEditable}
                     keyboardType="numeric" />
 
-                  <Pressable style={{ ...changeButtonBackgroundColor, marginLeft: 0 }} disabled={!isEditable} onPress={() => {
+                  <Pressable style={{ ...buttonStyle, marginLeft: 0 }} disabled={!isEditable} onPress={() => {
                     aMajorSet.reps++
                     setAMajorSet(Object.assign({}, aMajorSet))
                   }} >
@@ -661,7 +662,7 @@ export default function App() {
                 <Text style={{ fontSize: Layout.defaultFontSize }}
                 > complete(%): </Text>
                 <View style={{ flexDirection: "row", justifyContent: "space-evenly", }}>
-                  <Pressable style={changeButtonBackgroundColor} disabled={!isEditable} onPress={() => {
+                  <Pressable style={buttonStyle} disabled={!isEditable} onPress={() => {
                     aMajorSet.percent_complete--
                     if (aMajorSet.percent_complete < 0) {
                       aMajorSet.percent_complete = 0
@@ -673,7 +674,7 @@ export default function App() {
                     <Text style={bases.incrementButton}>-</Text>
                   </Pressable>
                   <TextInput placeholder='percentage complete'
-                    style={{ ...numberInputBackgroundColor, width: 30 }}
+                    style={{ ...numberInputStyle, width: 30 }}
                     value={aMajorSet.percent_complete.toString()}
                     onChangeText={text => {
                       const p = Number(text);
@@ -687,7 +688,7 @@ export default function App() {
                     }}
                     editable={isEditable}
                     keyboardType="numeric" />
-                  <Pressable style={{ ...changeButtonBackgroundColor, marginLeft: 0 }} disabled={!isEditable} onPress={() => {
+                  <Pressable style={{ ...buttonStyle, marginLeft: 0 }} disabled={!isEditable} onPress={() => {
                     aMajorSet.percent_complete++
                     setAMajorSet(Object.assign({}, aMajorSet))
                   }}>
@@ -699,7 +700,7 @@ export default function App() {
                 <Text style={{ fontSize: Layout.defaultFontSize }}
                 > Sets: </Text>
                 <View style={{ flexDirection: "row", justifyContent: "space-evenly", }}>
-                  <Pressable style={changeButtonBackgroundColor} disabled={!isEditable} onPress={() => {
+                  <Pressable style={buttonStyle} disabled={!isEditable} onPress={() => {
                     aMajorSet.sets--
                     if (aMajorSet.sets < 0) {
                       aMajorSet.sets = 0
@@ -711,7 +712,7 @@ export default function App() {
                     <Text style={bases.incrementButton}>-</Text>
                   </Pressable>
                   <TextInput placeholder='sets'
-                    style={{ ...numberInputBackgroundColor, width: 30 }}
+                    style={{ ...numberInputStyle, width: 30 }}
                     value={aMajorSet.sets.toString()}
                     onChangeText={text => {
                       const sets = Number(text);
@@ -724,7 +725,7 @@ export default function App() {
                     }}
                     editable={isEditable}
                     keyboardType="numeric" />
-                  <Pressable style={{ ...changeButtonBackgroundColor, marginLeft: 0 }} disabled={!isEditable} onPress={() => {
+                  <Pressable style={{ ...buttonStyle, marginLeft: 0 }} disabled={!isEditable} onPress={() => {
                     aMajorSet.sets++
                     setAMajorSet(Object.assign({}, aMajorSet))
                   }}>
@@ -736,7 +737,7 @@ export default function App() {
                 <Text style={{ fontSize: Layout.defaultFontSize }}
                 > Duration (sec): </Text>
                 <View style={{ flexDirection: "row", justifyContent: "space-evenly", }}>
-                  <Pressable style={changeButtonBackgroundColor} disabled={!isEditable} onPress={() => {
+                  <Pressable style={buttonStyle} disabled={!isEditable} onPress={() => {
                     aMajorSet.duration_in_seconds--
                     if (aMajorSet.duration_in_seconds < 0) {
                       aMajorSet.duration_in_seconds = 0
@@ -750,7 +751,7 @@ export default function App() {
 
                   <TextInput placeholder='seconds'
 
-                    style={{ ...numberInputBackgroundColor, width: 30 }}
+                    style={{ ...numberInputStyle, width: 30 }}
                     value={aMajorSet.duration_in_seconds.toString()}
                     onChangeText={text => {
                       const duration = Number(text);
@@ -763,7 +764,7 @@ export default function App() {
                     }}
                     editable={isEditable}
                     keyboardType="numeric" />
-                  <Pressable style={{ ...changeButtonBackgroundColor, marginLeft: 0 }} disabled={!isEditable} onPress={() => {
+                  <Pressable style={{ ...buttonStyle, marginLeft: 0 }} disabled={!isEditable} onPress={() => {
                     aMajorSet.duration_in_seconds++
                     setAMajorSet(Object.assign({}, aMajorSet))
                   }}>
@@ -776,8 +777,8 @@ export default function App() {
                 <Text style={{ fontSize: Layout.defaultFontSize }}
                 > Weight (kg): </Text>
                 <View style={{ flexDirection: "row", justifyContent: "space-evenly", }}>
-                  <Pressable style={changeButtonBackgroundColor} disabled={!isEditable} onPress={() => {
-                    let s = Object.assign({},aMajorSet)
+                  <Pressable style={buttonStyle} disabled={!isEditable} onPress={() => {
+                    let s = Object.assign({}, aMajorSet)
                     s.weight--
                     if (s.weight < 0) {
                       s.weight = 0
@@ -789,7 +790,7 @@ export default function App() {
                     <Text style={bases.incrementButton}>-</Text>
                   </Pressable>
                   <TextInput placeholder='kg'
-                    style={{ ...numberInputBackgroundColor, width: 30 }}
+                    style={{ ...numberInputStyle, width: 30 }}
                     value={aMajorSet.weight.toString()}
                     onChangeText={text => {
                       const weight = Number(text);
@@ -803,7 +804,7 @@ export default function App() {
                     }}
                     editable={isEditable}
                     keyboardType="numeric" />
-                  <Pressable style={{ ...changeButtonBackgroundColor, marginLeft: 0 }} disabled={!isEditable} onPress={() => {
+                  <Pressable style={{ ...buttonStyle, marginLeft: 0 }} disabled={!isEditable} onPress={() => {
                     aMajorSet.weight++
                     setAMajorSet(Object.assign({}, aMajorSet))
                   }}>
@@ -815,7 +816,7 @@ export default function App() {
                 <Text style={{ fontSize: Layout.defaultFontSize }}
                 > notes: </Text>
                 <TextInput placeholder='notes'
-                  style={{ ...textInputBackgroundColor, flexGrow: 1 }}
+                  style={{ ...textInputStyle, flexGrow: 1 }}
                   value={aMajorSet.notes.toString()}
                   onChangeText={text => {
                     const s = Object.assign({}, aMajorSet);
@@ -832,7 +833,7 @@ export default function App() {
                 <Text style={{ fontSize: Layout.defaultFontSize }}> date: {currentDate.dateString}</Text>
                 <Pressable
                   style={{
-                    ...changeButtonBackgroundColor,
+                    ...buttonStyle,
                     paddingVertical: Layout.defaultMargin * 1.5,
                   }}
                   disabled={!isEditable} onPress={() => {
@@ -881,7 +882,7 @@ export default function App() {
                 <Text style={{ fontSize: Layout.defaultFontSize }}
                 >Name: </Text>
                 <TextInput placeholder='Type in exercise name.'
-                  style={textInputBackgroundColor}
+                  style={textInputStyle}
                   value={aExercise.name}
                   onChangeText={text => {
                     const e = Object.assign({}, aExercise);
@@ -901,7 +902,7 @@ export default function App() {
                 <Text
                   style={{ fontSize: Layout.defaultFontSize }}
                 >Description: </Text>
-                <TextInput style={{ ...textInputBackgroundColor, fontSize: Layout.defaultFontSize }}
+                <TextInput style={{ ...textInputStyle, fontSize: Layout.defaultFontSize }}
                   multiline={true} placeholder='Type in exercise description.'
                   value={aExercise.description}
                   onChangeText={text => {
