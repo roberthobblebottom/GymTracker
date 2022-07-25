@@ -72,6 +72,9 @@ export default function App() {
       { label: PushPullEnum.Pull, value: PushPullEnum.Pull }
     ]
   );
+  const [aExerciseMinutes, setAExerciseMinutes] = useState(0);
+
+  const [aExerciseSeconds, setAExerciseSeconds] = useState(0);
 
   //shared
   const [dialogText, setDialogText] = useState("");
@@ -81,8 +84,8 @@ export default function App() {
   //for majorSet
   const [isCalendarDialogVisible, setCalendarDialogVisibility] = useState(false);
   const [isPlanDialogVisible, setPlanDialogVisibility] = useState(false);
-  const [majorSets, setScheduledItems] = useState(dummyScheduledItem);
-  const [aScheduledItem, setAScheduledItem] = useState(majorSets[0]);
+  const [scheduledItems, setScheduledItems] = useState(dummyScheduledItem);
+  const [aScheduledItem, setAScheduledItem] = useState(scheduledItems[0]);
   const [isDropDownOpen, setDropDownOpenOrNot] = useState(false);
   const [dropDownExerciseNameSelected, setDropDownExerciseNameSelected] = useState(dummyExercises[0].name);
   const [currentDate, setCurrentDate] = useState(dummyDate);
@@ -115,8 +118,8 @@ export default function App() {
           tempExercises.forEach(ex => {
             ex.major_muscles = dummyMajorMuscles;
           })
-          if (majorSets[0] != undefined)
-            if (majorSets[0].exercise == dummyExercises[0])
+          if (scheduledItems[0] != undefined)
+            if (scheduledItems[0].exercise == dummyExercises[0])
               db.transaction(
                 t => {
                   t.executeSql("SELECT * FROM major_sets", [],
@@ -172,7 +175,7 @@ export default function App() {
       })
       setEmm([]);
     }
-  }, [majorSets, exercises, majorMuscles, filteredExercises]);
+  }, [scheduledItems, exercises, majorMuscles, filteredExercises]);
   init();
 
   let textInputStyle, numberInputStyle, buttonStyle;
@@ -360,7 +363,7 @@ export default function App() {
       (_, result) => {
         let exerciseToBeUpdated: Exercise = {
           name: aExercise.name, description: aExercise.description, imagesJson: aExercise.imagesJson,
-          major_muscles: selected,push_or_pull:pushPullDropDownValue
+          major_muscles: selected, push_or_pull: pushPullDropDownValue
         }
         let es: Exercise[] = exercises.slice();
         es.forEach((currentExercise, i) => {
@@ -401,11 +404,13 @@ export default function App() {
       ))
     );
     db.transaction(t => t.executeSql("INSERT INTO exercise VALUES (?,?,?,?)",
-      [aExercise.name, aExercise.description, aExercise.imagesJson,pushPullDropDownValue],
+      [aExercise.name, aExercise.description, aExercise.imagesJson, pushPullDropDownValue],
       (_, result) => {
         const es: Exercise[] = exercises.slice();
-        es.push({ name: aExercise.name, description: aExercise.description, imagesJson: aExercise.imagesJson, major_muscles: selected,
-        push_or_pull:pushPullDropDownValue })
+        es.push({
+          name: aExercise.name, description: aExercise.description, imagesJson: aExercise.imagesJson, major_muscles: selected,
+          push_or_pull: pushPullDropDownValue
+        })
         commonExercisesCRUD(es)
         Toast.show("The exercise " + aExercise.name + " is created.");
       },
@@ -430,18 +435,20 @@ export default function App() {
 
   //Major Set Functions:
 
-  function handleScheduledItemCRUDPress(majorSet: ScheduledItem) {
+  function handleScheduledItemCRUDPress(scheduledItem: ScheduledItem) {
     buttonStyle = styles.changeDateButtonDisabled;
     setEditability(false);
     textInputStyle = styles.textInputViewOnly;
     numberInputStyle = styles.numberInputViewOnly;
-    setAScheduledItem(majorSet);
+    setAScheduledItem(scheduledItem);
     setDialogText(ScheduledItemInformation);
     setDropDownOpenOrNot(false);
-    setDropDownExerciseNameSelected(majorSet.exercise.name);
+    setDropDownExerciseNameSelected(scheduledItem.exercise.name);
     setExDialogVisibility(false);
     setPlanDialogVisibility(true);
-    setCurrentDate(majorSet.date);
+    setCurrentDate(scheduledItem.date);
+    setAExerciseMinutes(Math.floor(scheduledItem.duration_in_seconds / 60))
+    setAExerciseSeconds(scheduledItem.duration_in_seconds % 60)
   }
   let deleteScheduledItemConfirmation = (ms: ScheduledItem) => {
     Alert.alert(
@@ -455,7 +462,7 @@ export default function App() {
   let deleteScheduledItem = (id: number) => {
     db.transaction(t => t.executeSql("DELETE FROM major_sets where id= ?", [id],
       () => {
-        let ms = majorSets.slice();
+        let ms = scheduledItems.slice();
         ms.forEach((ms1, i) => {
           if (ms1.id == id) {
             ms.splice(i, 1);
@@ -476,7 +483,7 @@ export default function App() {
     ));
   }
   const updateScheduledItem = () => {
-    console.log(aScheduledItem.duration_in_seconds)
+    let duration = aExerciseMinutes * 60 + aExerciseSeconds
     if (dropDownExerciseNameSelected == undefined || dropDownExerciseNameSelected == "") {
       Toast.show("exercise must be selected")
       return;
@@ -484,22 +491,20 @@ export default function App() {
     let theexercise = exercises.filter((e, i, a) => {
       if (e.name == dropDownExerciseNameSelected) return e;
     })[0];
-    console.log(dropDownExerciseNameSelected);
-    console.log(currentDate);
     db.transaction(t => t.executeSql(`UPDATE major_sets 
     SET exercise=?,reps=?,percent_complete=?,sets=?,duration_in_seconds=?,weight=?,notes=?,date=? 
     WHERE id=?`,
       [dropDownExerciseNameSelected, aScheduledItem.reps, aScheduledItem.percent_complete, aScheduledItem.sets,
-        aScheduledItem.duration_in_seconds, aScheduledItem.weight,
+        duration, aScheduledItem.weight,
         aScheduledItem.notes, JSON.stringify(currentDate), aScheduledItem.id],
       (_, result) => {
         let toBeUpdated: ScheduledItem = {
           id: aScheduledItem.id, exercise: theexercise, reps: aScheduledItem.reps,
           percent_complete: aScheduledItem.percent_complete, sets: aScheduledItem.sets,
-          duration_in_seconds: aScheduledItem.duration_in_seconds,
+          duration_in_seconds: duration,
           weight: aScheduledItem.weight, notes: aScheduledItem.notes, date: currentDate
         }
-        let ms: ScheduledItem[] = majorSets.slice();
+        let ms: ScheduledItem[] = scheduledItems.slice();
         ms.forEach((currentScheduledItem, i) => {
           if (currentScheduledItem.id == aScheduledItem.id) {
             ms.splice(i, 1, toBeUpdated);
@@ -537,43 +542,49 @@ export default function App() {
       year: d.getFullYear(), month: monthNumber, day: d.getDate(), timestamp: 0,
       dateString: d.getFullYear() + "-" + month + "-" + day
     });
+    setAExerciseMinutes(0);
+    setAExerciseSeconds(0);
   }
 
   function createScheduledItem() {
-    let e1: Exercise;
+
+    let duration = aExerciseMinutes * 60 + aExerciseSeconds
+    let e1: Exercise
+
     exercises.forEach(e => {
-      if (e.name == dropDownExerciseNameSelected) aScheduledItem.exercise = e;
+      if (e.name == dropDownExerciseNameSelected) aScheduledItem.exercise = e
     });
     db.transaction(t => {
       t.executeSql(`INSERT INTO major_sets
            (exercise,reps,percent_complete,sets,duration_in_seconds,weight,notes,date)  
            VALUES(?,?,?,?,?,?,?,?);`,
         [aScheduledItem.exercise.name, aScheduledItem.reps, aScheduledItem.percent_complete, aScheduledItem.sets,
-        aScheduledItem.duration_in_seconds, aScheduledItem.weight,
+          duration, aScheduledItem.weight,
         aScheduledItem.notes, JSON.stringify(currentDate)],
         (_, r) => {
-          aScheduledItem.id = r.insertId!;
-          aScheduledItem.date = currentDate;
-          let tempScheduledItem = Object.assign({}, aScheduledItem);
-          console.log(tempScheduledItem.id);
-          let m = majorSets.slice();
-          m.push(tempScheduledItem);
-          setScheduledItems([...m]);
-          setFilteredScheduledItems([...m]);
-          setfilteredScheduledItemsKeywords("");
-          cancelDialog();
+          aScheduledItem.id = r.insertId!
+          aScheduledItem.date = currentDate
+          aScheduledItem.duration_in_seconds = duration
+          let tempScheduledItem = Object.assign({}, aScheduledItem)
+          console.log(tempScheduledItem.id)
+          let m = scheduledItems.slice()
+          m.push(tempScheduledItem)
+          setScheduledItems([...m])
+          setFilteredScheduledItems([...m])
+          setfilteredScheduledItemsKeywords("")
+          cancelDialog()
         },
         (_, e) => {
-          console.log(e);
-          cancelDialog();
-          return true;
+          console.log(e)
+          cancelDialog()
+          return true
         }
       )
-    });
+    })
   }
   function handleFilterScheduledItem(keyword: string) {
     console.log("handleFilterScheduledItem");
-    let filtered = majorSets.filter(mm => {
+    let filtered = scheduledItems.filter(mm => {
       //  console.log(mm.exercise.name +"   "+keyword)
       return ((mm.percent_complete, toString() + "%").includes(keyword)
         || mm.id.toString().includes(keyword)
@@ -694,7 +705,7 @@ export default function App() {
                       const s = Object.assign({}, aScheduledItem);
                       if (Number.isNaN(p) || p > 100) {
                         Toast.show("Percentage cannot go above 100% and symbols other than numeric ones are not allow.");
-                        s.percent_complete = 0;
+                        s.percent_complete = 100;
                       }
                       else s.percent_complete = p;
                       setAScheduledItem(s);
@@ -702,7 +713,12 @@ export default function App() {
                     editable={isEditable}
                     keyboardType="numeric" />
                   <Pressable style={{ ...buttonStyle, marginLeft: 0 }} disabled={!isEditable} onPress={() => {
+
                     aScheduledItem.percent_complete++
+                    if (aScheduledItem.percent_complete > 100) {
+                      aScheduledItem.percent_complete = 100;
+                      Toast.show("Percentage cannot go above 100% and symbols other than numeric ones are not allow.");
+                    }
                     setAScheduledItem(Object.assign({}, aScheduledItem))
                   }}>
                     <Text style={bases.incrementButton}>+</Text>
@@ -748,38 +764,91 @@ export default function App() {
               </View>
               <View style={bases.numberCRUD}>
                 <Text style={{ fontSize: Layout.defaultFontSize }}
-                > Duration (sec): </Text>
+                > Duration  min: </Text>
                 <View style={{ flexDirection: "row", justifyContent: "space-evenly", }}>
                   <Pressable style={buttonStyle} disabled={!isEditable} onPress={() => {
-                    aScheduledItem.duration_in_seconds--
-                    if (aScheduledItem.duration_in_seconds < 0) {
-                      aScheduledItem.duration_in_seconds = 0
+                    let a: number = aExerciseMinutes
+                    a--
+                    if (a < 0) {
+                      setAExerciseMinutes(0)
+                      Toast.show("Minutes cannot be less than 0.");
+                      return
+                    } else setAExerciseMinutes(a)
+                  }
+                  } >
+                    <Text style={bases.incrementButton}>-</Text>
+                  </Pressable>
+
+                  <TextInput placeholder='Minutes'
+
+                    style={{ ...numberInputStyle, width: 30 }}
+                    value={aExerciseMinutes.toString()}
+                    onChangeText={text => {
+                      const min = Number(text);
+                      if (min < 0) {
+                        setAExerciseMinutes(0);
+                        Toast.show("Minutes cannot be negative");
+                      } else if (isNaN(min)) {
+                        setAExerciseMinutes(0);
+                        Toast.show("Minutes must be a number");
+                      }
+                      else setAExerciseMinutes(min);
+                    }}
+                    editable={isEditable}
+                    keyboardType="numeric" />
+                  <Pressable style={{ ...buttonStyle, marginLeft: 0 }} disabled={!isEditable} onPress={() => {
+                    let a: number = aExerciseMinutes;
+                    a++
+                    setAExerciseMinutes(a);
+                  }}>
+                    <Text style={bases.incrementButton}>+</Text>
+                  </Pressable>
+
+                </View>
+              </View>
+              <View style={bases.numberCRUD}>
+                <Text style={{ fontSize: Layout.defaultFontSize }}
+                > sec: </Text>
+                <View style={{ flexDirection: "row", justifyContent: "space-evenly", }}>
+                  <Pressable style={buttonStyle} disabled={!isEditable} onPress={() => {
+                    let a: number = aExerciseSeconds
+                    a--
+                    if (a < 0) {
+                      setAExerciseSeconds(0)
+                      Toast.show("Seconds cannot be negative");
                       return
                     }
-                    setAScheduledItem(Object.assign({}, aScheduledItem))
+                    else setAExerciseSeconds(a)
                   }
                   } >
                     <Text style={bases.incrementButton}>-</Text>
                   </Pressable>
 
                   <TextInput placeholder='seconds'
-
                     style={{ ...numberInputStyle, width: 30 }}
-                    value={aScheduledItem.duration_in_seconds.toString()}
+                    value={aExerciseSeconds.toString()}
                     onChangeText={text => {
-                      const duration = Number(text);
-                      const s = Object.assign({}, aScheduledItem);
-                      if (Number.isNaN(duration)) {
-                        Toast.show("Symbol other than numeric ones are not allow.");
-                        s.duration_in_seconds = 0;
-                      } else s.duration_in_seconds = duration;
-                      setAScheduledItem(s);
+                      const min = Number(text);
+                      if (min< 0) {
+                        setAExerciseSeconds(0);
+                        Toast.show("Seconds cannot be negative");
+                      }
+                      else if (isNaN(min)){
+                        setAExerciseSeconds(0);
+                        Toast.show("Seconds must be a number.")
+                      }
+                      else setAExerciseSeconds(min);
                     }}
                     editable={isEditable}
                     keyboardType="numeric" />
                   <Pressable style={{ ...buttonStyle, marginLeft: 0 }} disabled={!isEditable} onPress={() => {
-                    aScheduledItem.duration_in_seconds++
-                    setAScheduledItem(Object.assign({}, aScheduledItem))
+                    let a: number = aExerciseSeconds;
+                    a++
+                    if (a > 59) {
+                      setAExerciseSeconds(59)
+                      Toast.show("Seconds cannot be more than 59");
+                      return
+                    } else setAExerciseSeconds(a);
                   }}>
                     <Text style={bases.incrementButton}>+</Text>
                   </Pressable>
@@ -946,7 +1015,7 @@ export default function App() {
                   searchTextInputStyle={{ borderWidth: 0, zIndex: -1 }}
                   placeholderStyle={{ color: "#9E9E9E" }}
 
-                  items={pushPullDropDownList }
+                  items={pushPullDropDownList}
                   value={pushPullDropDownValue}
                   setValue={setPushPullDropDownValue}
                   open={openPushPullDropDown}
@@ -1006,7 +1075,7 @@ export default function App() {
             handleFilterExercises: handleFilterExercies
           }}>
             <ScheduledItemContext.Provider value={{
-              majorSet: majorSets,
+              majorSet: scheduledItems,
               handleSelected: handleScheduledItemCRUDPress,
               handleCreate: showCreateScheduledItemDialog,
               handleFilterScheduledItem: handleFilterScheduledItem,
