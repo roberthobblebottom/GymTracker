@@ -54,9 +54,9 @@ CREATE TABLE IF NOT EXISTS "major_muscle" (
 );
 CREATE TABLE IF NOT EXISTS "exercise" (
 	"name"	TEXT NOT NULL UNIQUE,
+"push_or_pull" TEXT NOT NULL,
 	"description"	TEXT,
 	"imagesJson"	TEXT,
-"push_or_pull" TEXT,
 	PRIMARY KEY("name")
 );
 CREATE TABLE IF NOT EXISTS "exercise_major_muscle_one_to_many" (
