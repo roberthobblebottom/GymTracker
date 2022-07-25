@@ -15,10 +15,12 @@ import { ScheduledItem } from './types';
 import Toast from 'react-native-simple-toast';
 import Colors from './constants/Colors';
 import Layout from './constants/Layout';
-import { Calendar } from 'react-native-calendars';
+import { Calendar, DateData } from 'react-native-calendars';
 import DropDownPicker, { ItemType } from 'react-native-dropdown-picker';
 import { Ionicons, MaterialCommunityIcons, } from '@expo/vector-icons';
 import { isEntityName } from 'typescript';
+import { Header } from 'react-native/Libraries/NewAppScreen';
+import _default from 'babel-plugin-transform-typescript-metadata';
 LogBox.ignoreLogs(['Require cycle:']);
 const Tab = createBottomTabNavigator();
 
@@ -39,6 +41,7 @@ export const dummyScheduledItem: ScheduledItem[] = [{
 const dummyMajorMuscles: MajorMuscle[] = [{ name: "", notes: "", imageJson: "" }];
 const dummyEmm: Emm[] = [{ id: 9999, exercise_name: "", major_muscle_name: "" }];
 
+let d: Date = new Date();
 //constexts
 export const handleResetDBContext = React.createContext(() => { });
 export const ExerciseScreenContext = React.createContext(
@@ -53,6 +56,7 @@ export const ScheduledItemContext = React.createContext({
   handleCreate: (majorSet: ScheduledItem) => { },
   handleFilterScheduledItem: (keyword: string) => { },
   filteredKeyword: "",
+  handlePlanHeader: (date: DateData) => { }
 });
 
 export default function App() {
@@ -89,10 +93,10 @@ export default function App() {
   const [isDropDownOpen, setDropDownOpenOrNot] = useState(false);
   const [dropDownExerciseNameSelected, setDropDownExerciseNameSelected] = useState(dummyExercises[0].name);
   const [currentDate, setCurrentDate] = useState(dummyDate);
-  // const [buttonStyle, setChangeButtonBackgroundColor] = useState(styles.changeDateButtonDisabled);
   const [filteredScheduledItems, setFilteredScheduledItems] = useState(dummyScheduledItem);
   const [filteredScheduledItemKeyword, setfilteredScheduledItemsKeywords] = useState("");
-  // const [numberInputStyle, setNumberInputBackgroundColor] = useState(styles.numberInputViewOnly);
+  console.log(d.getDate())
+  const [planHeader, SetPlanHeader] = useState("Plan " + d.getDate() + "-" + (d.getMonth()+1)+"-"+d.getFullYear());
 
   //for major muscles
   const [majorMuscles, setMajorMuscles] = useState(dummyMajorMuscles);
@@ -106,6 +110,10 @@ export default function App() {
   const ScheduledItemInformation = "Information:";
   const EditScheduledItemText: string = "Edit";
   const DuplicateScheduledItemText: string = "Duplicate:";
+
+  function handlePlanHeader(date: DateData) {
+    SetPlanHeader("Plan " + date.day + "-" + date.month+"-"+date.year)
+  }
 
   useEffect(() => {
     let tempExercises: Exercise[];
@@ -534,13 +542,14 @@ export default function App() {
     setPlanDialogVisibility(true);
     setDropDownExerciseNameSelected(exercises[0].name);
     setDropDownOpenOrNot(false);
-    let d = new Date();
-    let monthNumber: number = d.getMonth() + 1;
+    let parts:string[] = planHeader.split(" ")[1].split("-")
+    let monthNumber: number = Number(parts[1]);
     let month: string = monthNumber < 10 ? "0" + monthNumber.toString() : monthNumber.toString();
-    let day: string = d.getDate() < 10 ? "0" + d.getDate().toString() : d.getDate().toString();
+    let day: string = Number(parts[0]) < 10 ? "0" + parts[0] : parts[0];
+    console.log(parts)
     setCurrentDate({
-      year: d.getFullYear(), month: monthNumber, day: d.getDate(), timestamp: 0,
-      dateString: d.getFullYear() + "-" + month + "-" + day
+      year: Number(parts[2]), month: monthNumber, day:Number(parts[0]), timestamp: 0,
+      dateString: parts[2] + "-" + month + "-" + day
     });
     setAExerciseMinutes(0);
     setAExerciseSeconds(0);
@@ -912,7 +921,7 @@ export default function App() {
 
 
               <View style={{ flexDirection: "row", marginTop: 10, display: 'flex', justifyContent: "space-between" }}>
-                <Text style={{ fontSize: Layout.defaultFontSize }}> date: {currentDate.dateString}</Text>
+                <Text style={{ fontSize: Layout.defaultFontSize }}> date: {currentDate.day+"-"+currentDate.month+"-"+currentDate.year}</Text>
                 <Pressable
                   style={{
                     ...buttonStyle,
@@ -1079,7 +1088,8 @@ export default function App() {
               handleSelected: handleScheduledItemCRUDPress,
               handleCreate: showCreateScheduledItemDialog,
               handleFilterScheduledItem: handleFilterScheduledItem,
-              filteredKeyword: filteredScheduledItemKeyword
+              filteredKeyword: filteredScheduledItemKeyword,
+              handlePlanHeader: handlePlanHeader
             }}>
               <Tab.Navigator
                 screenOptions={({ route }) =>
@@ -1107,7 +1117,10 @@ export default function App() {
                   tabBarActiveTintColor: Colors.light.tint
                 })
                 }>
-                <Tab.Screen name="Plan" component={PlanScreen} />
+                <Tab.Screen
+                  options={
+                    { headerTitle: planHeader }}
+                  name="Plan" component={PlanScreen} />
                 <Tab.Screen name="Exercises" component={ExercisesScreen} />
                 <Tab.Screen name="Settings" component={SettingsScreen} />
               </Tab.Navigator>

@@ -36,6 +36,7 @@ export function PlanScreen() {
   const handleSelected: Function = context.handleSelected;
   const fitlerScheduledItem: Function = context.handleFilterScheduledItem;
   const majorSetKeyword: string = context.filteredKeyword;
+  const handlePlanHeader: Function = context.handlePlanHeader;
   return (
     <View style={{
       flexDirection: "column", flex: 1,
@@ -46,14 +47,13 @@ export function PlanScreen() {
         initialNumToRender={2}
         style={{
           width: '100%',
-          // marginBottom: '-4%',
-          // paddingBottom: "17%",
           transform: [{ rotateX: "180deg" }]
         }}
         showScrollIndicator={true}
-        // contentContainerStyle={{ margin: Layout.defaultMargin }}
-        // calendarStyle={ }}
         showClosingKnob={true}
+        onDayPress={(date: DateData) =>
+          handlePlanHeader(date)
+        }
         renderEmptyDate={() => {
           return (
             <View style={styles.listStyle}>
@@ -91,7 +91,6 @@ export function PlanScreen() {
               }} onPress={() => { handleSelected(set) }}>
                 <Text style={{ fontSize: Layout.defaultFontSize }}>{labelToShow}</Text>
               </TouchableOpacity>
-              {/* <Text style={{fontSize:Layout.defaultFontSize* 2,bottom:"100%"}}>{dateLabelToShow}</Text> */}
             </View>
           );
         }}
@@ -111,14 +110,6 @@ export function PlanScreen() {
             Toast.show("Error, there is a major set with undefined exercise");
             return (<View><Text>2</Text></View>);
           }
-          // if (isFirst) {
-          //   header = (<View><Text style={{
-          //     fontSize: Layout.defaultFontSize * 1.5,
-          //     color: Colors.light.tint,
-          //     marginTop: Layout.defaultMargin
-          //   }}>{set.date.day + "/" + set.date.month}</Text></View>);
-          // }
-          // console.log(set.exercise.name);
           let labelToShow = set.id + " " + set.exercise.name + " \n" +
             +set.sets + "x" + set.reps + " " +
             set.weight + "kg "
