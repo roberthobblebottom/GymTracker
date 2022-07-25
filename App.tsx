@@ -544,7 +544,7 @@ export default function App() {
     setDropDownOpenOrNot(false);
     let parts:string[] = planHeader.split(" ")[1].split("-")
     let monthNumber: number = Number(parts[1]);
-    let month: string = monthNumber < 10 ? "0" + monthNumber.toString() : monthNumber.toString();
+    let month: string = monthNumber < 10 ? "0" + monthNumber.toString() : monthNumber.toString();e
     let day: string = Number(parts[0]) < 10 ? "0" + parts[0] : parts[0];
     console.log(parts)
     setCurrentDate({
