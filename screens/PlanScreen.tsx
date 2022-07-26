@@ -1,8 +1,8 @@
-import { Modal, Text, TouchableOpacity, View, StyleSheet, TextInput } from 'react-native';
+import { Text, TouchableOpacity, View, StyleSheet, TextInput } from 'react-native';
 import React, { useContext } from 'react';
 import Colors from '../constants/Colors';
 import { Agenda, AgendaEntry, DateData } from 'react-native-calendars';
-import { ScheduledItemContext, dummyScheduledItem, dummyDate, dummyExercises } from '../App';
+import { ScheduledItemContext, initialDate } from '../App';
 import { ScheduledItem } from '../types';
 import Toast from 'react-native-simple-toast';
 import Layout from '../constants/Layout';
@@ -27,7 +27,7 @@ export function PlanScreen() {
     majorSet.forEach(ms => {
       // console.log(ms.date == dummyDate);
       if (ms == undefined) return;
-      if (ms.date == dummyDate) return;
+      if (ms.date == initialDate) return;
       if (a[ms.date.dateString] == undefined) a[ms.date.dateString] =
         [{ name: ms.id.toString(), height: 0, day: "" }];
       else a[ms.date.dateString].push({ name: ms.id.toString(), height: 0, day: "" })

@@ -1,6 +1,6 @@
 import {
   Modal, StyleSheet, View, Text, Button,
-  TouchableOpacity, Alert, LogBox, TextInput, Platform, Pressable
+  TouchableOpacity, Alert, LogBox, TextInput, Platform
 } from 'react-native';
 import { ExercisesScreen } from './screens/ExercisesScreen';
 import { SettingsScreen } from './screens/SettingsScreen';
@@ -15,44 +15,43 @@ import { ScheduledItem } from './types';
 import Toast from 'react-native-simple-toast';
 import Colors from './constants/Colors';
 import Layout from './constants/Layout';
-import { Calendar, DateData } from 'react-native-calendars';
-import DropDownPicker, { ItemType } from 'react-native-dropdown-picker';
+import { DateData } from 'react-native-calendars';
 import { Ionicons, MaterialCommunityIcons, } from '@expo/vector-icons';
-import { isEntityName } from 'typescript';
-import { Header } from 'react-native/Libraries/NewAppScreen';
 import _default from 'babel-plugin-transform-typescript-metadata';
+import { ScheduleDialog } from './ScheduleDialog';
+import { ExerciseDialog } from './ExerciseDialog';
 LogBox.ignoreLogs(['Require cycle:'])
 const Tab = createBottomTabNavigator()
 
-//dummy constant values
-export const dummyDate = { year: 0, month: 0, day: 0, timestamp: 0, dateString: "" };
-export const dummyExercises: Exercise[] = [{ name: "", description: "", imagesJson: "", major_muscles: [], push_or_pull: PushPullEnum.Push }];
-export const dummyScheduledItem: ScheduledItem[] = [{
+//initial constant values
+export const initialDate = { year: 0, month: 0, day: 0, timestamp: 0, dateString: "" };
+export const initialExercises: Exercise[] = [{ name: "", description: "", imagesJson: "", major_muscles: [], push_or_pull: PushPullEnum.Push }];
+export const initialScheduledItem: ScheduledItem[] = [{
   id: 0,
-  exercise: dummyExercises[0],
+  exercise: initialExercises[0],
   reps: 0,
   percent_complete: 0,
   sets: 0,
   duration_in_seconds: 0,
   weight: 0,
   notes: "",
-  date: dummyDate
+  date: initialDate
 }];
-const dummyMajorMuscles: MajorMuscle[] = [{ name: "", notes: "", imageJson: "" }];
-const dummyEmm: Emm[] = [{ id: 9999, exercise_name: "", major_muscle_name: "" }];
+const initialMajorMuscles: MajorMuscle[] = [{ name: "", notes: "", imageJson: "" }];
+const initialEmm: Emm[] = [{ id: 9999, exercise_name: "", major_muscle_name: "" }];
 
 let d: Date = new Date()
 //constexts
 export const handleResetDBContext = React.createContext(() => { })
 export const ExerciseScreenContext = React.createContext(
   {
-    exercises: dummyExercises, handleSelected: (exercise: Exercise) => { }, handleCreate: () => { },
+    exercises: initialExercises, handleSelected: (exercise: Exercise) => { }, handleCreate: () => { },
     handleFilterExercises: (keyword: string) => { },
     filteredKeyword: ""
   }
 )
 export const ScheduledItemContext = React.createContext({
-  majorSet: dummyScheduledItem, handleSelected: (majorSet: ScheduledItem) => { },
+  majorSet: initialScheduledItem, handleSelected: (majorSet: ScheduledItem) => { },
   handleCreate: (majorSet: ScheduledItem) => { },
   handleFilterScheduledItem: (keyword: string) => { },
   filteredKeyword: "",
@@ -61,25 +60,18 @@ export const ScheduledItemContext = React.createContext({
 
 export default function App() {
   //for exercise
-  const [exercises, setExercises] = useState(dummyExercises)
+  const [exercises, setExercises] = useState(initialExercises)
   const [isExDialogVisible, setExDialogVisibility] = useState(false)//Ex = exercise
-  const [aExercise, setAExercise] = useState(dummyExercises[0])
+  const [aExercise, setAExercise] = useState(initialExercises[0])
   const [oldExerciseName, setOldExerciseName] = useState("")
   const [dropDownMajorMuscleNameSelected, setDropDownMajorMuscleNameSelected] = useState([""])
-  const [filteredExercises, setFilteredExercises] = useState(dummyExercises)
+  const [filteredExercises, setFilteredExercises] = useState(initialExercises)
   const [filteredExerciseKeyword, setFilteredExerciseKeyword] = useState("")
   const [openPushPullDropDown, setOpenPushPullDropDown] = useState(false)
   const [pushPullDropDownValue, setPushPullDropDownValue] = useState(PushPullEnum.Push)
-  const [pushPullDropDownList, setPushPullDropDownList] = useState(
-    [
-      { label: PushPullEnum.Push, value: PushPullEnum.Push },
-      { label: PushPullEnum.Pull, value: PushPullEnum.Pull }
-    ]
-  )
+
   const [aExerciseMinutes, setAExerciseMinutes] = useState(0)
-
   const [aExerciseSeconds, setAExerciseSeconds] = useState(0)
-
   //shared
   const [dialogText, setDialogText] = useState("")
   // const [textInputStyle, setTextInputBackgroundColor] = useState(styles.textInputViewOnly)
@@ -88,18 +80,18 @@ export default function App() {
   //for majorSet
   const [isCalendarDialogVisible, setCalendarDialogVisibility] = useState(false)
   const [isPlanDialogVisible, setPlanDialogVisibility] = useState(false)
-  const [scheduledItems, setScheduledItems] = useState(dummyScheduledItem)
+  const [scheduledItems, setScheduledItems] = useState(initialScheduledItem)
   const [aScheduledItem, setAScheduledItem] = useState(scheduledItems[0])
   const [isDropDownOpen, setDropDownOpenOrNot] = useState(false)
-  const [dropDownExerciseNameSelected, setDropDownExerciseNameSelected] = useState(dummyExercises[0].name)
-  const [currentDate, setCurrentDate] = useState(dummyDate)
-  const [filteredScheduledItems, setFilteredScheduledItems] = useState(dummyScheduledItem)
+  const [dropDownExerciseNameSelected, setDropDownExerciseNameSelected] = useState(initialExercises[0].name)
+  const [currentDate, setCurrentDate] = useState(initialDate)
+  const [filteredScheduledItems, setFilteredScheduledItems] = useState(initialScheduledItem)
   const [filteredScheduledItemKeyword, setfilteredScheduledItemsKeywords] = useState("")
   const [planHeader, SetPlanHeader] = useState("Plan " + d.getDate() + "-" + (d.getMonth() + 1) + "-" + d.getFullYear())
 
   //for major muscles
-  const [majorMuscles, setMajorMuscles] = useState(dummyMajorMuscles)
-  const [emm, setEmm] = useState(dummyEmm)
+  const [majorMuscles, setMajorMuscles] = useState(initialMajorMuscles)
+  const [emm, setEmm] = useState(initialEmm)
 
   //constant strings
   const ExerciseInformationText = "Exercise Information";
@@ -123,10 +115,10 @@ export default function App() {
         (_, r) => {
           tempExercises = r.rows._array;
           tempExercises.forEach(ex => {
-            ex.major_muscles = dummyMajorMuscles;
+            ex.major_muscles = initialMajorMuscles;
           })
           if (scheduledItems[0] != undefined)
-            if (scheduledItems[0].exercise == dummyExercises[0])
+            if (scheduledItems[0].exercise == initialExercises[0])
               db.transaction(
                 t => {
                   t.executeSql("SELECT * FROM scheduled_item", [],
@@ -152,7 +144,7 @@ export default function App() {
         },
         (_, e) => { console.log(e); return true; }
       ))
-    if (majorMuscles[0] == dummyMajorMuscles[0]) {
+    if (majorMuscles[0] == initialMajorMuscles[0]) {
       let tempMajorMuscles: MajorMuscle[];
       db.transaction(t => t.executeSql("SELECT * from major_muscle", undefined,
         (_, results) => {
@@ -160,7 +152,7 @@ export default function App() {
           setMajorMuscles(results.rows._array)
         }, (_, err) => { console.log(err); return true; }))
     }
-    if (emm[0] == dummyEmm[0])
+    if (emm[0] == initialEmm[0])
       db.transaction(t => t.executeSql("SELECT * from exercise_major_muscle_one_to_many;", undefined,
         (_, results) => {
           let temp_emm_one_to_many = results.rows._array;
@@ -175,7 +167,7 @@ export default function App() {
           Toast.show("There is an error is extracting major muscles from each exercises")
           return;
         }
-        if (ex!.major_muscles == dummyMajorMuscles) ex!.major_muscles = [mm2!];
+        if (ex!.major_muscles == initialMajorMuscles) ex!.major_muscles = [mm2!];
         else ex!.major_muscles.push(mm2!)
 
       })
@@ -194,98 +186,40 @@ export default function App() {
     numberInputStyle = styles.numberInputViewOnly
     buttonStyle = styles.changeDateButtonDisabled
   }
-  const ButtonSet = () => {
-    switch (dialogText) {
-      case ExerciseInformationText:
-        return (
-          <View style={{ flexDirection: "row", justifyContent: "space-around", marginTop: 20 }}>
-            <Button title="delete" onPress={() => deleteExerciseConfirmation(aExercise)} />
-            <Button title='Edit' onPress={() => {
-              setOldExerciseName(oldExerciseName)
-              setEditability(true)
-              textInputStyle = styles.textInputEditable;
-              setDialogText(EditExerciseText)
-              setDropDownOpenOrNot(false)
-            }} />
-            <Button title='Cancel' onPress={() => cancelDialog()} />
-          </View>
-        )
-      case CreateExerciseText:
-        return (
-          <View style={{ flexDirection: "row", justifyContent: "space-around", marginTop: 20 }}>
-            <Button title='Save' onPress={() => createExercise()}></Button>
-            <Button title='Cancel' onPress={() => cancelDialog()} />
-          </View>
-        )
-      case EditExerciseText:
-        return (
-          <View style={{ flexDirection: "row", justifyContent: "space-around", marginTop: 20 }}>
-            <Button title='Save' onPress={() => updateExercise()}></Button>
-            <Button title='Back' onPress={() => handleExerciseCRUDPress(aExercise)} />
-            <Button title='Cancel' onPress={() => cancelDialog()} />
-          </View>
-        )
-      case CreateScheduledItemText:
-        return (
-          <View style={{ flexDirection: "row", justifyContent: "space-around", marginTop: 20 }}>
-            <Button title='Save' onPress={() => createScheduledItem()}></Button>
-            <Button title='Cancel' onPress={() => cancelDialog()} />
-          </View>
-        )
-      case ScheduledItemInformation:
-        return (
-          <View style={{ flexDirection: "row", justifyContent: "space-around", marginTop: 20 }}>
-            <Button title="delete" onPress={() => deleteScheduledItemConfirmation(aScheduledItem)} />
-            <Button title='Edit' onPress={() => {
-              buttonStyle = styles.changeDateButtonEnabled;
-              setEditability(true)
-              setDropDownOpenOrNot(false)
-              textInputStyle = styles.textInputEditable;
-              setDialogText(EditScheduledItemText)
-              setAScheduledItem(aScheduledItem)
-              setDropDownExerciseNameSelected(aScheduledItem.exercise.name)
-              setCurrentDate(aScheduledItem.date)
-            }} />
-            <Button title="duplicate" onPress={() => {
-              buttonStyle = styles.changeDateButtonEnabled;
-              setEditability(true)
-              setDropDownOpenOrNot(false)
-              textInputStyle = styles.textInputEditable;
-              setDialogText(DuplicateScheduledItemText)
-              setAScheduledItem(aScheduledItem)
-              setDropDownExerciseNameSelected(aScheduledItem.exercise.name)
-              setCurrentDate(aScheduledItem.date)
-            }} />
-            <Button title='Cancel' onPress={() => cancelDialog()} />
-          </View>
-        )
-      case DuplicateScheduledItemText:
-      case EditScheduledItemText:
-        return (
-          <View style={{ flexDirection: "row", justifyContent: "space-around", marginTop: 20 }}>
-            <Button title='Save' onPress={() => {
-              switch (dialogText) {
-                case EditScheduledItemText:
-                  updateScheduledItem()
-                  break
-                case DuplicateScheduledItemText:
-                  createScheduledItem()
-                  break
-              }
-            }}></Button>
-            <Button title='Back' onPress={() => handleScheduledItemCRUDPress(aScheduledItem)} />
-            <Button title='Cancel' onPress={() => cancelDialog()} />
-          </View>
-        )
+  const renderScheduledItemDialogForEdit = () => {
+    buttonStyle = styles.changeDateButtonEnabled;
+    setEditability(true)
+    setDropDownOpenOrNot(false)
+    textInputStyle = styles.textInputEditable;
+    setDialogText(EditScheduledItemText)
+    setAScheduledItem(aScheduledItem)
+    setDropDownExerciseNameSelected(aScheduledItem.exercise.name)
+    setCurrentDate(aScheduledItem.date)
+  }
+  const renderScheduledItemDialogForDuplication = () => {
 
-    }
+    buttonStyle = styles.changeDateButtonEnabled;
+    setEditability(true)
+    setDropDownOpenOrNot(false)
+    textInputStyle = styles.textInputEditable;
+    setDialogText(DuplicateScheduledItemText)
+    setAScheduledItem(aScheduledItem)
+    setDropDownExerciseNameSelected(aScheduledItem.exercise.name)
+    setCurrentDate(aScheduledItem.date)
+  }
+  const renderExerciseDialogForEdit = () => {
+    setOldExerciseName(oldExerciseName)
+    setEditability(true)
+    textInputStyle = styles.textInputEditable;
+    setDialogText(EditExerciseText)
+    setDropDownOpenOrNot(false)
   }
 
   const handleResetDB = () => {
     resetTables()
-    setExercises(dummyExercises)
-    setScheduledItems(dummyScheduledItem)
-    setMajorMuscles(dummyMajorMuscles)
+    setExercises(initialExercises)
+    setScheduledItems(initialScheduledItem)
+    setMajorMuscles(initialMajorMuscles)
   }
   function cancelDialog() {
     setExDialogVisibility(false)
@@ -302,7 +236,7 @@ export default function App() {
 
     cancelDialog()
   }
-  const handleExerciseCRUDPress = (exercise: Exercise) => {
+  const renderExerciseDialogForViewing = (exercise: Exercise) => {
     setEditability(false)
     textInputStyle = styles.textInputViewOnly;
     setAExercise(exercise)
@@ -322,7 +256,7 @@ export default function App() {
       "Confirmation",
       "Are you sure you want to delete this exercise?",
       [{ text: "Yes", onPress: () => deleteExercise(exercise) },
-      { text: "No", onPress: () => handleExerciseCRUDPress(exercise) }],//warning, recursive-
+      { text: "No", onPress: () => renderExerciseDialogForViewing(exercise) }],//warning, recursive-
       { cancelable: true }
     )
   };
@@ -393,7 +327,7 @@ export default function App() {
   }
 
   const showCreateExerciseDialog = () => {
-    setAExercise(dummyExercises[0])
+    setAExercise(initialExercises[0])
     setDropDownMajorMuscleNameSelected([])
     setEditability(true)
     textInputStyle = styles.textInputEditable;
@@ -450,7 +384,7 @@ export default function App() {
     setFilteredExerciseKeyword("")
     cancelDialog()
   }
-  function handleScheduledItemCRUDPress(scheduledItem: ScheduledItem) {
+  function renderScheduledItemDialogForViewing(scheduledItem: ScheduledItem) {
     buttonStyle = styles.changeDateButtonDisabled;
     setEditability(false)
     textInputStyle = styles.textInputViewOnly;
@@ -470,7 +404,7 @@ export default function App() {
       "Confirmation",
       "Are you sure you want to delete this major set?",
       [{ text: "Yes", onPress: () => deleteScheduledItem(ms.id) },
-      { text: "No", onPress: () => handleScheduledItemCRUDPress(ms) }],//warning, recursive
+      { text: "No", onPress: () => renderScheduledItemDialogForViewing(ms) }],//warning, recursive
       { cancelable: true }
     )
   };
@@ -541,7 +475,7 @@ export default function App() {
     setEditability(true)
     textInputStyle = styles.textInputEditable;
     numberInputStyle = styles.numberInputEditable;
-    setAScheduledItem(dummyScheduledItem[0])
+    setAScheduledItem(initialScheduledItem[0])
     setDialogText(CreateScheduledItemText)
     setPlanDialogVisibility(true)
     setDropDownExerciseNameSelected(exercises[0].name)
@@ -575,7 +509,6 @@ export default function App() {
           duration, aScheduledItem.weight,
         aScheduledItem.notes, JSON.stringify(currentDate)],
         (_, r) => {
-          // aScheduledItem.id = r.insertId!
           let tempScheduledItem = Object.assign({}, aScheduledItem)
           tempScheduledItem.id = r.insertId!
           tempScheduledItem.date = currentDate
@@ -597,14 +530,14 @@ export default function App() {
   }
   function handleFilterScheduledItem(keyword: string) {
     let filtered = scheduledItems.filter(si => {
-      let sec = si.duration_in_seconds%60;
-      let min = Math.floor(si.duration_in_seconds/60)
+      let sec = si.duration_in_seconds % 60;
+      let min = Math.floor(si.duration_in_seconds / 60)
       return ((si.percent_complete.toString() + "%").includes(keyword)
         || si.id.toString().includes(keyword)
         || (si.weight.toString() + "kg").includes(keyword)
         || (si.sets.toString() + "x" + si.reps.toString()).includes(keyword)
-        || (min+" minutes").includes(keyword)
-        || (sec+" seconds").includes(keyword)
+        || (min + " minutes").includes(keyword)
+        || (sec + " seconds").includes(keyword)
         || si.exercise.name.includes(keyword)
         || si.exercise.major_muscles.filter(
           si => si.name.includes(keyword)
@@ -618,479 +551,82 @@ export default function App() {
   return (
     <>
       <NavigationContainer>
-        <Modal visible={isPlanDialogVisible} animationType="fade" transparent={true}>
-          <TouchableOpacity style={{ flex: 1, display: 'flex', justifyContent: 'flex-end' }} onPressIn={() => setPlanDialogVisibility(false)}>
-            <TouchableOpacity style={{ ...styles.innerTouchableOpacity2 }} activeOpacity={1} onPress={() => setDropDownOpenOrNot(false)}>
-              <Text style={{ fontSize: Layout.defaultFontSize, fontWeight: "bold" }}>{dialogText}</Text>
-              <View style={{ marginLeft: "1%", ...bases.numberCRUD }}>
-                <Text style={{ fontSize: Layout.defaultFontSize, marginRight: "1%" }}>
-                  Exercise:
-                </Text>
-                <DropDownPicker
-                  placeholder="Select a exercise"
-                  open={isDropDownOpen}
-                  schema={{ label: "name", value: "name" }}
-                  items={exercises as ItemType<string>[]}
-                  itemKey="name"
-                  value={dropDownExerciseNameSelected}
-                  setOpen={setDropDownOpenOrNot}
-                  setValue={setDropDownExerciseNameSelected}
-                  disabled={!isEditable}
-                  dropDownContainerStyle={{
-                    marginTop: -5, backgroundColor: Colors.light.altBackground,
-                    borderWidth: 0, width: 200, minHeight: 300, borderRadius: 0
-                  }}
-                  selectedItemContainerStyle={{
-                    backgroundColor: Colors.light.altBackground,
-                    borderColor: "white"
-                  }}
-                  style={{
-                    justifyContent: "flex-end",
-                    marginTop: -5, minHeight: 30, paddingVertical: 3,
-                    backgroundColor: Colors.light.altBackground,
-                    borderWidth: 0, borderRadius: 0,
-                    width: "75%"
-                  }}
-                  textStyle={{ fontSize: Layout.defaultFontSize }}
-                  disabledStyle={{ backgroundColor: "white" }}
-                  searchTextInputStyle={{ borderWidth: 0 }}
-                  searchable={true}
-                  closeAfterSelecting={true}
-                  closeOnBackPressed={true}
-                />
-              </View>
-              <View style={bases.numberCRUD}>
-                <Text style={{ fontSize: Layout.defaultFontSize }}
-                > Sets: </Text>
-                <View style={{ flexDirection: "row", justifyContent: "space-evenly", }}>
-                  <Pressable style={buttonStyle} disabled={!isEditable} onPress={() => {
-                    aScheduledItem.sets--
-                    if (aScheduledItem.sets < 0) {
-                      aScheduledItem.sets = 0
-                      return
-                    }
-                    setAScheduledItem(Object.assign({}, aScheduledItem))
-                  }
-                  } >
-                    <Text style={bases.incrementButton}>-</Text>
-                  </Pressable>
-                  <TextInput placeholder='sets'
-                    style={{ ...numberInputStyle, width: 30 }}
-                    value={aScheduledItem.sets.toString()}
-                    onChangeText={text => {
-                      const sets = Number(text)
-                      const s = Object.assign({}, aScheduledItem)
-                      if (Number.isNaN(sets)) {
-                        Toast.show("Symbol other than numeric ones are not allow.")
-                        s.sets = 0;
-                      } else s.sets = sets;
-                      setAScheduledItem(s)
-                    }}
-                    editable={isEditable}
-                    keyboardType="numeric" />
-                  <Pressable style={{ ...buttonStyle, marginLeft: 0 }} disabled={!isEditable} onPress={() => {
-                    aScheduledItem.sets++
-                    setAScheduledItem(Object.assign({}, aScheduledItem))
-                  }}>
-                    <Text style={bases.incrementButton}>+</Text>
-                  </Pressable>
-                </View>
-              </View>
-              <View style={bases.numberCRUD}>
-                <Text style={{ fontSize: Layout.defaultFontSize }}
-                > Reps: </Text>
-                <View style={{ flexDirection: "row", justifyContent: "space-evenly", }}>
-                  <Pressable style={buttonStyle} disabled={!isEditable} onPress={() => {
-                    aScheduledItem.reps--
-                    if (aScheduledItem.reps < 0) {
-                      aScheduledItem.reps = 0
-                      return
-                    }
-                    setAScheduledItem(Object.assign({}, aScheduledItem))
-                  }
-                  } >
-                    <Text style={bases.incrementButton}>-</Text></Pressable>
-                  <TextInput placeholder='reps'
-                    style={{ ...numberInputStyle, width: 30 }}
-                    value={aScheduledItem.reps.toString()}
-                    onChangeText={text => {
-                      const rep = Number(text)
-                      const s = Object.assign({}, aScheduledItem)
-                      if (Number.isNaN(rep)) {
-                        Toast.show("Symbols other than numeric ones are not allow.")
-                        s.reps = 0;
-                      } else s.reps = rep;
-                      setAScheduledItem(s)
-                    }}
-                    editable={isEditable}
-                    keyboardType="numeric" />
+        <ScheduleDialog
+          isPlanDialogVisible={isPlanDialogVisible}
+          dialogText={dialogText}
+          isDropDownOpen={isDropDownOpen}
+          exercises={exercises}
+          dropDownExerciseNameSelected={dropDownExerciseNameSelected}
+          aScheduledItem={aScheduledItem}
+          setAScheduledItem={setAScheduledItem}
+          isEditable={isEditable}
+          setPlanDialogVisibility={setPlanDialogVisibility}
+          setDropDownOpenOrNot={setDropDownOpenOrNot}
+          setDropDownExerciseNameSelected={setDropDownExerciseNameSelected}
+          aExerciseMinutes={aExerciseMinutes}
+          aExerciseSeconds={aExerciseSeconds}
+          setAExerciseMinutes={setAExerciseMinutes}
+          setAExerciseSeconds={setAExerciseSeconds}
+          isCalendarDialogVisible={isCalendarDialogVisible}
+          setCalendarDialogVisibility={setCalendarDialogVisibility}
+          currentDate={currentDate}
+          setCurrentDate={setCurrentDate}
 
-                  <Pressable style={{ ...buttonStyle, marginLeft: 0 }} disabled={!isEditable} onPress={() => {
-                    aScheduledItem.reps++
-                    setAScheduledItem(Object.assign({}, aScheduledItem))
-                  }} >
-                    <Text style={bases.incrementButton}>+</Text></Pressable>
+          cancelDialog={cancelDialog}
+          aExercise={aExercise}
 
-                </View>
-              </View>
-              <View style={bases.numberCRUD}>
-                <Text style={{ fontSize: Layout.defaultFontSize }}
-                > complete(%): </Text>
-                <View style={{ flexDirection: "row", justifyContent: "space-evenly", }}>
-                  <Pressable style={buttonStyle} disabled={!isEditable} onPress={() => {
-                    aScheduledItem.percent_complete--
-                    if (aScheduledItem.percent_complete < 0) {
-                      aScheduledItem.percent_complete = 0
-                      return
-                    }
-                    setAScheduledItem(Object.assign({}, aScheduledItem))
-                  }
-                  } >
-                    <Text style={bases.incrementButton}>-</Text>
-                  </Pressable>
-                  <TextInput placeholder='percentage complete'
-                    style={{ ...numberInputStyle, width: 30 }}
-                    value={aScheduledItem.percent_complete.toString()}
-                    onChangeText={text => {
-                      const p = Number(text)
-                      const s = Object.assign({}, aScheduledItem)
-                      if (Number.isNaN(p) || p > 100) {
-                        Toast.show("Percentage cannot go above 100% and symbols other than numeric ones are not allow.")
-                        s.percent_complete = 100;
-                      }
-                      else s.percent_complete = p;
-                      setAScheduledItem(s)
-                    }}
-                    editable={isEditable}
-                    keyboardType="numeric" />
-                  <Pressable style={{ ...buttonStyle, marginLeft: 0 }} disabled={!isEditable} onPress={() => {
+          deleteScheduledItemConfirmation={deleteScheduledItemConfirmation}
+          renderScheduledItemDialogForEdit={renderScheduledItemDialogForEdit}
+          createScheduledItem={createScheduledItem}
+          updateScheduledItem={updateScheduledItem}
+          renderScheduledItemDialogForViewing={renderScheduledItemDialogForViewing}
+          renderScheduledItemDialogForDuplication={renderScheduledItemDialogForDuplication}
 
-                    aScheduledItem.percent_complete++
-                    if (aScheduledItem.percent_complete > 100) {
-                      aScheduledItem.percent_complete = 100;
-                      Toast.show("Percentage cannot go above 100% and symbols other than numeric ones are not allow.")
-                    }
-                    setAScheduledItem(Object.assign({}, aScheduledItem))
-                  }}>
-                    <Text style={bases.incrementButton}>+</Text>
-                  </Pressable>
-                </View>
-              </View>
+        />
+        <ExerciseDialog
+          isExDialogVisible={isExDialogVisible}
+          dialogText={dialogText}
+          isDropDownOpen={isDropDownOpen}
+          isEditable={isEditable}
+          aExercise={aExercise}
+          pushPullDropDownValue={pushPullDropDownValue}
+          majorMuscles={majorMuscles}
+          openPushPullDropDown={openPushPullDropDown}
+          dropDownMajorMuscleNameSelected={dropDownMajorMuscleNameSelected}
 
-              <View style={bases.numberCRUD}>
-                <Text style={{ fontSize: Layout.defaultFontSize }}
-                > Duration  min: </Text>
-                <View style={{ flexDirection: "row", justifyContent: "space-evenly", }}>
-                  <Pressable style={buttonStyle} disabled={!isEditable} onPress={() => {
-                    let a: number = aExerciseMinutes
-                    a--
-                    if (a < 0) {
-                      setAExerciseMinutes(0)
-                      Toast.show("Minutes cannot be less than 0.")
-                      return
-                    } else setAExerciseMinutes(a)
-                  }
-                  } >
-                    <Text style={bases.incrementButton}>-</Text>
-                  </Pressable>
-
-                  <TextInput placeholder='Minutes'
-
-                    style={{ ...numberInputStyle, width: 30 }}
-                    value={aExerciseMinutes.toString()}
-                    onChangeText={text => {
-                      const min = Number(text)
-                      if (min < 0) {
-                        setAExerciseMinutes(0)
-                        Toast.show("Minutes cannot be negative")
-                      } else if (isNaN(min)) {
-                        setAExerciseMinutes(0)
-                        Toast.show("Minutes must be a number")
-                      }
-                      else setAExerciseMinutes(min)
-                    }}
-                    editable={isEditable}
-                    keyboardType="numeric" />
-                  <Pressable style={{ ...buttonStyle, marginLeft: 0 }} disabled={!isEditable} onPress={() => {
-                    let a: number = aExerciseMinutes;
-                    a++
-                    setAExerciseMinutes(a)
-                  }}>
-                    <Text style={bases.incrementButton}>+</Text>
-                  </Pressable>
-
-                </View>
-              </View>
-              <View style={bases.numberCRUD}>
-                <Text style={{ fontSize: Layout.defaultFontSize }}
-                > sec: </Text>
-                <View style={{ flexDirection: "row", justifyContent: "space-evenly", }}>
-                  <Pressable style={buttonStyle} disabled={!isEditable} onPress={() => {
-                    let a: number = aExerciseSeconds
-                    a--
-                    if (a < 0) {
-                      setAExerciseSeconds(0)
-                      Toast.show("Seconds cannot be negative")
-                      return
-                    }
-                    else setAExerciseSeconds(a)
-                  }
-                  } >
-                    <Text style={bases.incrementButton}>-</Text>
-                  </Pressable>
-
-                  <TextInput placeholder='seconds'
-                    style={{ ...numberInputStyle, width: 30 }}
-                    value={aExerciseSeconds.toString()}
-                    onChangeText={text => {
-                      const min = Number(text)
-                      if (min < 0) {
-                        setAExerciseSeconds(0)
-                        Toast.show("Seconds cannot be negative")
-                      }
-                      else if (isNaN(min)) {
-                        setAExerciseSeconds(0)
-                        Toast.show("Seconds must be a number.")
-                      }
-                      else setAExerciseSeconds(min)
-                    }}
-                    editable={isEditable}
-                    keyboardType="numeric" />
-                  <Pressable style={{ ...buttonStyle, marginLeft: 0 }} disabled={!isEditable} onPress={() => {
-                    let a: number = aExerciseSeconds;
-                    a++
-                    if (a > 59) {
-                      setAExerciseSeconds(59)
-                      Toast.show("Seconds cannot be more than 59")
-                      return
-                    } else setAExerciseSeconds(a)
-                  }}>
-                    <Text style={bases.incrementButton}>+</Text>
-                  </Pressable>
-
-                </View>
-              </View>
-              <View style={bases.numberCRUD}>
-                <Text style={{ fontSize: Layout.defaultFontSize }}
-                > Weight (kg): </Text>
-                <View style={{ flexDirection: "row", justifyContent: "space-evenly", }}>
-                  <Pressable style={buttonStyle} disabled={!isEditable} onPress={() => {
-                    let s = Object.assign({}, aScheduledItem)
-                    s.weight--
-                    if (s.weight < 0) {
-                      s.weight = 0
-                      return
-                    }
-                    setAScheduledItem(Object.assign({}, s))
-                  }
-                  } >
-                    <Text style={bases.incrementButton}>-</Text>
-                  </Pressable>
-                  <TextInput placeholder='kg'
-                    style={{ ...numberInputStyle, width: 30 }}
-                    value={aScheduledItem.weight.toString()}
-                    onChangeText={text => {
-                      const weight = Number(text)
-                      const s = Object.assign({}, aScheduledItem)
-                      if (Number.isNaN(weight)) {
-                        Toast.show("Symbol other than numeric ones are not allow.")
-                        s.weight = 0;
-                      } else s.weight = weight;
-                      setAScheduledItem(s)
-
-                    }}
-                    editable={isEditable}
-                    keyboardType="numeric" />
-                  <Pressable style={{ ...buttonStyle, marginLeft: 0 }} disabled={!isEditable} onPress={() => {
-                    aScheduledItem.weight++
-                    setAScheduledItem(Object.assign({}, aScheduledItem))
-                  }}>
-                    <Text style={bases.incrementButton}>+</Text>
-                  </Pressable>
-                </View>
-              </View>
-              <View style={{ flexDirection: "row", marginTop: 20, display: 'flex', justifyContent: "space-between" }}>
-                <Text style={{ fontSize: Layout.defaultFontSize }}
-                > notes: </Text>
-                <TextInput placeholder='notes'
-                  style={{ ...textInputStyle, flexGrow: 1 }}
-                  value={aScheduledItem.notes.toString()}
-                  onChangeText={text => {
-                    const s = Object.assign({}, aScheduledItem)
-                    s.notes = text;
-                    setAScheduledItem(s)
-                  }}
-                  editable={isEditable} />
-
-              </View>
+          setAExercise={setAExercise}
+          setExDialogVisibility={setExDialogVisibility}
+          setDropDownOpenOrNot={setDropDownOpenOrNot}
+          setPushPullDropDownValue={setPushPullDropDownValue}
+          setDropDownMajorMuscleNameSelected={setDropDownMajorMuscleNameSelected}
+          setOpenPushPullDropDown={setOpenPushPullDropDown}
 
 
-
-              <View style={{ flexDirection: "row", marginTop: 10, display: 'flex', justifyContent: "space-between" }}>
-                <Text style={{ fontSize: Layout.defaultFontSize }}> date: {currentDate.day + "-" + currentDate.month + "-" + currentDate.year}</Text>
-                <Pressable
-                  style={{
-                    ...buttonStyle,
-                    paddingVertical: Layout.defaultMargin * 1.5,
-                  }}
-                  disabled={!isEditable} onPress={() => {
-                    setCalendarDialogVisibility(true)
-                  }} >
-                  <Text style={{
-                    color: "white", fontWeight: "600", flexDirection: "column", flex: 1,
-                    marginTop: "-5%",
-                  }}>CHANGE DATE</Text>
-                </Pressable>
-                <Modal visible={isCalendarDialogVisible} animationType="fade" transparent={true} >
-                  <TouchableOpacity style={{ flex: 1, display: "flex", justifyContent: "flex-end" }} onPressIn={() => setCalendarDialogVisibility(false)}>
-                    <TouchableOpacity style={styles.innerTouchableOpacity2}
-                      onPress={() => { }}
-                      activeOpacity={1}
-                    >
-                      <Text style={{ fontSize: Layout.defaultFontSize, fontWeight: "bold" }} >Select a date</Text>
-                      <Calendar
-                        initialDate={currentDate.dateString}
-                        onDayPress={day => {
-                          const s = Object.assign({}, aScheduledItem)
-                          s.date = day;
-                          setCurrentDate(day)
-                          setAScheduledItem(s)
-                          setCalendarDialogVisibility(false)
-
-                        }} />
-                      <Button title='Cancel' onPress={() => setCalendarDialogVisibility(false)} />
-                    </TouchableOpacity>
-                  </TouchableOpacity>
-                </Modal>
-              </View>
-              {ButtonSet()}
-            </TouchableOpacity>
-          </TouchableOpacity>
-        </Modal>
-        <Modal visible={isExDialogVisible} animationType="fade" transparent={true}>
-          <TouchableOpacity style={{ flex: 1, display: "flex", justifyContent: "flex-end" }} onPressIn={() => setExDialogVisibility(false)}>
-            <TouchableOpacity style={{ ...styles.innerTouchableOpacity }}
-              onPress={() => { setDropDownOpenOrNot(false) }}
-              activeOpacity={1}
-            >
-              <Text style={{ fontSize: Layout.defaultFontSize, fontWeight: "bold" }}>{dialogText}</Text>
-              <View style={{ flexDirection: "row", marginTop: 20 }}>
-                <Text style={{ fontSize: Layout.defaultFontSize }}
-                >Name: </Text>
-                <TextInput placeholder='Type in exercise name.'
-                  style={textInputStyle}
-                  value={aExercise.name}
-                  onChangeText={text => {
-                    const e = Object.assign({}, aExercise)
-                    let parts: string[] = text.split(" ")
-                    let formattedText: string = "";
-                    parts.forEach(part => {
-                      let formatedWord = part.charAt(0).toUpperCase() + part.slice(1)
-                      formattedText = formattedText + " " + formatedWord;
-                    }
-                    )
-                    e.name = formattedText;
-                    setAExercise(e)
-                  }}
-                  editable={isEditable} />
-              </View>
-              <View style={{ flexDirection: "row", marginTop: 20 }}>
-                <Text
-                  style={{ fontSize: Layout.defaultFontSize }}
-                >Description: </Text>
-                <TextInput style={{ ...textInputStyle, fontSize: Layout.defaultFontSize }}
-                  multiline={true} placeholder='Type in exercise description.'
-                  value={aExercise.description}
-                  onChangeText={text => {
-                    const e = Object.assign({}, aExercise)
-                    e.description = text;
-                    setAExercise(e)
-                  }}
-                  editable={isEditable} />
-              </View>
-              <View style={{ flexDirection: "row", marginTop: 20 }}>
-                <Text
-                  style={{ fontSize: Layout.defaultFontSize }}
-                >Push Or Pull: </Text>
-                <DropDownPicker
-
-                  style={{
-                    width: "100%", minHeight: 30,
-                    transform: [{ rotateX: "180deg" }],
-                    backgroundColor: Colors.light.altBackground, borderWidth: 0, borderRadius: 0
-                  }}
-                  disabledStyle={{ borderWidth: 0, backgroundColor: "white" }}
-                  dropDownContainerStyle={{
-                    transform: [{ rotateX: "180deg" }],
-                    backgroundColor: Colors.light.altBackground, borderWidth: 0,
-                    borderRadius: 0, minHeight: 500,
-                  }}
-                  textStyle={{ fontSize: Layout.defaultFontSize, transform: [{ rotateX: "180deg" }] }}
-                  searchTextInputStyle={{ borderWidth: 0, zIndex: -1 }}
-                  placeholderStyle={{ color: "#9E9E9E" }}
-
-                  items={pushPullDropDownList}
-                  value={pushPullDropDownValue}
-                  setValue={setPushPullDropDownValue}
-                  open={openPushPullDropDown}
-                  setOpen={setOpenPushPullDropDown}
-                  disabled={!isEditable}
-                  dropDownDirection="TOP"
-                  closeOnBackPressed={true}
-                />
-              </View>
-              <View style={{ flexDirection: "row", marginTop: 20 }}>
-                <DropDownPicker
-
-                  style={{
-                    width: "100%", minHeight: 30,
-                    transform: [{ rotateX: "180deg" }],
-                    backgroundColor: Colors.light.altBackground, borderWidth: 0, borderRadius: 0
-                  }}
-                  disabledStyle={{ borderWidth: 0, backgroundColor: "white" }}
-                  dropDownContainerStyle={{
-                    transform: [{ rotateX: "180deg" }],
-                    backgroundColor: Colors.light.altBackground, borderWidth: 0,
-                    borderRadius: 0, minHeight: 500,
-                  }}
-                  textStyle={{ fontSize: Layout.defaultFontSize, transform: [{ rotateX: "180deg" }] }}
-                  searchTextInputStyle={{ borderWidth: 0, zIndex: -1 }}
-                  placeholderStyle={{ color: "#9E9E9E" }}
-
-                  showBadgeDot={false}
-                  schema={{ label: "name", value: "name" }}
-                  items={majorMuscles as ItemType<string>[]}
-                  value={dropDownMajorMuscleNameSelected}
-                  setValue={setDropDownMajorMuscleNameSelected}
-                  open={isDropDownOpen}
-                  setOpen={setDropDownOpenOrNot}
-                  disabled={!isEditable}
-                  multiple={true}
-                  dropDownDirection="TOP"
-                  searchable={true}
-                  closeOnBackPressed={true}
-                  placeholder='Select Muscle Group(s).'
-                  mode="BADGE"
-                  extendableBadgeContainer={true}
-                  badgeProps={{ disabled: !isEditable }}
-
-                />
-              </View>
-              {ButtonSet()}
-            </TouchableOpacity>
-          </TouchableOpacity>
-        </Modal>
+          cancelDialog={cancelDialog}
+          aScheduledItem={aScheduledItem}
+          deleteExerciseConfirmation={deleteExerciseConfirmation}
+          renderExerciseDialogForEdit={renderExerciseDialogForEdit}
+          createExercise={createExercise}
+          updateExercise={updateExercise}
+          renderExerciseDialogForViewing={renderExerciseDialogForViewing}
+          deleteScheduledItemConfirmation={deleteScheduledItemConfirmation}
+          renderScheduledItemDialogForEdit={renderScheduledItemDialogForEdit}
+          createScheduledItem={createScheduledItem}
+          updateScheduledItem={updateScheduledItem}
+          renderScheduledItemDialogForViewing={renderScheduledItemDialogForViewing}
+          renderScheduledItemDialogForDuplication={renderScheduledItemDialogForDuplication}
+        />
         <handleResetDBContext.Provider value={handleResetDB}>
           <ExerciseScreenContext.Provider value={{
             exercises: filteredExercises,
-            handleSelected: handleExerciseCRUDPress,
+            handleSelected: renderExerciseDialogForViewing,
             handleCreate: showCreateExerciseDialog,
             filteredKeyword: filteredExerciseKeyword,
             handleFilterExercises: handleFilterExercies
           }}>
             <ScheduledItemContext.Provider value={{
               majorSet: filteredScheduledItems,
-              handleSelected: handleScheduledItemCRUDPress,
+              handleSelected: renderScheduledItemDialogForViewing,
               handleCreate: showCreateScheduledItemDialog,
               handleFilterScheduledItem: handleFilterScheduledItem,
               filteredKeyword: filteredScheduledItemKeyword,
@@ -1100,7 +636,7 @@ export default function App() {
                 screenOptions={({ route }) =>
                 ({
                   tabBarIcon: ({ focused, color, size }) => {
-                    let iconName;
+                    let iconName: any;
                     switch (route.name) {
                       case 'Plan':
                         iconName = focused
@@ -1136,7 +672,7 @@ export default function App() {
     </>
   )
 }
-const bases = StyleSheet.create({
+export const bases = StyleSheet.create({
   textInputBase: {
     fontSize: Layout.defaultFontSize,
     color: "black", marginTop: -5,
@@ -1197,7 +733,7 @@ const bases = StyleSheet.create({
 
 })
 
-const styles = StyleSheet.create({
+export const styles = StyleSheet.create({
   innerTouchableOpacity2: {
     // top: '20%',
     ...bases.innerTouchableOpacityBase
