@@ -18,16 +18,16 @@ export function ScheduleDialog(props: any) {
   const isPlanDialogVisible = props.isPlanDialogVisible
   const dialogText = props.dialogText
   const isDropDownOpen = props.isDropDownOpen
-  const exercises = props.exercises
+  const exerciseState = props.exerciseState
   const dropDownExerciseNameSelected = props.dropDownExerciseNameSelected
   const aScheduledItem: ScheduledItem = props.aScheduledItem
   const isEditable = props.isEditable
-  // const aExerciseMinutes = props.aExerciseMinutes
-  // const aExerciseSeconds = props.aExerciseSeconds
+
   const isCalendarDialogVisible = props.isCalendarDialogVisible
   const currentDate = props.currentDate
   const cancelDialog = props.cancelDialog
-  const aExercise: Exercise = props.aExercise
+  
+  const aExercise: Exercise = props.exerciseState.aExercise
 
   const minutes = Math.floor(aScheduledItem.duration_in_seconds / 60)
   const seconds = aScheduledItem.duration_in_seconds % 60
@@ -37,8 +37,6 @@ export function ScheduleDialog(props: any) {
   const setAScheduledItem: Function = props.setAScheduledItem
   const setDropDownOpenOrNot = props.setDropDownOpenOrNot
   const setDropDownExerciseNameSelected = props.setDropDownExerciseNameSelected
-  // const setAExerciseMinutes: Function = props.setAExerciseMinutes
-  // const setAExerciseSeconds: Function = props.setAExerciseSeconds
   const setCurrentDate: Function = props.setCurrentDate
   const setCalendarDialogVisibility: Function = props.setCalendarDialogVisibility
 
@@ -49,7 +47,6 @@ export function ScheduleDialog(props: any) {
   const updateScheduledItem: Function = props.updateScheduledItem
   const renderScheduledItemDialogForViewing: Function = props.renderScheduledItemDialogForViewing
   const renderScheduledItemDialogForDuplication: Function = props.renderScheduledItemDialogForDuplication
-
   let textInputStyle, numberInputStyle, buttonStyle
   if (isEditable) {
     textInputStyle = styles.textInputEditable
@@ -73,7 +70,7 @@ export function ScheduleDialog(props: any) {
               placeholder="Select a exercise"
               open={isDropDownOpen}
               schema={{ label: "name", value: "name" }}
-              items={exercises as ItemType<string>[]}
+              items={exerciseState. exercises as ItemType<string>[]}
               itemKey="name"
               value={dropDownExerciseNameSelected}
               setOpen={setDropDownOpenOrNot}

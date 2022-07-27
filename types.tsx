@@ -70,3 +70,12 @@ export type Emm = {
   exercise_name:string,
   major_muscle_name:string
 }
+
+
+export type ExerciseState={
+  exercises:Exercise[],
+  aExercise:Exercise,
+  filteredExercises:Exercise[],
+  filteredExerciseKeyword:string,
+  oldExerciseName:string
+}

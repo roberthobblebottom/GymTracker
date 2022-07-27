@@ -8,13 +8,13 @@ import Layout from './constants/Layout'
 import DropDownPicker, { ItemType } from 'react-native-dropdown-picker'
 import _default from 'babel-plugin-transform-typescript-metadata'
 import { styles } from './App'
-import { PushPullEnum } from './types'
+import { Exercise, PushPullEnum } from './types'
 import { ButtonSet } from './ButtonSet'
 export function ExerciseDialog(props: any) {
     const dialogText = props.dialogText
     const isDropDownOpen = props.isDropDownOpen
     const isEditable = props.isEditable
-    const aExercise = props.aExercise
+    const exerciseState = props.exerciseState;
     const pushPullDropDownValue = props.pushPullDropDownValue
     const majorMuscles = props.majorMuscles
     const openPushPullDropDown = props.openPushPullDropDown
@@ -22,7 +22,8 @@ export function ExerciseDialog(props: any) {
     const isExDialogVisible = props.isExDialogVisible
     const aScheduledItem = props.aScheduledItem
 
-    const setAExercise = props.setAExercise
+    // const setAExercise = props.setAExercise
+    const setExerciseState:Function = props.setExerciseState;
     const setExDialogVisibility = props.setExDialogVisibility
     const setDropDownOpenOrNot = props.setDropDownOpenOrNot
     const setPushPullDropDownValue = props.setPushPullDropDownValue
@@ -34,13 +35,9 @@ export function ExerciseDialog(props: any) {
     const createExercise = props.createExercise
     const updateExercise = props.updateExercise
     const renderExerciseDialogForViewing = props.renderExerciseDialogForViewing
-    const deleteScheduledItemConfirmation = props.deleteScheduledItemConfirmation
-    const renderScheduledItemDialogForEdit = props.renderScheduledItemDialogForEdit
-    const createScheduledItem = props.createScheduledItem
-    const updateScheduledItem = props.updateScheduledItem
-    const renderScheduledItemDialogForViewing = props.renderScheduledItemDialogForViewing
-    const renderScheduledItemDialogForDuplication = props.renderScheduledItemDialogForDuplication
 
+    const setAExercise = (e:Exercise) => setExerciseState({...exerciseState,aExercise:e})
+    const aExercise = exerciseState.aExercise;
     let textInputStyle, numberInputStyle, buttonStyle
     if (isEditable) {
         textInputStyle = styles.textInputEditable
@@ -113,7 +110,6 @@ export function ExerciseDialog(props: any) {
                             textStyle={{ fontSize: Layout.defaultFontSize, transform: [{ rotateX: "180deg" }] }}
                             searchTextInputStyle={{ borderWidth: 0, zIndex: -1 }}
                             placeholderStyle={{ color: "#9E9E9E" }}
-
                             items={
                                 [
                                     { label: PushPullEnum.Push, value: PushPullEnum.Push },
@@ -175,12 +171,6 @@ export function ExerciseDialog(props: any) {
                         createExercise={createExercise}
                         updateExercise={updateExercise}
                         renderExerciseDialogForViewing={renderExerciseDialogForViewing}
-                        deleteScheduledItemConfirmation={deleteScheduledItemConfirmation}
-                        renderScheduledItemDialogForEdit={renderScheduledItemDialogForEdit}
-                        createScheduledItem={createScheduledItem}
-                        updateScheduledItem={updateScheduledItem}
-                        renderScheduledItemDialogForViewing={renderScheduledItemDialogForViewing}
-                        renderScheduledItemDialogForDuplication={renderScheduledItemDialogForDuplication}
                     />
                 </TouchableOpacity>
             </TouchableOpacity>
