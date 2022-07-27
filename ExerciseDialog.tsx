@@ -7,7 +7,7 @@ import Colors from './constants/Colors'
 import Layout from './constants/Layout'
 import DropDownPicker, { ItemType } from 'react-native-dropdown-picker'
 import _default from 'babel-plugin-transform-typescript-metadata'
-import { styles } from './App'
+import { styles } from './styles'
 import { Exercise, PushPullEnum } from './types'
 import { ButtonSet } from './ButtonSet'
 export function ExerciseDialog(props: any) {

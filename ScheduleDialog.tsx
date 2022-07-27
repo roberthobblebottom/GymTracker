@@ -10,7 +10,7 @@ import Layout from './constants/Layout'
 import { Calendar } from 'react-native-calendars'
 import DropDownPicker, { ItemType } from 'react-native-dropdown-picker'
 import _default from 'babel-plugin-transform-typescript-metadata'
-import { bases, styles } from './App'
+import { bases, styles } from './styles'
 import { ButtonSet } from './ButtonSet'
 import { Exercise, ScheduledItem } from './types'
 export function ScheduleDialog(props: any) {
