@@ -96,5 +96,6 @@ export const styles = StyleSheet.create({
     backgroundColor: Colors.light.altBackground,
     ...bases.changeDateButtonBase
   }
-
+  ,
+  dialogRow: { flexDirection: "row", marginTop: 20 }
 })

@@ -2,7 +2,7 @@ import {
     Modal, View, Text, TouchableOpacity, TextInput
 } from 'react-native'
 import 'react-native-gesture-handler'
-import React, { } from 'react'
+import React, { Dispatch } from 'react'
 import Colors from './constants/Colors'
 import Layout from './constants/Layout'
 import DropDownPicker, { ItemType } from 'react-native-dropdown-picker'
@@ -23,11 +23,11 @@ export function ExerciseDialog(props: any) {
     const aScheduledItem = props.aScheduledItem
 
     // const setAExercise = props.setAExercise
-    const setExerciseState:Function = props.setExerciseState;
+    const setExerciseState: Function = props.setExerciseState;
     const setExDialogVisibility = props.setExDialogVisibility
     const setDropDownOpenOrNot = props.setDropDownOpenOrNot
     const setPushPullDropDownValue = props.setPushPullDropDownValue
-    const setDropDownMajorMuscleNameSelected = props.setDropDronMajorMuscleNameSelected
+    const setMajorMuscleValues:Dispatch<any>= props.setMajorMuscleValues
     const setOpenPushPullDropDown = props.setOpenPushPullDropDown
     const cancelDialog = props.cancelDialog
     const deleteExerciseConfirmation = props.deleteExerciseConfirmation
@@ -36,7 +36,7 @@ export function ExerciseDialog(props: any) {
     const updateExercise = props.updateExercise
     const renderExerciseDialogForViewing = props.renderExerciseDialogForViewing
 
-    const setAExercise = (e:Exercise) => setExerciseState({...exerciseState,aExercise:e})
+    const setAExercise = (e: Exercise) => setExerciseState({ ...exerciseState, aExercise: e })
     const aExercise = exerciseState.aExercise;
     let textInputStyle, numberInputStyle, buttonStyle
     if (isEditable) {
@@ -48,6 +48,7 @@ export function ExerciseDialog(props: any) {
         numberInputStyle = styles.numberInputViewOnly
         buttonStyle = styles.changeDateButtonDisabled
     }
+    console.log(isEditable)
     return (
         <Modal visible={isExDialogVisible} animationType="fade" transparent={true}>
             <TouchableOpacity style={{ flex: 1, display: "flex", justifyContent: "flex-end" }} onPressIn={() => setExDialogVisibility(false)}>
@@ -56,7 +57,7 @@ export function ExerciseDialog(props: any) {
                     activeOpacity={1}
                 >
                     <Text style={{ fontSize: Layout.defaultFontSize, fontWeight: "bold" }}>{dialogText}</Text>
-                    <View style={{ flexDirection: "row", marginTop: 20 }}>
+                    <View style={styles.dialogRow}>
                         <Text style={{ fontSize: Layout.defaultFontSize }}
                         >Name: </Text>
                         <TextInput placeholder='Type in exercise name.'
@@ -76,7 +77,7 @@ export function ExerciseDialog(props: any) {
                             }}
                             editable={isEditable} />
                     </View>
-                    <View style={{ flexDirection: "row", marginTop: 20 }}>
+                    <View style={styles.dialogRow}>
                         <Text
                             style={{ fontSize: Layout.defaultFontSize }}
                         >Description: </Text>
@@ -90,7 +91,7 @@ export function ExerciseDialog(props: any) {
                             }}
                             editable={isEditable} />
                     </View>
-                    <View style={{ flexDirection: "row", marginTop: 20 }}>
+                    <View style={styles.dialogRow}>
                         <Text
                             style={{ fontSize: Layout.defaultFontSize }}
                         >Push Or Pull: </Text>
@@ -99,23 +100,21 @@ export function ExerciseDialog(props: any) {
                             style={{
                                 width: "100%", minHeight: 30,
                                 transform: [{ rotateX: "180deg" }],
-                                backgroundColor: Colors.light.altBackground, borderWidth: 0, borderRadius: 0
+                                backgroundColor: Colors.light.altBackground, borderWidth: 0, borderRadius: 0, maxWidth: 100
                             }}
                             disabledStyle={{ borderWidth: 0, backgroundColor: "white" }}
                             dropDownContainerStyle={{
                                 transform: [{ rotateX: "180deg" }],
                                 backgroundColor: Colors.light.altBackground, borderWidth: 0,
-                                borderRadius: 0, minHeight: 500,
+                                borderRadius: 0, minHeight: 500, maxWidth: 100
                             }}
                             textStyle={{ fontSize: Layout.defaultFontSize, transform: [{ rotateX: "180deg" }] }}
                             searchTextInputStyle={{ borderWidth: 0, zIndex: -1 }}
                             placeholderStyle={{ color: "#9E9E9E" }}
-                            items={
-                                [
-                                    { label: PushPullEnum.Push, value: PushPullEnum.Push },
-                                    { label: PushPullEnum.Pull, value: PushPullEnum.Pull }
-                                ]
-                            }
+                            items={[
+                                { label: PushPullEnum.Push, value: PushPullEnum.Push },
+                                { label: PushPullEnum.Pull, value: PushPullEnum.Pull }
+                            ]}
                             value={pushPullDropDownValue}
                             setValue={setPushPullDropDownValue}
                             open={openPushPullDropDown}
@@ -125,7 +124,7 @@ export function ExerciseDialog(props: any) {
                             closeOnBackPressed={true}
                         />
                     </View>
-                    <View style={{ flexDirection: "row", marginTop: 20 }}>
+                    <View style={styles.dialogRow}>
                         <DropDownPicker
                             style={{
                                 width: "100%", minHeight: 30,
@@ -146,7 +145,7 @@ export function ExerciseDialog(props: any) {
                             schema={{ label: "name", value: "name" }}
                             items={majorMuscles as ItemType<string>[]}
                             value={dropDownMajorMuscleNameSelected}
-                            setValue={setDropDownMajorMuscleNameSelected}
+                            setValue={setMajorMuscleValues}
                             open={isDropDownOpen}
                             setOpen={setDropDownOpenOrNot}
                             disabled={!isEditable}

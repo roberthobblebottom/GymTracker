@@ -69,7 +69,7 @@ export default function App() {
   //for exercise
   const [exerciseState, setExerciseState] = useState(initialExerciseState)
   const [isExDialogVisible, setExDialogVisibility] = useState(false)//Ex = exercise
-  const [dropDownMajorMuscleNameSelected, setDropDownMajorMuscleNameSelected] = useState([""])
+  const [dropDownMajorMuscleNameSelected, setMajorMuscleValues] = useState([""])
   const [openPushPullDropDown, setOpenPushPullDropDown] = useState(false)
   const [pushPullDropDownValue, setPushPullDropDownValue] = useState(PushPullEnum.Push)
 
@@ -238,7 +238,7 @@ export default function App() {
     let names: string[] = [];
     exercise.major_muscles.forEach(mm => names.push(mm.name))
     setDropDownOpenOrNot(false)
-    setDropDownMajorMuscleNameSelected(names)
+    setMajorMuscleValues(names)
     setDialogText(ExerciseInformationText)
     setExDialogVisibility(true)
     setPushPullDropDownValue(exercise.push_or_pull)
@@ -324,7 +324,7 @@ export default function App() {
 
   const showCreateExerciseDialog = () => {
     setExerciseState({ ...exerciseState, aExercise: initialExerciseState.aExercise })
-    setDropDownMajorMuscleNameSelected([])
+    setMajorMuscleValues([])
     setEditability(true)
     textInputStyle = styles.textInputEditable;
     setDialogText(CreateExerciseText)
@@ -582,7 +582,7 @@ export default function App() {
           setExDialogVisibility={setExDialogVisibility}
           setDropDownOpenOrNot={setDropDownOpenOrNot}
           setPushPullDropDownValue={setPushPullDropDownValue}
-          setDropDownMajorMuscleNameSelected={setDropDownMajorMuscleNameSelected}
+          setMajorMuscleValues={setMajorMuscleValues}
           setOpenPushPullDropDown={setOpenPushPullDropDown}
 
 
