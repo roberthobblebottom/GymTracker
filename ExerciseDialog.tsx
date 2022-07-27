@@ -11,35 +11,29 @@ import { styles } from './styles'
 import { Exercise, PushPullEnum } from './types'
 import { ButtonSet } from './ButtonSet'
 export function ExerciseDialog(props: any) {
-    const dialogText = props.dialogText
     const isDropDownOpen = props.isDropDownOpen
-    const isEditable = props.isEditable
     const exerciseState = props.exerciseState;
-    const pushPullDropDownValue = props.pushPullDropDownValue
     const majorMuscles = props.majorMuscles
-    const openPushPullDropDown = props.openPushPullDropDown
     const dropDownMajorMuscleNameSelected = props.dropDownMajorMuscleNameSelected
-    const isExDialogVisible = props.isExDialogVisible
     const aScheduledItem = props.aScheduledItem
+    const dialogState=props.dialogState
 
     // const setAExercise = props.setAExercise
     const setExerciseState: Function = props.setExerciseState;
-    const setExDialogVisibility = props.setExDialogVisibility
     const setDropDownOpenOrNot = props.setDropDownOpenOrNot
-    const setPushPullDropDownValue = props.setPushPullDropDownValue
     const setMajorMuscleValues:Dispatch<any>= props.setMajorMuscleValues
-    const setOpenPushPullDropDown = props.setOpenPushPullDropDown
     const cancelDialog = props.cancelDialog
     const deleteExerciseConfirmation = props.deleteExerciseConfirmation
     const renderExerciseDialogForEdit = props.renderExerciseDialogForEdit
     const createExercise = props.createExercise
     const updateExercise = props.updateExercise
     const renderExerciseDialogForViewing = props.renderExerciseDialogForViewing
+    const SetDialogState = props.setDialogState
 
     const setAExercise = (e: Exercise) => setExerciseState({ ...exerciseState, aExercise: e })
     const aExercise = exerciseState.aExercise;
     let textInputStyle, numberInputStyle, buttonStyle
-    if (isEditable) {
+    if (dialogState.isEditable) {
         textInputStyle = styles.textInputEditable
         numberInputStyle = styles.numberInputEditable
         buttonStyle = styles.changeDateButtonEnabled
@@ -48,15 +42,15 @@ export function ExerciseDialog(props: any) {
         numberInputStyle = styles.numberInputViewOnly
         buttonStyle = styles.changeDateButtonDisabled
     }
-    console.log(isEditable)
+    console.log(dialogState.isEditable)
     return (
-        <Modal visible={isExDialogVisible} animationType="fade" transparent={true}>
-            <TouchableOpacity style={{ flex: 1, display: "flex", justifyContent: "flex-end" }} onPressIn={() => setExDialogVisibility(false)}>
+        <Modal visible={dialogState.isExDialogVisible} animationType="fade" transparent={true}>
+            <TouchableOpacity style={{ flex: 1, display: "flex", justifyContent: "flex-end" }} onPressIn={() => SetDialogState({...dialogState, isExDialogVisible:false})}>
                 <TouchableOpacity style={{ ...styles.innerTouchableOpacity }}
                     onPress={() => { setDropDownOpenOrNot(false) }}
                     activeOpacity={1}
                 >
-                    <Text style={{ fontSize: Layout.defaultFontSize, fontWeight: "bold" }}>{dialogText}</Text>
+                    <Text style={{ fontSize: Layout.defaultFontSize, fontWeight: "bold" }}>{dialogState.dialogText}</Text>
                     <View style={styles.dialogRow}>
                         <Text style={{ fontSize: Layout.defaultFontSize }}
                         >Name: </Text>
@@ -75,7 +69,7 @@ export function ExerciseDialog(props: any) {
                                 e.name = formattedText
                                 setAExercise(e)
                             }}
-                            editable={isEditable} />
+                            editable={dialogState.isEditable} />
                     </View>
                     <View style={styles.dialogRow}>
                         <Text
@@ -89,7 +83,7 @@ export function ExerciseDialog(props: any) {
                                 e.description = text
                                 setAExercise(e)
                             }}
-                            editable={isEditable} />
+                            editable={dialogState.isEditable} />
                     </View>
                     <View style={styles.dialogRow}>
                         <Text
@@ -115,11 +109,11 @@ export function ExerciseDialog(props: any) {
                                 { label: PushPullEnum.Push, value: PushPullEnum.Push },
                                 { label: PushPullEnum.Pull, value: PushPullEnum.Pull }
                             ]}
-                            value={pushPullDropDownValue}
-                            setValue={setPushPullDropDownValue}
-                            open={openPushPullDropDown}
-                            setOpen={setOpenPushPullDropDown}
-                            disabled={!isEditable}
+                            value={dialogState.pushPullDropDownValue}
+                            setValue={v=>SetDialogState({...dialogState,   pushPullDropDownValue:v})}
+                            open={dialogState.openPushPullDropDown}
+                            setOpen={v => SetDialogState({...dialogState, openPushPullDropDown:v})}
+                            disabled={!dialogState.isEditable}
                             dropDownDirection="TOP"
                             closeOnBackPressed={true}
                         />
@@ -148,7 +142,7 @@ export function ExerciseDialog(props: any) {
                             setValue={setMajorMuscleValues}
                             open={isDropDownOpen}
                             setOpen={setDropDownOpenOrNot}
-                            disabled={!isEditable}
+                            disabled={!dialogState.isEditable}
                             multiple={true}
                             dropDownDirection="TOP"
                             searchable={true}
@@ -156,12 +150,12 @@ export function ExerciseDialog(props: any) {
                             placeholder='Select Muscle Group(s).'
                             mode="BADGE"
                             extendableBadgeContainer={true}
-                            badgeProps={{ disabled: !isEditable }}
+                            badgeProps={{ disabled: !dialogState.isEditable }}
 
                         />
                     </View>
                     <ButtonSet
-                        dialogText={dialogText}
+                        dialogText={dialogState.dialogText}
                         cancelDialog={cancelDialog}
                         aExercise={aExercise}
                         aScheduledItem={aScheduledItem}

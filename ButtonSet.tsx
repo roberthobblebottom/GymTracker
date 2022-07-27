@@ -14,11 +14,10 @@ export function ButtonSet(props: any) {
     const EditScheduledItemText: string = "Edit"
     const DuplicateScheduledItemText: string = "Duplicate:"
 
-    const dialogText = props.dialogText
     const cancelDialog = props.cancelDialog
     const aExercise = props.aExercise
     const aScheduledItem = props.aScheduledItem
-
+const dialogText=props.dialogText
     const deleteExerciseConfirmation = props.deleteExerciseConfirmation
     const renderExerciseDialogForEdit = props.renderExerciseDialogForEdit
     const renderExerciseDialogForViewing = props.renderExerciseDialogForViewing

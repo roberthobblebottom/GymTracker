@@ -19,7 +19,7 @@ import { Ionicons, MaterialCommunityIcons, } from '@expo/vector-icons';
 import _default from 'babel-plugin-transform-typescript-metadata';
 import { ScheduleDialog } from './ScheduleDialog';
 import { ExerciseDialog } from './ExerciseDialog';
-import { styles,bases } from './styles';
+import { styles, bases } from './styles';
 LogBox.ignoreLogs(['Require cycle:'])
 const Tab = createBottomTabNavigator()
 
@@ -31,7 +31,7 @@ export const initialExerciseState: ExerciseState = {
   , aExercise: { name: "", description: "", imagesJson: "", major_muscles: [], push_or_pull: PushPullEnum.Push }
   , filteredExercises: [{ name: "", description: "", imagesJson: "", major_muscles: [], push_or_pull: PushPullEnum.Push }]
   , filteredExerciseKeyword: ""
-  , oldExerciseName:""
+  , oldExerciseName: ""
 };
 export const initialScheduledItem: ScheduledItem[] = [{
   id: 0,
@@ -46,7 +46,13 @@ export const initialScheduledItem: ScheduledItem[] = [{
 }];
 const initialMajorMuscles: MajorMuscle[] = [{ name: "", notes: "", imageJson: "" }];
 const initialEmm: Emm[] = [{ id: 9999, exercise_name: "", major_muscle_name: "" }];
-
+const initialDialogState = {
+  isExDialogVisible: false,
+  openPushPullDropDown: false,
+  pushPullDropDownValue: PushPullEnum.Push,
+  dialogText: "",
+  isEditable: false,
+}
 let d: Date = new Date()
 //constexts
 export const handleResetDBContext = React.createContext(() => { })
@@ -68,14 +74,17 @@ export const ScheduledItemContext = React.createContext({
 export default function App() {
   //for exercise
   const [exerciseState, setExerciseState] = useState(initialExerciseState)
-  const [isExDialogVisible, setExDialogVisibility] = useState(false)//Ex = exercise
+  // const [isExDialogVisible, setExDialogVisibility] = useState(false)//Ex = exercise
   const [dropDownMajorMuscleNameSelected, setMajorMuscleValues] = useState([""])
-  const [openPushPullDropDown, setOpenPushPullDropDown] = useState(false)
-  const [pushPullDropDownValue, setPushPullDropDownValue] = useState(PushPullEnum.Push)
+  // const [openPushPullDropDown, setOpenPushPullDropDown] = useState(false)
+  // const [pushPullDropDownValue, setPushPullDropDownValue] = useState(PushPullEnum.Push)
 
   //shared
-  const [dialogText, setDialogText] = useState("")
-  const [isEditable, setEditability] = useState(false)
+  const [dialogState, SetDialogState] = useState(initialDialogState)
+
+
+  // const [dialogText, setDialogText] = useState("")
+  // const [isEditable, setEditability] = useState(false)
 
   //for majorSet
   const [isCalendarDialogVisible, setCalendarDialogVisibility] = useState(false)
@@ -176,7 +185,7 @@ export default function App() {
   init()
   // console.log(exerciseState.exercises.length)
   let textInputStyle, numberInputStyle, buttonStyle;
-  if (isEditable) {
+  if (dialogState.isEditable) {
     textInputStyle = styles.textInputEditable
     numberInputStyle = styles.numberInputEditable
     buttonStyle = styles.changeDateButtonEnabled
@@ -187,30 +196,27 @@ export default function App() {
   }
   const renderScheduledItemDialogForEdit = () => {
     buttonStyle = styles.changeDateButtonEnabled;
-    setEditability(true)
     setDropDownOpenOrNot(false)
     textInputStyle = styles.textInputEditable;
-    setDialogText(EditScheduledItemText)
     setAScheduledItem(aScheduledItem)
     setDropDownExerciseNameSelected(aScheduledItem.exercise.name)
     setCurrentDate(aScheduledItem.date)
+    SetDialogState({ ...dialogState, isEditable: true, dialogText: EditScheduledItemText });
   }
   const renderScheduledItemDialogForDuplication = () => {
 
     buttonStyle = styles.changeDateButtonEnabled;
-    setEditability(true)
     setDropDownOpenOrNot(false)
     textInputStyle = styles.textInputEditable;
-    setDialogText(DuplicateScheduledItemText)
     setAScheduledItem(aScheduledItem)
     setDropDownExerciseNameSelected(aScheduledItem.exercise.name)
     setCurrentDate(aScheduledItem.date)
+    SetDialogState({ ...dialogState, isEditable: true, dialogText: DuplicateScheduledItemText });
   }
   const renderExerciseDialogForEdit = () => {
-    setEditability(true)
     textInputStyle = styles.textInputEditable;
-    setDialogText(EditExerciseText)
     setDropDownOpenOrNot(false)
+    SetDialogState({ ...dialogState, isEditable: true, dialogText: EditExerciseText });
   }
 
   const handleResetDB = () => {
@@ -220,7 +226,7 @@ export default function App() {
     setMajorMuscles(initialMajorMuscles)
   }
   function cancelDialog() {
-    setExDialogVisibility(false)
+    SetDialogState({ ...dialogState, isExDialogVisible: false });
     setCalendarDialogVisibility(false)
     setPlanDialogVisibility(false)
   }
@@ -232,17 +238,20 @@ export default function App() {
     cancelDialog()
   }
   const renderExerciseDialogForViewing = (exercise: Exercise) => {
-    setEditability(false)
     textInputStyle = styles.textInputViewOnly;
-    setExerciseState({ ...exerciseState, aExercise: exercise,oldExerciseName:exercise.name })
+    setExerciseState({ ...exerciseState, aExercise: exercise, oldExerciseName: exercise.name })
     let names: string[] = [];
     exercise.major_muscles.forEach(mm => names.push(mm.name))
     setDropDownOpenOrNot(false)
     setMajorMuscleValues(names)
-    setDialogText(ExerciseInformationText)
-    setExDialogVisibility(true)
-    setPushPullDropDownValue(exercise.push_or_pull)
-    setOpenPushPullDropDown(false)
+    SetDialogState({
+      ...dialogState,
+      isExDialogVisible: true,
+      pushPullDropDownValue: exercise.push_or_pull,
+      openPushPullDropDown: false,
+      dialogText: ExerciseInformationText,
+      isEditable: false
+    });
   }
 
   let deleteExerciseConfirmation = (exercise: Exercise) => {
@@ -284,8 +293,9 @@ export default function App() {
     ))
   }
   const updateExercise = () => {
-    const aExercise = exerciseState.aExercise;
-    const oldExerciseName = exerciseState.oldExerciseName;
+    const aExercise = exerciseState.aExercise
+    const oldExerciseName = exerciseState.oldExerciseName
+    const pushPullDropDownValue = dialogState.pushPullDropDownValue
     let selected: MajorMuscle[] = majorMuscles.filter(x => dropDownMajorMuscleNameSelected.includes(x.name))
     let toBeUpdated = selected.filter(x => aExercise.major_muscles.includes(x))
     toBeUpdated.forEach(x => {
@@ -325,13 +335,16 @@ export default function App() {
   const showCreateExerciseDialog = () => {
     setExerciseState({ ...exerciseState, aExercise: initialExerciseState.aExercise })
     setMajorMuscleValues([])
-    setEditability(true)
     textInputStyle = styles.textInputEditable;
-    setDialogText(CreateExerciseText)
-    setExDialogVisibility(true)
     setDropDownOpenOrNot(false)
-    setPushPullDropDownValue(PushPullEnum.Push)
-    setOpenPushPullDropDown(false)
+    SetDialogState({
+      ...dialogState,
+      isExDialogVisible: true,
+      pushPullDropDownValue: PushPullEnum.Push,
+      openPushPullDropDown: false,
+      dialogText: CreateExerciseText,
+      isEditable: true
+    });
   }
 
   function createExercise() {
@@ -345,12 +358,12 @@ export default function App() {
       ))
     )
     db.transaction(t => t.executeSql("INSERT INTO exercise VALUES (?,?,?,?)",
-      [aExercise.name, aExercise.description, aExercise.imagesJson, pushPullDropDownValue],
+      [aExercise.name, aExercise.description, aExercise.imagesJson, dialogState.pushPullDropDownValue],
       (_, result) => {
         const es: Exercise[] = exerciseState.exercises.slice()
         es.push({
           name: aExercise.name, description: aExercise.description, imagesJson: aExercise.imagesJson, major_muscles: selected,
-          push_or_pull: pushPullDropDownValue
+          push_or_pull: dialogState.pushPullDropDownValue
         })
         commonExercisesCRUD(es)
         Toast.show("The exercise " + aExercise.name + " is created.")
@@ -387,16 +400,20 @@ export default function App() {
   }
   function renderScheduledItemDialogForViewing(scheduledItem: ScheduledItem) {
     buttonStyle = styles.changeDateButtonDisabled;
-    setEditability(false)
     textInputStyle = styles.textInputViewOnly;
     numberInputStyle = styles.numberInputViewOnly;
     setAScheduledItem(scheduledItem)
-    setDialogText(ScheduledItemInformation)
     setDropDownOpenOrNot(false)
     setDropDownExerciseNameSelected(scheduledItem.exercise.name)
-    setExDialogVisibility(false)
     setPlanDialogVisibility(true)
     setCurrentDate(scheduledItem.date)
+
+    SetDialogState({
+      ...dialogState,
+      isEditable: false,
+      dialogText: ScheduledItemInformation,
+      isExDialogVisible: false
+    })
   }
   let deleteScheduledItemConfirmation = (ms: ScheduledItem) => {
     Alert.alert(
@@ -467,14 +484,17 @@ export default function App() {
 
   function showCreateScheduledItemDialog() {
     buttonStyle = styles.changeDateButtonEnabled;
-    setEditability(true)
     textInputStyle = styles.textInputEditable;
     numberInputStyle = styles.numberInputEditable;
     setAScheduledItem(initialScheduledItem[0])
-    setDialogText(CreateScheduledItemText)
     setPlanDialogVisibility(true)
     setDropDownExerciseNameSelected(exerciseState.exercises[0].name)
     setDropDownOpenOrNot(false)
+    SetDialogState({
+      ...dialogState,
+      isEditable: true,
+      dialogText: CreateScheduledItemText
+    })
     let parts: string[] = planHeader.split(" ")[1].split("-")
     let monthNumber: number = Number(parts[1])
     let month: string = monthNumber < 10 ? "0" + monthNumber.toString() : monthNumber.toString()
@@ -542,13 +562,12 @@ export default function App() {
       <NavigationContainer>
         <ScheduleDialog
           isPlanDialogVisible={isPlanDialogVisible}
-          dialogText={dialogText}
+          dialogState={dialogState}
           isDropDownOpen={isDropDownOpen}
           exerciseState={exerciseState}
           dropDownExerciseNameSelected={dropDownExerciseNameSelected}
           aScheduledItem={aScheduledItem}
           setAScheduledItem={setAScheduledItem}
-          isEditable={isEditable}
           setPlanDialogVisibility={setPlanDialogVisibility}
           setDropDownOpenOrNot={setDropDownOpenOrNot}
           setDropDownExerciseNameSelected={setDropDownExerciseNameSelected}
@@ -556,7 +575,7 @@ export default function App() {
           setCalendarDialogVisibility={setCalendarDialogVisibility}
           currentDate={currentDate}
           setCurrentDate={setCurrentDate}
-
+          SetDialogState={SetDialogState}
           cancelDialog={cancelDialog}
 
           deleteScheduledItemConfirmation={deleteScheduledItemConfirmation}
@@ -568,22 +587,17 @@ export default function App() {
 
         />
         <ExerciseDialog
-          isExDialogVisible={isExDialogVisible}
-          dialogText={dialogText}
           isDropDownOpen={isDropDownOpen}
-          isEditable={isEditable}
           exerciseState={exerciseState}
-          pushPullDropDownValue={pushPullDropDownValue}
           majorMuscles={majorMuscles}
-          openPushPullDropDown={openPushPullDropDown}
           dropDownMajorMuscleNameSelected={dropDownMajorMuscleNameSelected}
 
+          dialogState={dialogState}
+
+          setDialogState={SetDialogState}
           setExerciseState={setExerciseState}
-          setExDialogVisibility={setExDialogVisibility}
           setDropDownOpenOrNot={setDropDownOpenOrNot}
-          setPushPullDropDownValue={setPushPullDropDownValue}
           setMajorMuscleValues={setMajorMuscleValues}
-          setOpenPushPullDropDown={setOpenPushPullDropDown}
 
 
           cancelDialog={cancelDialog}
