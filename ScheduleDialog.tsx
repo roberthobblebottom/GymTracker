@@ -12,36 +12,43 @@ import DropDownPicker, { ItemType } from 'react-native-dropdown-picker'
 import _default from 'babel-plugin-transform-typescript-metadata'
 import { bases, styles } from './App'
 import { ButtonSet } from './ButtonSet'
+import { Exercise, ScheduledItem } from './types'
 export function ScheduleDialog(props: any) {
+  //variables
   const isPlanDialogVisible = props.isPlanDialogVisible
   const dialogText = props.dialogText
   const isDropDownOpen = props.isDropDownOpen
   const exercises = props.exercises
   const dropDownExerciseNameSelected = props.dropDownExerciseNameSelected
-  const aScheduledItem = props.aScheduledItem
+  const aScheduledItem: ScheduledItem = props.aScheduledItem
   const isEditable = props.isEditable
-  const aExerciseMinutes = props.aExerciseMinutes
-  const aExerciseSeconds = props.aExerciseSeconds
+  // const aExerciseMinutes = props.aExerciseMinutes
+  // const aExerciseSeconds = props.aExerciseSeconds
   const isCalendarDialogVisible = props.isCalendarDialogVisible
   const currentDate = props.currentDate
   const cancelDialog = props.cancelDialog
-  const aExercise = props.aExercise
+  const aExercise: Exercise = props.aExercise
 
+  const minutes = Math.floor(aScheduledItem.duration_in_seconds / 60)
+  const seconds = aScheduledItem.duration_in_seconds % 60
+
+  //dispatchers
   const setPlanDialogVisibility: Function = props.setPlanDialogVisibility
   const setAScheduledItem: Function = props.setAScheduledItem
   const setDropDownOpenOrNot = props.setDropDownOpenOrNot
   const setDropDownExerciseNameSelected = props.setDropDownExerciseNameSelected
-  const setAExerciseMinutes: Function = props.setAExerciseMinutes
-  const setAExerciseSeconds: Function = props.setAExerciseSeconds
+  // const setAExerciseMinutes: Function = props.setAExerciseMinutes
+  // const setAExerciseSeconds: Function = props.setAExerciseSeconds
   const setCurrentDate: Function = props.setCurrentDate
   const setCalendarDialogVisibility: Function = props.setCalendarDialogVisibility
-  
-  const deleteScheduledItemConfirmation = props.deleteScheduledItemConfirmation
-  const renderScheduledItemDialogForEdit = props.renderScheduledItemDialogForEdit
-  const createScheduledItem = props.createScheduledItem
-  const updateScheduledItem = props.updateScheduledItem
-  const renderScheduledItemDialogForViewing = props.renderScheduledItemDialogForViewing
-  const renderScheduledItemDialogForDuplication = props.renderScheduledItemDialogForDuplication
+
+  //functions
+  const deleteScheduledItemConfirmation: Function = props.deleteScheduledItemConfirmation
+  const renderScheduledItemDialogForEdit: Function = props.renderScheduledItemDialogForEdit
+  const createScheduledItem: Function = props.createScheduledItem
+  const updateScheduledItem: Function = props.updateScheduledItem
+  const renderScheduledItemDialogForViewing: Function = props.renderScheduledItemDialogForViewing
+  const renderScheduledItemDialogForDuplication: Function = props.renderScheduledItemDialogForDuplication
 
   let textInputStyle, numberInputStyle, buttonStyle
   if (isEditable) {
@@ -218,39 +225,32 @@ export function ScheduleDialog(props: any) {
             > Duration  min: </Text>
             <View style={{ flexDirection: "row", justifyContent: "space-evenly", }}>
               <Pressable style={buttonStyle} disabled={!isEditable} onPress={() => {
-                let a: number = aExerciseMinutes
-                a--
+
+                const a = aScheduledItem.duration_in_seconds - 60;
                 if (a < 0) {
-                  setAExerciseMinutes(0)
-                  Toast.show("Minutes cannot be less than 0.")
+                  setAScheduledItem({ ...aScheduledItem, duration_in_seconds: 0 });
+                  Toast.show("minutes cannot be negative")
                   return
-                } else setAExerciseMinutes(a)
+                }
+                else setAScheduledItem({ ...aScheduledItem, duration_in_seconds: a });
               }
               } >
                 <Text style={bases.incrementButton}>-</Text>
               </Pressable>
-
               <TextInput placeholder='Minutes'
-
                 style={{ ...numberInputStyle, width: 30 }}
-                value={aExerciseMinutes.toString()}
+                value={minutes.toString()}
                 onChangeText={text => {
                   const min = Number(text)
-                  if (min < 0) {
-                    setAExerciseMinutes(0)
-                    Toast.show("Minutes cannot be negative")
-                  } else if (isNaN(min)) {
-                    setAExerciseMinutes(0)
+                  if (isNaN(min))
                     Toast.show("Minutes must be a number")
-                  }
-                  else setAExerciseMinutes(min)
+                  else
+                    setAScheduledItem({ ...aScheduledItem, duration_in_seconds: aScheduledItem.duration_in_seconds % 60 + min * 60 });
                 }}
                 editable={isEditable}
                 keyboardType="numeric" />
               <Pressable style={{ ...buttonStyle, marginLeft: 0 }} disabled={!isEditable} onPress={() => {
-                let a: number = aExerciseMinutes
-                a++
-                setAExerciseMinutes(a)
+                setAScheduledItem({ ...aScheduledItem, duration_in_seconds: aScheduledItem.duration_in_seconds + 60 });
               }}>
                 <Text style={bases.incrementButton}>+</Text>
               </Pressable>
@@ -262,14 +262,13 @@ export function ScheduleDialog(props: any) {
             > sec: </Text>
             <View style={{ flexDirection: "row", justifyContent: "space-evenly", }}>
               <Pressable style={buttonStyle} disabled={!isEditable} onPress={() => {
-                let a: number = aExerciseSeconds
-                a--
+                const a = aScheduledItem.duration_in_seconds-1;
+                console.log(a)
                 if (a < 0) {
-                  setAExerciseSeconds(0)
+                  setAScheduledItem({ ...aScheduledItem, duration_in_seconds: 0 });
                   Toast.show("Seconds cannot be negative")
-                  return
                 }
-                else setAExerciseSeconds(a)
+                else setAScheduledItem({ ...aScheduledItem, duration_in_seconds: a });
               }
               } >
                 <Text style={bases.incrementButton}>-</Text>
@@ -277,29 +276,27 @@ export function ScheduleDialog(props: any) {
 
               <TextInput placeholder='seconds'
                 style={{ ...numberInputStyle, width: 30 }}
-                value={aExerciseSeconds.toString()}
+                value={seconds.toString()}
                 onChangeText={text => {
-                  const min = Number(text)
-                  if (min < 0) {
-                    setAExerciseSeconds(0)
-                    Toast.show("Seconds cannot be negative")
+                  const seconds = Number(text)
+                  if (isNaN(seconds)) {
+                    setAScheduledItem({ ...aScheduledItem, duration_in_seconds: 0 });
+                    Toast.show("Seconds must be a number")
+                    return
+                  } else if (seconds >59){
+                    setAScheduledItem({ ...aScheduledItem, duration_in_seconds: 59 });
+                    Toast.show("Seconds cannot be 60 or more.");
+                  return
                   }
-                  else if (isNaN(min)) {
-                    setAExerciseSeconds(0)
-                    Toast.show("Seconds must be a number.")
-                  }
-                  else setAExerciseSeconds(min)
+                  const totalSec = minutes + seconds;
+                  const item = Object.assign({},aScheduledItem)
+                  item.duration_in_seconds = totalSec
+                  setAScheduledItem(item);
                 }}
                 editable={isEditable}
                 keyboardType="numeric" />
               <Pressable style={{ ...buttonStyle, marginLeft: 0 }} disabled={!isEditable} onPress={() => {
-                let a: number = aExerciseSeconds
-                a++
-                if (a > 59) {
-                  setAExerciseSeconds(59)
-                  Toast.show("Seconds cannot be more than 59")
-                  return
-                } else setAExerciseSeconds(a)
+                setAScheduledItem({ ...aScheduledItem, duration_in_seconds: aScheduledItem.duration_in_seconds+1 });
               }}>
                 <Text style={bases.incrementButton}>+</Text>
               </Pressable>

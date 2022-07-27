@@ -1,6 +1,5 @@
 import {
-  Modal, StyleSheet, View, Text, Button,
-  TouchableOpacity, Alert, LogBox, TextInput, Platform
+  StyleSheet, Alert, LogBox, Platform
 } from 'react-native';
 import { ExercisesScreen } from './screens/ExercisesScreen';
 import { SettingsScreen } from './screens/SettingsScreen';
@@ -70,11 +69,8 @@ export default function App() {
   const [openPushPullDropDown, setOpenPushPullDropDown] = useState(false)
   const [pushPullDropDownValue, setPushPullDropDownValue] = useState(PushPullEnum.Push)
 
-  const [aExerciseMinutes, setAExerciseMinutes] = useState(0)
-  const [aExerciseSeconds, setAExerciseSeconds] = useState(0)
   //shared
   const [dialogText, setDialogText] = useState("")
-  // const [textInputStyle, setTextInputBackgroundColor] = useState(styles.textInputViewOnly)
   const [isEditable, setEditability] = useState(false)
 
   //for majorSet
@@ -396,8 +392,6 @@ export default function App() {
     setExDialogVisibility(false)
     setPlanDialogVisibility(true)
     setCurrentDate(scheduledItem.date)
-    setAExerciseMinutes(Math.floor(scheduledItem.duration_in_seconds / 60))
-    setAExerciseSeconds(scheduledItem.duration_in_seconds % 60)
   }
   let deleteScheduledItemConfirmation = (ms: ScheduledItem) => {
     Alert.alert(
@@ -429,7 +423,6 @@ export default function App() {
     ))
   }
   const updateScheduledItem = () => {
-    let duration = aExerciseMinutes * 60 + aExerciseSeconds
     if (dropDownExerciseNameSelected == undefined || dropDownExerciseNameSelected == "") {
       Toast.show("exercise must be selected")
       return;
@@ -441,13 +434,13 @@ export default function App() {
     SET exercise=?,reps=?,percent_complete=?,sets=?,duration_in_seconds=?,weight=?,notes=?,date=? 
     WHERE id=?`,
       [dropDownExerciseNameSelected, aScheduledItem.reps, aScheduledItem.percent_complete, aScheduledItem.sets,
-        duration, aScheduledItem.weight,
+        aScheduledItem.duration_in_seconds, aScheduledItem.weight,
         aScheduledItem.notes, JSON.stringify(currentDate), aScheduledItem.id],
       (_, result) => {
         let toBeUpdated: ScheduledItem = {
           id: aScheduledItem.id, exercise: theexercise, reps: aScheduledItem.reps,
           percent_complete: aScheduledItem.percent_complete, sets: aScheduledItem.sets,
-          duration_in_seconds: duration,
+          duration_in_seconds: aScheduledItem.duration_in_seconds,
           weight: aScheduledItem.weight, notes: aScheduledItem.notes, date: currentDate
         }
         let ms: ScheduledItem[] = scheduledItems.slice()
@@ -489,13 +482,9 @@ export default function App() {
       year: Number(parts[2]), month: monthNumber, day: Number(parts[0]), timestamp: 0,
       dateString: parts[2] + "-" + month + "-" + day
     })
-    setAExerciseMinutes(0)
-    setAExerciseSeconds(0)
   }
 
   function createScheduledItem() {
-
-    let duration = aExerciseMinutes * 60 + aExerciseSeconds
     let e1: Exercise
 
     exercises.forEach(e => {
@@ -506,13 +495,13 @@ export default function App() {
            (exercise,reps,percent_complete,sets,duration_in_seconds,weight,notes,date)  
            VALUES(?,?,?,?,?,?,?,?)`,
         [aScheduledItem.exercise.name, aScheduledItem.reps, aScheduledItem.percent_complete, aScheduledItem.sets,
-          duration, aScheduledItem.weight,
+          aScheduledItem.duration_in_seconds, aScheduledItem.weight,
         aScheduledItem.notes, JSON.stringify(currentDate)],
         (_, r) => {
           let tempScheduledItem = Object.assign({}, aScheduledItem)
           tempScheduledItem.id = r.insertId!
           tempScheduledItem.date = currentDate
-          tempScheduledItem.duration_in_seconds = duration
+          tempScheduledItem.duration_in_seconds = aScheduledItem.duration_in_seconds
 
           console.log(tempScheduledItem.id)
           let m = scheduledItems.slice()
@@ -563,10 +552,6 @@ export default function App() {
           setPlanDialogVisibility={setPlanDialogVisibility}
           setDropDownOpenOrNot={setDropDownOpenOrNot}
           setDropDownExerciseNameSelected={setDropDownExerciseNameSelected}
-          aExerciseMinutes={aExerciseMinutes}
-          aExerciseSeconds={aExerciseSeconds}
-          setAExerciseMinutes={setAExerciseMinutes}
-          setAExerciseSeconds={setAExerciseSeconds}
           isCalendarDialogVisible={isCalendarDialogVisible}
           setCalendarDialogVisibility={setCalendarDialogVisibility}
           currentDate={currentDate}
