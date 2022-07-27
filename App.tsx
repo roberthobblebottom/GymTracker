@@ -16,9 +16,9 @@ import Colors from './constants/Colors';
 import { DateData } from 'react-native-calendars';
 import { Ionicons, MaterialCommunityIcons, } from '@expo/vector-icons';
 import _default from 'babel-plugin-transform-typescript-metadata';
-import { ScheduleDialog } from './ScheduleDialog';
-import { ExerciseDialog } from './ExerciseDialog';
-import { styles } from './styles';
+import { ScheduleDialog } from './screens/ScheduleDialog';
+import { ExerciseDialog } from './screens/ExerciseDialog';
+import { styles } from './constants/styles';
 LogBox.ignoreLogs(['Require cycle:'])
 const Tab = createBottomTabNavigator()
 

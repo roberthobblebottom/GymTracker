@@ -3,12 +3,12 @@ import {
 } from 'react-native'
 import 'react-native-gesture-handler'
 import React, { Dispatch } from 'react'
-import Colors from './constants/Colors'
-import Layout from './constants/Layout'
+import Colors from '../constants/Colors'
+import Layout from '../constants/Layout'
 import DropDownPicker, { ItemType } from 'react-native-dropdown-picker'
 import _default from 'babel-plugin-transform-typescript-metadata'
-import { styles } from './styles'
-import { Exercise, PushPullEnum } from './types'
+import { styles } from '../constants/styles'
+import { Exercise, PushPullEnum } from '../types'
 import { ButtonSet } from './ButtonSet'
 export function ExerciseDialog(props: any) {
     const exerciseState = props.exerciseState;
@@ -43,12 +43,12 @@ export function ExerciseDialog(props: any) {
     }
     return (
         <Modal visible={dialogState.isExDialogVisible} animationType="fade" transparent={true}>
-            <TouchableOpacity style={{ flex: 1, display: "flex", justifyContent: "flex-end" }} onPressIn={() => SetDialogState({ ...dialogState, isExDialogVisible: false })}>
-                <TouchableOpacity style={{ ...styles.innerTouchableOpacity }}
+            <TouchableOpacity style={styles.overallDialog} onPressIn={() => SetDialogState({ ...dialogState, isExDialogVisible: false })}>
+                <TouchableOpacity style={styles.innerTouchableOpacity}
                     onPress={() => { SetDialogState({ ...dialogState, isDropDownOpen: false }) }}
                     activeOpacity={1}
                 >
-                    <Text style={{ fontSize: Layout.defaultFontSize, fontWeight: "bold" }}>{dialogState.dialogText}</Text>
+                    <Text style={{ fontSize: Layout.defaultFontSize }}>{dialogState.dialogText}</Text>
                     <View style={styles.dialogRow}>
                         <Text style={{ fontSize: Layout.defaultFontSize }}
                         >Name: </Text>
@@ -62,8 +62,7 @@ export function ExerciseDialog(props: any) {
                                 parts.forEach(part => {
                                     let formatedWord = part.charAt(0).toUpperCase() + part.slice(1)
                                     formattedText = formattedText + " " + formatedWord
-                                }
-                                )
+                                })
                                 e.name = formattedText
                                 setAExercise(e)
                             }}
@@ -84,9 +83,7 @@ export function ExerciseDialog(props: any) {
                             editable={dialogState.isEditable} />
                     </View>
                     <View style={styles.dialogRow}>
-                        <Text
-                            style={{ fontSize: Layout.defaultFontSize }}
-                        >Push Or Pull: </Text>
+                        <Text style={{ fontSize: Layout.defaultFontSize }}>Push Or Pull: </Text>
                         <DropDownPicker
                             style={{
                                 width: "100%", minHeight: 30,
@@ -131,7 +128,6 @@ export function ExerciseDialog(props: any) {
                             textStyle={{ fontSize: Layout.defaultFontSize, transform: [{ rotateX: "180deg" }] }}
                             searchTextInputStyle={{ borderWidth: 0, zIndex: -1 }}
                             placeholderStyle={{ color: "#9E9E9E" }}
-
                             showBadgeDot={false}
                             schema={{ label: "name", value: "name" }}
                             items={majorMuscles as ItemType<string>[]}
@@ -148,7 +144,6 @@ export function ExerciseDialog(props: any) {
                             mode="BADGE"
                             extendableBadgeContainer={true}
                             badgeProps={{ disabled: !dialogState.isEditable }}
-
                         />
                     </View>
                     <ButtonSet

@@ -5,14 +5,14 @@ import {
 import 'react-native-gesture-handler'
 import React, { } from 'react'
 import Toast from 'react-native-simple-toast'
-import Colors from './constants/Colors'
-import Layout from './constants/Layout'
+import Colors from '../constants/Colors'
+import Layout from '../constants/Layout'
 import { Calendar } from 'react-native-calendars'
 import DropDownPicker, { ItemType } from 'react-native-dropdown-picker'
 import _default from 'babel-plugin-transform-typescript-metadata'
-import { bases, styles } from './styles'
+import { bases, styles } from '../constants/styles'
 import { ButtonSet } from './ButtonSet'
-import { Exercise, ScheduledItem } from './types'
+import { Exercise, ScheduledItem } from '../types'
 export function ScheduleDialog(props: any) {
   //variables
   const exerciseState = props.exerciseState
@@ -20,7 +20,7 @@ export function ScheduleDialog(props: any) {
   const dialogState = props.dialogState;
   const currentDate = props.currentDate
   const cancelDialog = props.cancelDialog
-const dropDownExNameSelected = props.dropDownExNameSelected
+  const dropDownExNameSelected = props.dropDownExNameSelected
   const aExercise: Exercise = props.exerciseState.aExercise
 
   const minutes = Math.floor(aScheduledItem.duration_in_seconds / 60)
@@ -51,7 +51,7 @@ const dropDownExNameSelected = props.dropDownExNameSelected
   return (
     <Modal visible={dialogState.isPlanDialogVisible} animationType="fade" transparent={true}>
       <TouchableOpacity style={{ flex: 1, display: 'flex', justifyContent: 'flex-end' }} onPressIn={() => setDialogState({ ...dialogState, isPlanDialogVisible: false })}>
-        <TouchableOpacity style={{ ...styles.innerTouchableOpacity2 }} activeOpacity={1} onPress={() => setDialogState({ ...dialogState, isDropDownOpen: false })}>
+        <TouchableOpacity style={{ ...styles.innerTouchableOpacity }} activeOpacity={1} onPress={() => setDialogState({ ...dialogState, isDropDownOpen: false })}>
           <Text style={{ fontSize: Layout.defaultFontSize, fontWeight: "bold" }}>{dialogState.dialogText}</Text>
           <View style={{ marginLeft: "1%", ...bases.numberCRUD }}>
             <Text style={{ fontSize: Layout.defaultFontSize, marginRight: "1%" }}>
@@ -93,7 +93,7 @@ const dropDownExNameSelected = props.dropDownExNameSelected
           <View style={bases.numberCRUD}>
             <Text style={{ fontSize: Layout.defaultFontSize }}
             > Sets: </Text>
-            <View style={{ flexDirection: "row", justifyContent: "space-evenly", }}>
+            <View style={styles.numberElementsOnTheLeftOfScheduleItemDialog}>
               <Pressable style={buttonStyle} disabled={!dialogState.isEditable} onPress={() => {
                 aScheduledItem.sets--
                 if (aScheduledItem.sets < 0) {
@@ -106,7 +106,7 @@ const dropDownExNameSelected = props.dropDownExNameSelected
                 <Text style={bases.incrementButton}>-</Text>
               </Pressable>
               <TextInput placeholder='sets'
-                style={{ ...numberInputStyle, width: 30 }}
+                style={numberInputStyle}
                 value={aScheduledItem.sets.toString()}
                 onChangeText={text => {
                   const sets = Number(text)
@@ -130,7 +130,7 @@ const dropDownExNameSelected = props.dropDownExNameSelected
           <View style={bases.numberCRUD}>
             <Text style={{ fontSize: Layout.defaultFontSize }}
             > Reps: </Text>
-            <View style={{ flexDirection: "row", justifyContent: "space-evenly", }}>
+            <View style={styles.numberElementsOnTheLeftOfScheduleItemDialog}>
               <Pressable style={buttonStyle} disabled={!dialogState.isEditable} onPress={() => {
                 aScheduledItem.reps--
                 if (aScheduledItem.reps < 0) {
@@ -142,7 +142,7 @@ const dropDownExNameSelected = props.dropDownExNameSelected
               } >
                 <Text style={bases.incrementButton}>-</Text></Pressable>
               <TextInput placeholder='reps'
-                style={{ ...numberInputStyle, width: 30 }}
+                style={numberInputStyle}
                 value={aScheduledItem.reps.toString()}
                 onChangeText={text => {
                   const rep = Number(text)
@@ -160,14 +160,14 @@ const dropDownExNameSelected = props.dropDownExNameSelected
                 aScheduledItem.reps++
                 setAScheduledItem(Object.assign({}, aScheduledItem))
               }} >
-                <Text style={bases.incrementButton}>+</Text></Pressable>
-
+                <Text style={bases.incrementButton}>+</Text>
+              </Pressable>
             </View>
           </View>
           <View style={bases.numberCRUD}>
             <Text style={{ fontSize: Layout.defaultFontSize }}
             > complete(%): </Text>
-            <View style={{ flexDirection: "row", justifyContent: "space-evenly", }}>
+            <View style={styles.numberElementsOnTheLeftOfScheduleItemDialog}>
               <Pressable style={buttonStyle} disabled={!dialogState.isEditable} onPress={() => {
                 aScheduledItem.percent_complete--
                 if (aScheduledItem.percent_complete < 0) {
@@ -180,7 +180,7 @@ const dropDownExNameSelected = props.dropDownExNameSelected
                 <Text style={bases.incrementButton}>-</Text>
               </Pressable>
               <TextInput placeholder='percentage complete'
-                style={{ ...numberInputStyle, width: 30 }}
+                style={numberInputStyle}
                 value={aScheduledItem.percent_complete.toString()}
                 onChangeText={text => {
                   const p = Number(text)
@@ -195,7 +195,6 @@ const dropDownExNameSelected = props.dropDownExNameSelected
                 editable={dialogState.isEditable}
                 keyboardType="numeric" />
               <Pressable style={{ ...buttonStyle, marginLeft: 0 }} disabled={!dialogState.isEditable} onPress={() => {
-
                 aScheduledItem.percent_complete++
                 if (aScheduledItem.percent_complete > 100) {
                   aScheduledItem.percent_complete = 100
@@ -209,11 +208,9 @@ const dropDownExNameSelected = props.dropDownExNameSelected
           </View>
 
           <View style={bases.numberCRUD}>
-            <Text style={{ fontSize: Layout.defaultFontSize }}
-            > Duration  min: </Text>
-            <View style={{ flexDirection: "row", justifyContent: "space-evenly", }}>
+            <Text style={{ fontSize: Layout.defaultFontSize }}> Duration  min: </Text>
+            <View style={styles.numberElementsOnTheLeftOfScheduleItemDialog}>
               <Pressable style={buttonStyle} disabled={!dialogState.isEditable} onPress={() => {
-
                 const a = aScheduledItem.duration_in_seconds - 60;
                 if (a < 0) {
                   setAScheduledItem({ ...aScheduledItem, duration_in_seconds: 0 });
@@ -226,7 +223,7 @@ const dropDownExNameSelected = props.dropDownExNameSelected
                 <Text style={bases.incrementButton}>-</Text>
               </Pressable>
               <TextInput placeholder='Minutes'
-                style={{ ...numberInputStyle, width: 30 }}
+                style={numberInputStyle}
                 value={minutes.toString()}
                 onChangeText={text => {
                   const min = Number(text)
@@ -248,7 +245,7 @@ const dropDownExNameSelected = props.dropDownExNameSelected
           <View style={bases.numberCRUD}>
             <Text style={{ fontSize: Layout.defaultFontSize }}
             > sec: </Text>
-            <View style={{ flexDirection: "row", justifyContent: "space-evenly", }}>
+            <View style={styles.numberElementsOnTheLeftOfScheduleItemDialog}>
               <Pressable style={buttonStyle} disabled={!dialogState.isEditable} onPress={() => {
                 const a = aScheduledItem.duration_in_seconds - 1;
                 console.log(a)
@@ -263,7 +260,7 @@ const dropDownExNameSelected = props.dropDownExNameSelected
               </Pressable>
 
               <TextInput placeholder='seconds'
-                style={{ ...numberInputStyle, width: 30 }}
+                style={numberInputStyle}
                 value={seconds.toString()}
                 onChangeText={text => {
                   const seconds = Number(text)
@@ -294,7 +291,7 @@ const dropDownExNameSelected = props.dropDownExNameSelected
           <View style={bases.numberCRUD}>
             <Text style={{ fontSize: Layout.defaultFontSize }}
             > Weight (kg): </Text>
-            <View style={{ flexDirection: "row", justifyContent: "space-evenly", }}>
+            <View style={styles.numberElementsOnTheLeftOfScheduleItemDialog}>
               <Pressable style={buttonStyle} disabled={!dialogState.isEditable} onPress={() => {
                 let s = Object.assign({}, aScheduledItem)
                 s.weight--
@@ -308,7 +305,7 @@ const dropDownExNameSelected = props.dropDownExNameSelected
                 <Text style={bases.incrementButton}>-</Text>
               </Pressable>
               <TextInput placeholder='kg'
-                style={{ ...numberInputStyle, width: 30 }}
+                style={numberInputStyle}
                 value={aScheduledItem.weight.toString()}
                 onChangeText={text => {
                   const weight = Number(text)
@@ -331,8 +328,7 @@ const dropDownExNameSelected = props.dropDownExNameSelected
             </View>
           </View>
           <View style={{ flexDirection: "row", marginTop: 20, display: 'flex', justifyContent: "space-between" }}>
-            <Text style={{ fontSize: Layout.defaultFontSize }}
-            > notes: </Text>
+            <Text style={{ fontSize: Layout.defaultFontSize }}> notes: </Text>
             <TextInput placeholder='notes'
               style={{ ...textInputStyle, flexGrow: 1 }}
               value={aScheduledItem.notes.toString()}
@@ -363,12 +359,12 @@ const dropDownExNameSelected = props.dropDownExNameSelected
               }}>CHANGE DATE</Text>
             </Pressable>
             <Modal visible={dialogState.isCalendarDialogVisible} animationType="fade" transparent={true} >
-              <TouchableOpacity style={{ flex: 1, display: "flex", justifyContent: "flex-end" }} onPressIn={() => setDialogState({ ...dialogState, isCalendarDialogVisible: false })}>
-                <TouchableOpacity style={styles.innerTouchableOpacity2}
+              <TouchableOpacity style={styles.overallDialog} onPressIn={() => setDialogState({ ...dialogState, isCalendarDialogVisible: false })}>
+                <TouchableOpacity style={styles.innerTouchableOpacity}
                   onPress={() => { }}
                   activeOpacity={1}
                 >
-                  <Text style={{ fontSize: Layout.defaultFontSize, fontWeight: "bold" }} >Select a date</Text>
+                  <Text style={{ fontSize: Layout.defaultFontSize }} >Select a date</Text>
                   <Calendar
                     initialDate={currentDate.dateString}
                     onDayPress={day => {

@@ -1,6 +1,6 @@
 import { Platform, StyleSheet } from "react-native"
-import Colors  from "./constants/Colors"
-import Layout from "./constants/Layout"
+import Colors  from "./Colors"
+import Layout from "./Layout"
 
 export const bases = StyleSheet.create({
   textInputBase: {
@@ -12,15 +12,13 @@ export const bases = StyleSheet.create({
     height: 30,
     fontSize: Layout.defaultFontSize,
     color: "black", marginTop: 0,
-    width: 50, textAlign: "center"
+    width: 30, textAlign: "center"
 
   },
   changeDateButtonBase: {
     paddingHorizontal: Layout.defaultMargin,
     paddingTop: 10,
     height: 30,
-    // textAlign: "right",
-    // margin:Layout.defaultMargin,
     marginStart: 7,
     marginBottom: 7,
     elevation: 4,
@@ -39,7 +37,16 @@ export const bases = StyleSheet.create({
     borderRadius: 2,
 
   },
-  innerTouchableOpacityBase: {
+
+  numberCRUD: {
+    flexDirection: "row", marginTop: 20, display: 'flex', justifyContent: "space-between", maxHeight: 40
+  }, incrementButton:
+    { color: "white", fontSize: Layout.defaultFontSize, marginTop: -7 }
+
+})
+
+export const styles = StyleSheet.create({
+  innerTouchableOpacity: {
     flex: 0,
     margin: Layout.dialogSpacingMargin,
     backgroundColor: "white",
@@ -56,22 +63,7 @@ export const bases = StyleSheet.create({
     shadowRadius: 4,
     elevation: 5,
   },
-  numberCRUD: {
-    flexDirection: "row", marginTop: 20, display: 'flex', justifyContent: "space-between", maxHeight: 40
-  }, incrementButton:
-    { color: "white", fontSize: Layout.defaultFontSize, marginTop: -7 }
 
-})
-
-export const styles = StyleSheet.create({
-  innerTouchableOpacity2: {
-    // top: '20%',
-    ...bases.innerTouchableOpacityBase
-  },
-  innerTouchableOpacity: {
-    ...bases.innerTouchableOpacityBase,
-    // top: '60%',
-  },
   numberInputEditable: {
     backgroundColor: Colors.light.altBackground,
     ...bases.numberTextInput
@@ -97,5 +89,8 @@ export const styles = StyleSheet.create({
     ...bases.changeDateButtonBase
   }
   ,
-  dialogRow: { flexDirection: "row", marginTop: 20 }
+  dialogRow: { flexDirection: "row", marginTop: 20 },
+  buttonsRow:{ flexDirection: "row", justifyContent: "space-around", marginTop: 20 },
+  overallDialog:{ flex: 1, display: "flex", justifyContent: "flex-end" },
+  numberElementsOnTheLeftOfScheduleItemDialog:{ flexDirection: "row", justifyContent: "space-evenly", }
 })

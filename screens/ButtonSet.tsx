@@ -4,6 +4,7 @@ import {
 import 'react-native-gesture-handler'
 import React, { } from 'react'
 import _default from 'babel-plugin-transform-typescript-metadata'
+import { styles } from '../constants/styles'
 export function ButtonSet(props: any) {
     //constant strings
     const ExerciseInformationText = "Exercise Information"
@@ -17,7 +18,8 @@ export function ButtonSet(props: any) {
     const cancelDialog = props.cancelDialog
     const aExercise = props.aExercise
     const aScheduledItem = props.aScheduledItem
-const dialogText=props.dialogText
+    const dialogText = props.dialogText
+
     const deleteExerciseConfirmation = props.deleteExerciseConfirmation
     const renderExerciseDialogForEdit = props.renderExerciseDialogForEdit
     const renderExerciseDialogForViewing = props.renderExerciseDialogForViewing
@@ -34,22 +36,22 @@ const dialogText=props.dialogText
     switch (dialogText) {
         case ExerciseInformationText:
             return (
-                <View style={{ flexDirection: "row", justifyContent: "space-around", marginTop: 20 }}>
+                <View style={styles.buttonsRow}>
                     <Button title="delete" onPress={() => deleteExerciseConfirmation(aExercise)} />
-                    <Button title='Edit' onPress={() => {renderExerciseDialogForEdit()}} />
+                    <Button title='Edit' onPress={() => { renderExerciseDialogForEdit() }} />
                     <Button title='Cancel' onPress={() => cancelDialog()} />
                 </View>
             )
         case CreateExerciseText:
             return (
-                <View style={{ flexDirection: "row", justifyContent: "space-around", marginTop: 20 }}>
+                <View style={styles.buttonsRow}>
                     <Button title='Save' onPress={() => createExercise()}></Button>
                     <Button title='Cancel' onPress={() => cancelDialog()} />
                 </View>
             )
         case EditExerciseText:
             return (
-                <View style={{ flexDirection: "row", justifyContent: "space-around", marginTop: 20 }}>
+                <View style={styles.buttonsRow}>
                     <Button title='Save' onPress={() => updateExercise()}></Button>
                     <Button title='Back' onPress={() => renderExerciseDialogForViewing(aExercise)} />
                     <Button title='Cancel' onPress={() => cancelDialog()} />
@@ -57,14 +59,14 @@ const dialogText=props.dialogText
             )
         case CreateScheduledItemText:
             return (
-                <View style={{ flexDirection: "row", justifyContent: "space-around", marginTop: 20 }}>
+                <View style={styles.buttonsRow}>
                     <Button title='Save' onPress={() => createScheduledItem()}></Button>
                     <Button title='Cancel' onPress={() => cancelDialog()} />
                 </View>
             )
         case ScheduledItemInformation:
             return (
-                <View style={{ flexDirection: "row", justifyContent: "space-around", marginTop: 20 }}>
+                <View style={styles.buttonsRow}>
                     <Button title="delete" onPress={() => deleteScheduledItemConfirmation(aScheduledItem)} />
                     <Button title='Edit' onPress={() => { renderScheduledItemDialogForEdit() }} />
                     <Button title="duplicate" onPress={() => { renderScheduledItemDialogForDuplication() }} />
@@ -74,7 +76,7 @@ const dialogText=props.dialogText
         case DuplicateScheduledItemText:
         case EditScheduledItemText:
             return (
-                <View style={{ flexDirection: "row", justifyContent: "space-around", marginTop: 20 }}>
+                <View style={styles.buttonsRow}>
                     <Button title='Save' onPress={() => {
                         switch (dialogText) {
                             case EditScheduledItemText:
