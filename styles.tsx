@@ -1,5 +1,5 @@
 import { Platform, StyleSheet } from "react-native"
-import { Colors } from "react-native/Libraries/NewAppScreen"
+import Colors  from "./constants/Colors"
 import Layout from "./constants/Layout"
 
 export const bases = StyleSheet.create({

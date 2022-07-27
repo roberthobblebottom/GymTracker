@@ -42,6 +42,7 @@ export function ExerciseDialog(props: any) {
         numberInputStyle = styles.numberInputViewOnly
         buttonStyle = styles.changeDateButtonDisabled
     }
+    console.log(textInputStyle.backgroundColor)
     console.log(dialogState.isEditable)
     return (
         <Modal visible={dialogState.isExDialogVisible} animationType="fade" transparent={true}>

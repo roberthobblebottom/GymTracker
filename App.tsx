@@ -575,7 +575,6 @@ export default function App() {
           setCalendarDialogVisibility={setCalendarDialogVisibility}
           currentDate={currentDate}
           setCurrentDate={setCurrentDate}
-          SetDialogState={SetDialogState}
           cancelDialog={cancelDialog}
 
           deleteScheduledItemConfirmation={deleteScheduledItemConfirmation}

@@ -37,7 +37,6 @@ export function ScheduleDialog(props: any) {
   const setDropDownExerciseNameSelected = props.setDropDownExerciseNameSelected
   const setCurrentDate: Function = props.setCurrentDate
   const setCalendarDialogVisibility: Function = props.setCalendarDialogVisibility
-  const setDialogState = props.setDialogState
   //functions
   const deleteScheduledItemConfirmation: Function = props.deleteScheduledItemConfirmation
   const renderScheduledItemDialogForEdit: Function = props.renderScheduledItemDialogForEdit
