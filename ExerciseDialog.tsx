@@ -11,17 +11,16 @@ import { styles } from './styles'
 import { Exercise, PushPullEnum } from './types'
 import { ButtonSet } from './ButtonSet'
 export function ExerciseDialog(props: any) {
-    const isDropDownOpen = props.isDropDownOpen
     const exerciseState = props.exerciseState;
     const majorMuscles = props.majorMuscles
     const dropDownMajorMuscleNameSelected = props.dropDownMajorMuscleNameSelected
     const aScheduledItem = props.aScheduledItem
-    const dialogState=props.dialogState
+    const dialogState = props.dialogState
+    const dropDownPushPullSelected = props.dropDownPushPullSelected
+    const setDropDownPushPullSelected = props.setDropDownPushPullSelected
+    const setExerciseState: Dispatch<any> = props.setExerciseState;
+    const setMajorMuscleValues: Dispatch<any> = props.setMajorMuscleValues
 
-    // const setAExercise = props.setAExercise
-    const setExerciseState: Function = props.setExerciseState;
-    const setDropDownOpenOrNot = props.setDropDownOpenOrNot
-    const setMajorMuscleValues:Dispatch<any>= props.setMajorMuscleValues
     const cancelDialog = props.cancelDialog
     const deleteExerciseConfirmation = props.deleteExerciseConfirmation
     const renderExerciseDialogForEdit = props.renderExerciseDialogForEdit
@@ -42,13 +41,11 @@ export function ExerciseDialog(props: any) {
         numberInputStyle = styles.numberInputViewOnly
         buttonStyle = styles.changeDateButtonDisabled
     }
-    console.log(textInputStyle.backgroundColor)
-    console.log(dialogState.isEditable)
     return (
         <Modal visible={dialogState.isExDialogVisible} animationType="fade" transparent={true}>
-            <TouchableOpacity style={{ flex: 1, display: "flex", justifyContent: "flex-end" }} onPressIn={() => SetDialogState({...dialogState, isExDialogVisible:false})}>
+            <TouchableOpacity style={{ flex: 1, display: "flex", justifyContent: "flex-end" }} onPressIn={() => SetDialogState({ ...dialogState, isExDialogVisible: false })}>
                 <TouchableOpacity style={{ ...styles.innerTouchableOpacity }}
-                    onPress={() => { setDropDownOpenOrNot(false) }}
+                    onPress={() => { SetDialogState({ ...dialogState, isDropDownOpen: false }) }}
                     activeOpacity={1}
                 >
                     <Text style={{ fontSize: Layout.defaultFontSize, fontWeight: "bold" }}>{dialogState.dialogText}</Text>
@@ -91,7 +88,6 @@ export function ExerciseDialog(props: any) {
                             style={{ fontSize: Layout.defaultFontSize }}
                         >Push Or Pull: </Text>
                         <DropDownPicker
-
                             style={{
                                 width: "100%", minHeight: 30,
                                 transform: [{ rotateX: "180deg" }],
@@ -110,10 +106,10 @@ export function ExerciseDialog(props: any) {
                                 { label: PushPullEnum.Push, value: PushPullEnum.Push },
                                 { label: PushPullEnum.Pull, value: PushPullEnum.Pull }
                             ]}
-                            value={dialogState.pushPullDropDownValue}
-                            setValue={v=>SetDialogState({...dialogState,   pushPullDropDownValue:v})}
+                            value={dropDownPushPullSelected}
+                            setValue={setDropDownPushPullSelected}
                             open={dialogState.openPushPullDropDown}
-                            setOpen={v => SetDialogState({...dialogState, openPushPullDropDown:v})}
+                            setOpen={v => SetDialogState({ ...dialogState, openPushPullDropDown: v })}
                             disabled={!dialogState.isEditable}
                             dropDownDirection="TOP"
                             closeOnBackPressed={true}
@@ -141,8 +137,8 @@ export function ExerciseDialog(props: any) {
                             items={majorMuscles as ItemType<string>[]}
                             value={dropDownMajorMuscleNameSelected}
                             setValue={setMajorMuscleValues}
-                            open={isDropDownOpen}
-                            setOpen={setDropDownOpenOrNot}
+                            open={dialogState.isDropDownOpen}
+                            setOpen={o => SetDialogState({ ...dialogState, isDropDownOpen: o })}
                             disabled={!dialogState.isEditable}
                             multiple={true}
                             dropDownDirection="TOP"

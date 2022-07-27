@@ -86,7 +86,6 @@ export function PlanScreen() {
           let dateString = String(date);
           let dateParts: string[] = dateString.split(" ");
           let dateLabelToShow = dateParts[1] + " " + dateParts[2]
-          console.log(String(date))
           return (
             <View style={{ ...styles.listStyle, flexDirection: "row" }}>
               <TouchableOpacity style={{

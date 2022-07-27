@@ -15,28 +15,22 @@ import { ButtonSet } from './ButtonSet'
 import { Exercise, ScheduledItem } from './types'
 export function ScheduleDialog(props: any) {
   //variables
-  const isPlanDialogVisible = props.isPlanDialogVisible
-  const isDropDownOpen = props.isDropDownOpen
   const exerciseState = props.exerciseState
-  const dropDownExerciseNameSelected = props.dropDownExerciseNameSelected
   const aScheduledItem: ScheduledItem = props.aScheduledItem
   const dialogState = props.dialogState;
-  const isCalendarDialogVisible = props.isCalendarDialogVisible
   const currentDate = props.currentDate
   const cancelDialog = props.cancelDialog
-
+const dropDownExNameSelected = props.dropDownExNameSelected
   const aExercise: Exercise = props.exerciseState.aExercise
 
   const minutes = Math.floor(aScheduledItem.duration_in_seconds / 60)
   const seconds = aScheduledItem.duration_in_seconds % 60
 
   //dispatchers
-  const setPlanDialogVisibility: Function = props.setPlanDialogVisibility
   const setAScheduledItem: Function = props.setAScheduledItem
-  const setDropDownOpenOrNot = props.setDropDownOpenOrNot
-  const setDropDownExerciseNameSelected = props.setDropDownExerciseNameSelected
   const setCurrentDate: Function = props.setCurrentDate
-  const setCalendarDialogVisibility: Function = props.setCalendarDialogVisibility
+  const setDialogState = props.setDialogState
+  const setDropDownExNameSelected = props.setDropDownExNameSelected
   //functions
   const deleteScheduledItemConfirmation: Function = props.deleteScheduledItemConfirmation
   const renderScheduledItemDialogForEdit: Function = props.renderScheduledItemDialogForEdit
@@ -55,9 +49,9 @@ export function ScheduleDialog(props: any) {
     buttonStyle = styles.changeDateButtonDisabled
   }
   return (
-    <Modal visible={isPlanDialogVisible} animationType="fade" transparent={true}>
-      <TouchableOpacity style={{ flex: 1, display: 'flex', justifyContent: 'flex-end' }} onPressIn={() => setPlanDialogVisibility(false)}>
-        <TouchableOpacity style={{ ...styles.innerTouchableOpacity2 }} activeOpacity={1} onPress={() => setDropDownOpenOrNot(false)}>
+    <Modal visible={dialogState.isPlanDialogVisible} animationType="fade" transparent={true}>
+      <TouchableOpacity style={{ flex: 1, display: 'flex', justifyContent: 'flex-end' }} onPressIn={() => setDialogState({ ...dialogState, isPlanDialogVisible: false })}>
+        <TouchableOpacity style={{ ...styles.innerTouchableOpacity2 }} activeOpacity={1} onPress={() => setDialogState({ ...dialogState, isDropDownOpen: false })}>
           <Text style={{ fontSize: Layout.defaultFontSize, fontWeight: "bold" }}>{dialogState.dialogText}</Text>
           <View style={{ marginLeft: "1%", ...bases.numberCRUD }}>
             <Text style={{ fontSize: Layout.defaultFontSize, marginRight: "1%" }}>
@@ -65,13 +59,13 @@ export function ScheduleDialog(props: any) {
             </Text>
             <DropDownPicker
               placeholder="Select a exercise"
-              open={isDropDownOpen}
               schema={{ label: "name", value: "name" }}
               items={exerciseState.exercises as ItemType<string>[]}
               itemKey="name"
-              value={dropDownExerciseNameSelected}
-              setOpen={setDropDownOpenOrNot}
-              setValue={setDropDownExerciseNameSelected}
+              open={dialogState.isDropDownOpen}
+              setOpen={o => setDialogState({ ...dialogState, isDropDownOpen: o })}
+              value={dropDownExNameSelected}
+              setValue={setDropDownExNameSelected}
               disabled={!dialogState.isEditable}
               dropDownContainerStyle={{
                 marginTop: -5, backgroundColor: Colors.light.altBackground,
@@ -361,15 +355,15 @@ export function ScheduleDialog(props: any) {
                 paddingVertical: Layout.defaultMargin * 1.5,
               }}
               disabled={!dialogState.isEditable} onPress={() => {
-                setCalendarDialogVisibility(true)
+                setDialogState({ ...dialogState, isCalendarDialogVisible: true })
               }} >
               <Text style={{
                 color: "white", fontWeight: "600", flexDirection: "column", flex: 1,
                 marginTop: "-5%",
               }}>CHANGE DATE</Text>
             </Pressable>
-            <Modal visible={isCalendarDialogVisible} animationType="fade" transparent={true} >
-              <TouchableOpacity style={{ flex: 1, display: "flex", justifyContent: "flex-end" }} onPressIn={() => setCalendarDialogVisibility(false)}>
+            <Modal visible={dialogState.isCalendarDialogVisible} animationType="fade" transparent={true} >
+              <TouchableOpacity style={{ flex: 1, display: "flex", justifyContent: "flex-end" }} onPressIn={() => setDialogState({ ...dialogState, isCalendarDialogVisible: false })}>
                 <TouchableOpacity style={styles.innerTouchableOpacity2}
                   onPress={() => { }}
                   activeOpacity={1}
@@ -382,9 +376,9 @@ export function ScheduleDialog(props: any) {
                       s.date = day
                       setCurrentDate(day)
                       setAScheduledItem(s)
-                      setCalendarDialogVisibility(false)
+                      setDialogState({ ...dialogState, isCalendarDialogVisible: false })
                     }} />
-                  <Button title='Cancel' onPress={() => setCalendarDialogVisibility(false)} />
+                  <Button title='Cancel' onPress={() => setDialogState({ ...dialogState, isCalendarDialogVisible: false })} />
                 </TouchableOpacity>
               </TouchableOpacity>
             </Modal>
