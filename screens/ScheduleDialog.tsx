@@ -17,7 +17,6 @@ export function ScheduleDialog(props: any) {
   //variables
   const exerciseState = props.exerciseState
   const dialogState = props.dialogState;
-  const cancelDialog = props.cancelDialog
   const dropDownExNameSelected = props.dropDownExNameSelected
   const scheduledItemState: ScheduledItemState = props.scheduledItemState
 
@@ -32,13 +31,7 @@ export function ScheduleDialog(props: any) {
   const setScheduledItemState = props.setScheduledItemState
   const setDropDownExNameSelected = props.setDropDownExNameSelected
 
-  //functions
-  const deleteScheduledItemConfirmation: Function = props.deleteScheduledItemConfirmation
-  const renderScheduledItemDialogForEdit: Function = props.renderScheduledItemDialogForEdit
-  const createScheduledItem: Function = props.createScheduledItem
-  const updateScheduledItem: Function = props.updateScheduledItem
-  const renderScheduledItemDialogForViewing: Function = props.renderScheduledItemDialogForViewing
-  const renderScheduledItemDialogForDuplication: Function = props.renderScheduledItemDialogForDuplication
+  const buttonsSetProps = props.buttonsSetProps
 
   let textInputStyle, numberInputStyle, buttonStyle
   if (dialogState.isEditable) {
@@ -235,8 +228,6 @@ export function ScheduleDialog(props: any) {
                         ...aScheduledItem, duration_in_seconds: (aScheduledItem.duration_in_seconds % 60 + min * 60)
                       }
                     })
-
-
                 }}
                 editable={dialogState.isEditable}
                 keyboardType="numeric" />
@@ -408,15 +399,9 @@ export function ScheduleDialog(props: any) {
           </Modal>
           <ButtonSet
             dialogText={dialogState.dialogText}
-            cancelDialog={cancelDialog}
             aExercise={aExercise}
             aScheduledItem={aScheduledItem}
-            deleteScheduledItemConfirmation={deleteScheduledItemConfirmation}
-            renderScheduledItemDialogForEdit={renderScheduledItemDialogForEdit}
-            createScheduledItem={createScheduledItem}
-            updateScheduledItem={updateScheduledItem}
-            renderScheduledItemDialogForViewing={renderScheduledItemDialogForViewing}
-            renderScheduledItemDialogForDuplication={renderScheduledItemDialogForDuplication}
+            buttonsSetProps={buttonsSetProps}
           />
         </TouchableOpacity>
       </TouchableOpacity>

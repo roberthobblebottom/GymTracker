@@ -19,7 +19,6 @@ import _default from 'babel-plugin-transform-typescript-metadata';
 import { ScheduleDialog } from './screens/ScheduleDialog';
 import { ExerciseDialog } from './screens/ExerciseDialog';
 import { styles } from './constants/styles';
-import { useSafeAreaFrame } from 'react-native-safe-area-context';
 LogBox.ignoreLogs(['Require cycle:'])
 const Tab = createBottomTabNavigator()
 
@@ -201,29 +200,7 @@ export default function App() {
 
   // Exercises Functions:
   //renders:
-  const renderScheduledItemDialogForEdit = () => {
-    buttonStyle = styles.changeDateButtonEnabled;
-    textInputStyle = styles.textInputEditable;
-    // setAScheduledItem(aScheduledItem)
-    setScheduledItemState({ ...scheduledItemState, currentDate: scheduledItemState.aScheduledItem.date })
-    SetDialogState({
-      ...dialogState, isEditable: true, dialogText: EditScheduledItemText,
-      isDropDownOpen: false
-    });
-    setDropDownExNameSelected(scheduledItemState.aScheduledItem.exercise.name)
-  }
 
-  const renderScheduledItemDialogForDuplication = () => {
-    buttonStyle = styles.changeDateButtonEnabled;
-    textInputStyle = styles.textInputEditable;
-    // setAScheduledItem(aScheduledItem)
-    setScheduledItemState({ ...scheduledItemState, currentDate: scheduledItemState.aScheduledItem.date })
-    setDropDownExNameSelected(scheduledItemState.aScheduledItem.exercise.name)
-    SetDialogState({
-      ...dialogState, isEditable: true, dialogText: DuplicateScheduledItemText,
-      isDropDownOpen: false,
-    });
-  }
   const renderExerciseDialogForEdit = () => {
     textInputStyle = styles.textInputEditable;
     SetDialogState({ ...dialogState, isEditable: true, dialogText: EditExerciseText, isDropDownOpen: false, openPushPullDropDown: false });
@@ -388,12 +365,31 @@ export default function App() {
 
 
 
-  //Scheduled Item Functions:
-  function commonScheduledItemCRUD(si: ScheduledItem[]) {
-    setScheduledItemState({ ...scheduledItemState, scheduledItems: [...si], filteredScheduledItems: [...si] })
-    // setFilteredExerciseKeyword("")
-    cancelDialog()
+  //Scheduled Item Functions: 
+  const renderScheduledItemDialogForEdit = () => {
+    buttonStyle = styles.changeDateButtonEnabled;
+    textInputStyle = styles.textInputEditable;
+    // setAScheduledItem(aScheduledItem)
+    setScheduledItemState({ ...scheduledItemState, currentDate: scheduledItemState.aScheduledItem.date })
+    SetDialogState({
+      ...dialogState, isEditable: true, dialogText: EditScheduledItemText,
+      isDropDownOpen: false
+    });
+    setDropDownExNameSelected(scheduledItemState.aScheduledItem.exercise.name)
   }
+
+  const renderScheduledItemDialogForDuplication = () => {
+    buttonStyle = styles.changeDateButtonEnabled;
+    textInputStyle = styles.textInputEditable;
+    // setAScheduledItem(aScheduledItem)
+    setScheduledItemState({ ...scheduledItemState, currentDate: scheduledItemState.aScheduledItem.date })
+    setDropDownExNameSelected(scheduledItemState.aScheduledItem.exercise.name)
+    SetDialogState({
+      ...dialogState, isEditable: true, dialogText: DuplicateScheduledItemText,
+      isDropDownOpen: false,
+    });
+  }
+
   function renderScheduledItemDialogForViewing(scheduledItem: ScheduledItem) {
     buttonStyle = styles.changeDateButtonDisabled;
     textInputStyle = styles.textInputViewOnly;
@@ -435,6 +431,11 @@ export default function App() {
     setScheduledItemState({ ...scheduledItemState, currentDate: date })
   }
 
+  function commonScheduledItemCRUD(si: ScheduledItem[]) {
+    setScheduledItemState({ ...scheduledItemState, scheduledItems: [...si], filteredScheduledItems: [...si] })
+    // setFilteredExerciseKeyword("")
+    cancelDialog()
+  }
   let deleteScheduledItemConfirmation = (ms: ScheduledItem) => {
     Alert.alert(
       "Confirmation",
@@ -558,7 +559,20 @@ export default function App() {
     )
     setScheduledItemState({ ...scheduledItemState, filteredScheduledItems: filtered, filteredScheduledItemKeyword: keyword })
   }
-
+  const buttonsSetProps = {
+    cancelDialog: cancelDialog,
+    deleteScheduledItemConfirmation: deleteScheduledItemConfirmation,
+    renderScheduledItemDialogForEdit: renderScheduledItemDialogForEdit,
+    createScheduledItem: createScheduledItem,
+    updateScheduledItem: updateScheduledItem,
+    renderScheduledItemDialogForViewing: renderScheduledItemDialogForViewing,
+    renderScheduledItemDialogForDuplication: renderScheduledItemDialogForDuplication,
+    deleteExerciseConfirmation: deleteExerciseConfirmation,
+    renderExerciseDialogForEdit: renderExerciseDialogForEdit,
+    createExercise: createExercise,
+    updateExercise: updateExercise,
+    renderExerciseDialogForViewing: renderExerciseDialogForViewing,
+  };
   return (
     <>
       <NavigationContainer>
@@ -571,15 +585,8 @@ export default function App() {
           setScheduledItemState={setScheduledItemState}
           setDialogState={SetDialogState}
           setDropDownExNameSelected={setDropDownExNameSelected}
-          
-          cancelDialog={cancelDialog}
-          deleteScheduledItemConfirmation={deleteScheduledItemConfirmation}
-          renderScheduledItemDialogForEdit={renderScheduledItemDialogForEdit}
-          createScheduledItem={createScheduledItem}
-          updateScheduledItem={updateScheduledItem}
-          renderScheduledItemDialogForViewing={renderScheduledItemDialogForViewing}
-          renderScheduledItemDialogForDuplication={renderScheduledItemDialogForDuplication}
 
+          buttonsSetProps={buttonsSetProps}
         />
         <ExerciseDialog
           exerciseState={exerciseState}
@@ -593,13 +600,7 @@ export default function App() {
           setExerciseState={setExerciseState}
           setMajorMuscleValues={setMajorMuscleValues}
 
-          cancelDialog={cancelDialog}
-          deleteExerciseConfirmation={deleteExerciseConfirmation}
-          renderExerciseDialogForEdit={renderExerciseDialogForEdit}
-          createExercise={createExercise}
-          updateExercise={updateExercise}
-          renderExerciseDialogForViewing={renderExerciseDialogForViewing}
-
+          buttonsSetProps={buttonsSetProps}
         />
         <handleResetDBContext.Provider value={handleResetDB}>
           <ExerciseScreenContext.Provider value={{
@@ -644,8 +645,7 @@ export default function App() {
                 })
                 }>
                 <Tab.Screen
-                  options={
-                    { headerTitle: dialogState.planHeader }}
+                  options={{ headerTitle: dialogState.planHeader }}
                   name="Plan" component={PlanScreen} />
                 <Tab.Screen name="Exercises" component={ExercisesScreen} />
                 <Tab.Screen name="Settings" component={SettingsScreen} />

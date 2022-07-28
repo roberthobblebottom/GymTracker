@@ -13,25 +13,22 @@ import { ButtonSet } from './ButtonSet'
 export function ExerciseDialog(props: any) {
     const exerciseState = props.exerciseState;
     const majorMuscles = props.majorMuscles
-    const dropDownMajorMuscleNameSelected = props.dropDownMajorMuscleNameSelected
     const aScheduledItem = props.aScheduledItem
     const dialogState = props.dialogState
+
     const dropDownPushPullSelected = props.dropDownPushPullSelected
+    const dropDownMajorMuscleNameSelected = props.dropDownMajorMuscleNameSelected
+    
     const setDropDownPushPullSelected = props.setDropDownPushPullSelected
     const setExerciseState: Dispatch<any> = props.setExerciseState;
     const setMajorMuscleValues: Dispatch<any> = props.setMajorMuscleValues
 
-    const cancelDialog = props.cancelDialog
-    const deleteExerciseConfirmation = props.deleteExerciseConfirmation
-    const renderExerciseDialogForEdit = props.renderExerciseDialogForEdit
-    const createExercise = props.createExercise
-    const updateExercise = props.updateExercise
-    const renderExerciseDialogForViewing = props.renderExerciseDialogForViewing
+    const buttonsSetProps = props.buttonsSetProps
     const SetDialogState = props.setDialogState
 
     const setAExercise = (e: Exercise) => setExerciseState({ ...exerciseState, aExercise: e })
     const aExercise = exerciseState.aExercise;
-    
+
     let textInputStyle, numberInputStyle, buttonStyle
     if (dialogState.isEditable) {
         textInputStyle = styles.textInputEditable
@@ -147,14 +144,9 @@ export function ExerciseDialog(props: any) {
                     </View>
                     <ButtonSet
                         dialogText={dialogState.dialogText}
-                        cancelDialog={cancelDialog}
                         aExercise={aExercise}
                         aScheduledItem={aScheduledItem}
-                        deleteExerciseConfirmation={deleteExerciseConfirmation}
-                        renderExerciseDialogForEdit={renderExerciseDialogForEdit}
-                        createExercise={createExercise}
-                        updateExercise={updateExercise}
-                        renderExerciseDialogForViewing={renderExerciseDialogForViewing}
+                        buttonsSetProps={buttonsSetProps}
                     />
                 </TouchableOpacity>
             </TouchableOpacity>

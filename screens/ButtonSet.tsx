@@ -14,24 +14,25 @@ export function ButtonSet(props: any) {
     const ScheduledItemInformation = "Information:"
     const EditScheduledItemText: string = "Edit"
     const DuplicateScheduledItemText: string = "Duplicate:"
-
-    const cancelDialog = props.cancelDialog
+    
+    const buttonsSetProps = props.buttonsSetProps
     const aExercise = props.aExercise
     const aScheduledItem = props.aScheduledItem
     const dialogText = props.dialogText
 
-    const deleteExerciseConfirmation = props.deleteExerciseConfirmation
-    const renderExerciseDialogForEdit = props.renderExerciseDialogForEdit
-    const renderExerciseDialogForViewing = props.renderExerciseDialogForViewing
-    const createExercise = props.createExercise
-    const updateExercise = props.updateExercise
+    const cancelDialog = buttonsSetProps. cancelDialog
+    const deleteExerciseConfirmation = buttonsSetProps.deleteExerciseConfirmation
+    const renderExerciseDialogForEdit = buttonsSetProps.renderExerciseDialogForEdit
+    const renderExerciseDialogForViewing = buttonsSetProps.renderExerciseDialogForViewing
+    const createExercise = buttonsSetProps.createExercise
+    const updateExercise = buttonsSetProps.updateExercise
 
-    const deleteScheduledItemConfirmation = props.deleteScheduledItemConfirmation
-    const renderScheduledItemDialogForEdit = props.renderScheduledItemDialogForEdit
-    const renderScheduledItemDialogForViewing = props.renderScheduledItemDialogForViewing
-    const renderScheduledItemDialogForDuplication = props.renderScheduledItemDialogForDuplication
-    const createScheduledItem = props.createScheduledItem;
-    const updateScheduledItem = props.updateScheduledItem;
+    const deleteScheduledItemConfirmation = buttonsSetProps.deleteScheduledItemConfirmation
+    const renderScheduledItemDialogForEdit = buttonsSetProps.renderScheduledItemDialogForEdit
+    const renderScheduledItemDialogForViewing = buttonsSetProps.renderScheduledItemDialogForViewing
+    const renderScheduledItemDialogForDuplication = buttonsSetProps.renderScheduledItemDialogForDuplication
+    const createScheduledItem = buttonsSetProps.createScheduledItem;
+    const updateScheduledItem = buttonsSetProps.updateScheduledItem;
 
     switch (dialogText) {
         case ExerciseInformationText:
