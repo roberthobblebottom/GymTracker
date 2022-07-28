@@ -79,3 +79,11 @@ export type ExerciseState={
   filteredExerciseKeyword:string,
   oldExerciseName:string
 }
+
+export type ScheduledItemState = {
+  scheduledItems: ScheduledItem[],
+  aScheduledItem:ScheduledItem,
+  filteredScheduledItems: ScheduledItem[],
+  filteredScheduledItemKeyword:string,
+  currentDate:DateData
+}

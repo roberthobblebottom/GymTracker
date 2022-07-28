@@ -31,6 +31,7 @@ export function ExerciseDialog(props: any) {
 
     const setAExercise = (e: Exercise) => setExerciseState({ ...exerciseState, aExercise: e })
     const aExercise = exerciseState.aExercise;
+    
     let textInputStyle, numberInputStyle, buttonStyle
     if (dialogState.isEditable) {
         textInputStyle = styles.textInputEditable
@@ -41,6 +42,7 @@ export function ExerciseDialog(props: any) {
         numberInputStyle = styles.numberInputViewOnly
         buttonStyle = styles.changeDateButtonDisabled
     }
+
     return (
         <Modal visible={dialogState.isExDialogVisible} animationType="fade" transparent={true}>
             <TouchableOpacity style={styles.overallDialog} onPressIn={() => SetDialogState({ ...dialogState, isExDialogVisible: false })}>
@@ -50,8 +52,7 @@ export function ExerciseDialog(props: any) {
                 >
                     <Text style={{ fontSize: Layout.defaultFontSize }}>{dialogState.dialogText}</Text>
                     <View style={styles.dialogRow}>
-                        <Text style={{ fontSize: Layout.defaultFontSize }}
-                        >Name: </Text>
+                        <Text style={{ fontSize: Layout.defaultFontSize }}>Name: </Text>
                         <TextInput placeholder='Type in exercise name.'
                             style={textInputStyle}
                             value={aExercise.name}
@@ -69,9 +70,7 @@ export function ExerciseDialog(props: any) {
                             editable={dialogState.isEditable} />
                     </View>
                     <View style={styles.dialogRow}>
-                        <Text
-                            style={{ fontSize: Layout.defaultFontSize }}
-                        >Description: </Text>
+                        <Text style={{ fontSize: Layout.defaultFontSize }}>Description: </Text>
                         <TextInput style={{ ...textInputStyle, fontSize: Layout.defaultFontSize }}
                             multiline={true} placeholder='Type in exercise description.'
                             value={aExercise.description}

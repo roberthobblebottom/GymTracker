@@ -18,14 +18,9 @@ export function PlanScreen() {
   const context = useContext(ScheduledItemContext);
   const majorSet: ScheduledItem[] = context.majorSet;
   const a: { [key: string]: AgendaEntry[] } = {}
-  // console.log("=======");
-  // console.log("majorSet passed from App to PlanScreen")
-  // // console.log(majorSet)
-  // majorSet.forEach(r => console.log(r.exercise.name))
-  // console.log("=======");
+
   if (majorSet.length > 0)
     majorSet.forEach(ms => {
-      // console.log(ms.date == dummyDate);
       if (ms == undefined) return;
       if (ms.date == initialDate) return;
       if (a[ms.date.dateString] == undefined) a[ms.date.dateString] =
@@ -69,7 +64,6 @@ export function PlanScreen() {
             </View>);
         }}
         renderDay={(date: DateData, item) => {
-
           if (item === undefined || date === undefined) return (<View><Text></Text></View>);
           let id = Number(item.name);
           let set: ScheduledItem | undefined = majorSet.find(element => {
@@ -105,11 +99,11 @@ export function PlanScreen() {
           });
           if (set == undefined) {
             Toast.show("Error, there is a major set with undefined exercise");
-            return (<View><Text>1</Text></View>);
+            return (<View></View>);
           }
           else if (set.exercise == undefined) {
             Toast.show("Error, there is a major set with undefined exercise");
-            return (<View><Text>2</Text></View>);
+            return (<View></View>);
           }
           let labelToShow = set.id + " " + set.exercise.name + " \n" +
             +set.sets + "x" + set.reps + " " +

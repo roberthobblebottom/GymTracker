@@ -1,5 +1,5 @@
 import React from "react";
-import { FlatList, Text, View, TouchableOpacity, GestureResponderEvent } from 'react-native';
+import { FlatList, Text, View, TouchableOpacity } from 'react-native';
 import { ExerciseScreenContext } from '../App';
 import { useContext } from 'react';
 import layoutConstants from '../constants/Layout';
@@ -22,12 +22,12 @@ function ExercisesScreen() {
         data={exercises}
         initialNumToRender={15}
         renderItem={
-          ({ item, index, separators }) =>
+          ({ item}) =>
             <TouchableOpacity style={{
               alignItems: "flex-start",
               padding: layoutConstants.defaultMargin,
             }}
-              onPress={(event: GestureResponderEvent) => handleSelected(item)}
+              onPress={() => handleSelected(item)}
             >
               <Text style={{  transform:[{rotateX:"180deg"}],fontSize: layoutConstants.defaultFontSize }}>
                 {item.name}
