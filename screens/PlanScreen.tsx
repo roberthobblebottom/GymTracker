@@ -1,11 +1,12 @@
-import { Text, TouchableOpacity, View, StyleSheet, TextInput, Modal, Pressable } from 'react-native';
+import { Text, TouchableOpacity, View, StyleSheet, TextInput, Modal, Pressable, Alert } from 'react-native';
 import React, { Dispatch, useContext } from 'react';
 import Colors from '../constants/Colors';
 import { Agenda, AgendaEntry, DateData } from 'react-native-calendars';
-import { ScheduledItemContext, initialDate } from '../App';
+import { ScheduledItemContext, initialDate, initialScheduledItem } from '../App';
 import { ScheduledItem, ScheduledItemState } from '../types';
 import Toast from 'react-native-simple-toast';
 import Layout from '../constants/Layout';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 /*
 Note:
 this.renderWeekDayNames is commented out from line 325 of ./node_modules/react-native-calendars/src/agenda/index.js
@@ -31,11 +32,14 @@ export function PlanScreen() {
       else a[ms.date.dateString].push({ name: ms.id.toString(), height: 0, day: "" })
     })
   const selectedScheduledItems: ScheduledItem[] = scheduledItemState.selectedScheduledItems
-  
+console.log(selectedScheduledItems)
   const handleCreate: Function = contextProps.renderScheduledItemDialogForCreate;
   const handleSelected: Function = contextProps.renderScheduledItemDialogForViewing;
   const fitlerScheduledItem: Function = contextProps.handleFilterScheduledItem;
   const handlePlanHeader: Function = contextProps.handlePlanHeader;
+  const deleteScheduledItemsWithoutStateUpdate: Function = contextProps.deleteScheduledItemWithoutStateUpdate;
+  const commonScheduledItemCRUD: Function = contextProps.commonScheduledItemCRUD
+  contextProps.commonScheduledItemCRUD
   return (
     <View style={{
       flexDirection: "column", flex: 1,
@@ -98,7 +102,7 @@ export function PlanScreen() {
                 onLongPress={() => {
                   console.log("onlongpress")
                   let ssi = scheduledItemState.selectedScheduledItems.slice();
-                  if (ssi.find(e=>e.id==set?.id)==undefined)
+                  if (ssi.find(e => e.id == set?.id) == undefined)
                     ssi.push(set!)
                   else
                     ssi.splice(ssi.indexOf(set!), 1)
@@ -126,14 +130,11 @@ export function PlanScreen() {
             return (<View></View>);
           }
 
-          // console.log("selectedScheduledItems")
-          // console.log(selectedScheduledItems)
           let bgc
           if (selectedScheduledItems.indexOf(set) > -1)
             bgc = { backgroundColor: "gray" }
           else
             bgc = {}
-          // console.log(bgc)
           let labelToShow = set.id + " " + set.exercise.name + " \n" +
             +set.sets + "x" + set.reps + " " +
             set.weight + "kg "
@@ -149,16 +150,13 @@ export function PlanScreen() {
                 }}
                 onLongPress={() => {
                   let ssi = selectedScheduledItems.slice();
-                  console.log("long press")
                   //  ssi.forEach(s=>console.log(s.id+s.exercise.name)) 
                   if (ssi.find(e => e.id == set!.id) == undefined)
                     ssi.push(set!)
                   else {
                     const i = ssi.indexOf(set!);
                     ssi.splice(i, 1)
-                    console.log(i)
                   }
-                  // console.log(ssi)
                   setScheduledItemState({ ...scheduledItemState, selectedScheduledItems: ssi })
                 }}
                 onPress={() => { handleSelected(set) }}>
@@ -172,19 +170,49 @@ export function PlanScreen() {
       />
 
       <Pressable
-
         style={{
           borderRadius: 45,
           backgroundColor: "red",
           height: 60, width: 60,
-          bottom: '35%',
+          bottom: '43%',
           start: '80%',
           marginBottom: "-20%",
-          display: selectedScheduledItems.length > 0 ? "flex" : "none"
+          display: selectedScheduledItems.length>0? "flex" : "none"
+        }}
+        onPress={() => {
+          Alert.alert("confirmation", "Are you sure you like to delete all selected?", [{
+            text: "Yes", onPress: () => {
+              selectedScheduledItems.forEach(si => deleteScheduledItemsWithoutStateUpdate(si.id))
+              selectedScheduledItems.forEach(si => {
+                const i = scheduledItems.indexOf(si)
+                scheduledItems.splice(i, 1)
+              })
+              setScheduledItemState({ ...scheduledItemState, selectedScheduledItems: [] })
+              commonScheduledItemCRUD(scheduledItems)
+            }
+          }, { text: "No", onPress: () => { } }], { cancelable: true })
+        }}
+      >
+        <MaterialCommunityIcons style={{ bottom: "-14%", right: "-17%" }} name="delete" size={Layout.defaultMargin + 30} color="white" />
+      </Pressable>
+
+
+      <Pressable
+        style={{
+          borderRadius: 45,
+          backgroundColor: "red",
+          height: 60, width: 60,
+          bottom: '30%',
+          start: '80%',
+          marginBottom: "-20%",
+          display: selectedScheduledItems.length>0? "flex" : "none"
         }}
         onPress={() => { setScheduledItemState({ ...scheduledItemState, selectedScheduledItems: [] }) }}
       >
-
+        <MaterialCommunityIcons style={{ bottom: "-14%", right: "-17%" }}
+          name="selection-remove"
+          size={Layout.defaultMargin + 30}
+          color="white" />
       </Pressable>
 
       < TextInput
@@ -212,18 +240,11 @@ export function PlanScreen() {
           bottom: '25%',
           start: '80%',
           marginBottom: "-20%"
-
         }}
         onPress={() => { handleCreate() }}
       >
-        <View style={{
-          backgroundColor: "white", height: 40, width: 5,
-          start: "45%", top: "17%"
-        }}></View>
-        <View style={{
-          backgroundColor: "white", height: 5, width: 40,
-          start: "15%", bottom: "20%"
-        }}></View>
+        <Ionicons style={{ bottom: "-5%", right: "-10%" }} name="add-outline" size={Layout.defaultMargin + 40} color="white" />
+
       </TouchableOpacity>
     </View>
   );
@@ -236,4 +257,4 @@ const styles = StyleSheet.create({
     // marginTop: Layout.defaultMargin * 2
 
   }
-});
+})

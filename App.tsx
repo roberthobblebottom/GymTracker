@@ -49,7 +49,7 @@ export const initialScheduledItemState: ScheduledItemState = {
   aScheduledItem: initialScheduledItem[0],
   filteredScheduledItems: initialScheduledItem,
   filteredScheduledItemKeyword: "",
-  selectedScheduledItems: initialScheduledItem
+  selectedScheduledItems: []
 }
 const initialMajorMuscles: MajorMuscle[] = [{ name: "", notes: "", imageJson: "" }];
 const initialEmm: Emm[] = [{ id: 9999, exercise_name: "", major_muscle_name: "" }];
@@ -64,7 +64,6 @@ const initialDialogState = {
   isHistoryDialogVisible: false,
   planHeader: "Plan " + d.getDate() + "-" + (d.getMonth() + 1) + "-" + d.getFullYear(),
   isExerciseHistory: true,
-  isScheduledItemsSelected: false,
 }
 const iniitalContextProps: ContextProps={
   renderScheduledItemDialogForViewing: Function,
@@ -76,8 +75,10 @@ const iniitalContextProps: ContextProps={
   exerciseState:initialExerciseState,
   setExerciseState:()=>{},
   renderExerciseDialogForCreate:Function,
-  renderExerciseDialogForViewing:Function,
-  handleFilterExercises:Function
+renderExerciseDialogForViewing:Function,
+  handleFilterExercises:Function,
+  deleteScheduledItemWithoutStateUpdate:Function,
+  commonScheduledItemCRUD:Function
 }
 //contexts
 export const handleResetDBContext = React.createContext(() => { })
@@ -443,7 +444,9 @@ export default function App() {
   }
 
   function commonScheduledItemCRUD(si: ScheduledItem[]) {
-    setScheduledItemState({ ...scheduledItemState, scheduledItems: [...si], filteredScheduledItems: [...si] })
+    setScheduledItemState({ ...scheduledItemState, scheduledItems: [...si],
+       filteredScheduledItems: [...si],
+      selectedScheduledItems:[] })
     // setFilteredExerciseKeyword("")
     cancelDialog()
   }
@@ -456,6 +459,15 @@ export default function App() {
       { cancelable: true }
     )
   };
+  function deleteScheduledItemsWithoutStateUpdate (id:number){
+    db.transaction(t => t.executeSql("DELETE FROM scheduled_item where id= ?", [id],
+      () => {},
+      (_, err) => {
+        console.log(err)
+        return true;
+      }
+    ))
+  }
   let deleteScheduledItem = (id: number) => {
     db.transaction(t => t.executeSql("DELETE FROM scheduled_item where id= ?", [id],
       () => {
@@ -600,7 +612,9 @@ export default function App() {
     renderExerciseDialogForViewing:renderExerciseDialogForViewing,
     handleFilterExercises:handleFilterExercises,
     exerciseState:exerciseState,
-    setExerciseState:setExerciseState
+    setExerciseState:setExerciseState,
+    deleteScheduledItemWithoutStateUpdate:deleteScheduledItemsWithoutStateUpdate,
+    commonScheduledItemCRUD:commonScheduledItemCRUD
   }
 
   return (

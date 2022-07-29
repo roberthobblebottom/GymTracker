@@ -115,5 +115,7 @@ export type ContextProps = {
   setExerciseState:Dispatch<ExerciseState>,
   renderExerciseDialogForViewing: Function,
   renderExerciseDialogForCreate: Function
-  handleFilterExercises: Function
+  handleFilterExercises: Function,
+  deleteScheduledItemWithoutStateUpdate:Function,
+  commonScheduledItemCRUD:Function
 }

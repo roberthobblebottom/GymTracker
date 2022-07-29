@@ -7,6 +7,7 @@ import { Exercise } from "../types";
 import Layout from "../constants/Layout";
 import Colors from "../constants/Colors";
 import { TextInput } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 
 function ExercisesScreen() {
   let c = useContext(ExerciseScreenContext);
@@ -58,8 +59,7 @@ function ExercisesScreen() {
         }}
         onPress={() => handleShowCreate()}
       >
-        <View style={{ backgroundColor: "white", height: 40, width: 5, start: "45%", top: "17%" }}></View>
-        <View style={{ backgroundColor: "white", height: 5, width: 40, start: "15%", bottom: "20%" }}></View>
+        <Ionicons style={{bottom:"-5%",right:"-10%"}} name="add-outline" size={Layout.defaultMargin+40} color="white"/>
       </TouchableOpacity>
     </View>
   );
