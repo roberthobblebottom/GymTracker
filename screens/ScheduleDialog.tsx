@@ -12,17 +12,17 @@ import DropDownPicker, { ItemType } from 'react-native-dropdown-picker'
 import _default from 'babel-plugin-transform-typescript-metadata'
 import { bases, styles } from '../constants/styles'
 import { ButtonSet } from './ButtonSet'
-import { Exercise, ScheduledItem, ScheduledItemState } from '../types'
+import { DialogState, Exercise, ScheduledItem, ScheduledItemState } from '../types'
 export function ScheduleDialog(props: any) {
   //variables
   const exerciseState = props.exerciseState
-  const dialogState = props.dialogState;
+  const dialogState :DialogState= props.dialogState;
   const dropDownExNameSelected = props.dropDownExNameSelected
   const scheduledItemState: ScheduledItemState = props.scheduledItemState
 
   const aExercise: Exercise = props.exerciseState.aExercise
   const aScheduledItem: ScheduledItem = scheduledItemState.aScheduledItem
-  const currentDate: DateData = scheduledItemState.currentDate
+  const currentDate: DateData = aScheduledItem.date
   const minutes = Math.floor(aScheduledItem.duration_in_seconds / 60)
   const seconds = aScheduledItem.duration_in_seconds % 60
 
@@ -249,7 +249,6 @@ export function ScheduleDialog(props: any) {
             <View style={styles.numberElementsOnTheLeftOfScheduleItemDialog}>
               <Pressable style={buttonStyle} disabled={!dialogState.isEditable} onPress={() => {
                 const a = aScheduledItem.duration_in_seconds - 1;
-                console.log(a)
                 if (a < 0) {
                   setScheduledItemState({
                     ...scheduledItemState, aScheduledItem: {
@@ -362,7 +361,7 @@ export function ScheduleDialog(props: any) {
               editable={dialogState.isEditable} />
 
           </View>
-          <View style={{ flexDirection: "row", marginTop: 10, display: 'flex', justifyContent: "space-between" }}>
+          <View style={bases.numberCRUD}>
             <Text style={{ fontSize: Layout.defaultFontSize }}> date: {currentDate.day + "-" + currentDate.month + "-" + currentDate.year}</Text>
             <Pressable
               style={{
@@ -386,11 +385,11 @@ export function ScheduleDialog(props: any) {
               >
                 <Text style={{ fontSize: Layout.defaultFontSize }} >Select a date</Text>
                 <Calendar
-                  initialDate={currentDate.dateString}
+                  initialDate={aScheduledItem.date.dateString}
                   onDayPress={day => {
                     const s = Object.assign({}, aScheduledItem)
                     s.date = day
-                    setScheduledItemState({ ...scheduledItemState, aScheduledItem: s, currentDate: day })
+                    setScheduledItemState({ ...scheduledItemState, aScheduledItem: s })
                     setDialogState({ ...dialogState, isCalendarDialogVisible: false })
                   }} />
                 <Button title='Cancel' onPress={() => setDialogState({ ...dialogState, isCalendarDialogVisible: false })} />

@@ -62,6 +62,7 @@ export const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 4,
     elevation: 5,
+    fontSize:Layout.defaultFontSize
   },
 
   numberInputEditable: {
@@ -92,5 +93,6 @@ export const styles = StyleSheet.create({
   dialogRow: { flexDirection: "row", marginTop: 20 },
   buttonsRow:{ flexDirection: "row", justifyContent: "space-around", marginTop: 20 },
   overallDialog:{ flex: 1, display: "flex", justifyContent: "flex-end" },
-  numberElementsOnTheLeftOfScheduleItemDialog:{ flexDirection: "row", justifyContent: "space-evenly", }
+  numberElementsOnTheLeftOfScheduleItemDialog:{ flexDirection: "row", justifyContent: "space-evenly", },
+  dialogRow2:{ flexDirection: "row", marginTop: 10, display: 'flex', justifyContent: "space-between" }
 })

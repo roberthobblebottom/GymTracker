@@ -85,5 +85,19 @@ export type ScheduledItemState = {
   aScheduledItem:ScheduledItem,
   filteredScheduledItems: ScheduledItem[],
   filteredScheduledItemKeyword:string,
-  currentDate:DateData
+  // currentDate:DateData
+}
+
+export type DialogState={
+
+  isExDialogVisible: boolean,
+  openPushPullDropDown: boolean,
+  dialogText: string,
+  isEditable: boolean,
+  isCalendarDialogVisible: boolean,
+  isDropDownOpen: boolean,
+  isPlanDialogVisible: boolean,
+  isHistoryDialogVisible: boolean,
+  planHeader:string,
+  isExerciseHistory:boolean,//no means it is PR History. 
 }

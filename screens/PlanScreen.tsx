@@ -16,11 +16,11 @@ due to this issue: https://github.com/wix/react-native-calendars/issues/1589#iss
 */
 export function PlanScreen() {
   const context = useContext(ScheduledItemContext);
-  const majorSet: ScheduledItem[] = context.majorSet;
+  const scheduledItems: ScheduledItem[] = context.scheduledItems;
   const a: { [key: string]: AgendaEntry[] } = {}
 
-  if (majorSet.length > 0)
-    majorSet.forEach(ms => {
+  if (scheduledItems.length > 0)
+    scheduledItems.forEach(ms => {
       if (ms == undefined) return;
       if (ms.date == initialDate) return;
       if (a[ms.date.dateString] == undefined) a[ms.date.dateString] =
@@ -66,7 +66,7 @@ export function PlanScreen() {
         renderDay={(date: DateData, item) => {
           if (item === undefined || date === undefined) return (<View><Text></Text></View>);
           let id = Number(item.name);
-          let set: ScheduledItem | undefined = majorSet.find(element => {
+          let set: ScheduledItem | undefined = scheduledItems.find(element => {
             return element.id == id;
           });
           if (set == undefined) return (<View></View>);
@@ -94,7 +94,7 @@ export function PlanScreen() {
           let header;
           if (item === undefined || isFirst) return (<View><Text></Text></View>);
           let id = Number(item.name);
-          let set: ScheduledItem | undefined = majorSet.find(element => {
+          let set: ScheduledItem | undefined = scheduledItems.find(element => {
             return element.id == id;
           });
           if (set == undefined) {

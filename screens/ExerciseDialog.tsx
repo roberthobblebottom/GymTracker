@@ -1,5 +1,5 @@
 import {
-    Modal, View, Text, TouchableOpacity, TextInput
+    Modal, View, Text, TouchableOpacity, TextInput, Pressable, Button, FlatList
 } from 'react-native'
 import 'react-native-gesture-handler'
 import React, { Dispatch } from 'react'
@@ -7,27 +7,55 @@ import Colors from '../constants/Colors'
 import Layout from '../constants/Layout'
 import DropDownPicker, { ItemType } from 'react-native-dropdown-picker'
 import _default from 'babel-plugin-transform-typescript-metadata'
-import { styles } from '../constants/styles'
-import { Exercise, PushPullEnum } from '../types'
+import { bases, styles } from '../constants/styles'
+import { DialogState, Exercise, PushPullEnum, ScheduledItem, ScheduledItemState } from '../types'
 import { ButtonSet } from './ButtonSet'
+import Toast from 'react-native-simple-toast'
 export function ExerciseDialog(props: any) {
     const exerciseState = props.exerciseState;
     const majorMuscles = props.majorMuscles
-    const aScheduledItem = props.aScheduledItem
-    const dialogState = props.dialogState
+    const scheduledItemState: ScheduledItemState = props.scheduledItemState
+    const aScheduledItem = scheduledItemState.aScheduledItem
+    const dialogState: DialogState = props.dialogState
 
     const dropDownPushPullSelected = props.dropDownPushPullSelected
     const dropDownMajorMuscleNameSelected = props.dropDownMajorMuscleNameSelected
-    
+
     const setDropDownPushPullSelected = props.setDropDownPushPullSelected
     const setExerciseState: Dispatch<any> = props.setExerciseState;
     const setMajorMuscleValues: Dispatch<any> = props.setMajorMuscleValues
+    const SetDialogState: Dispatch<DialogState> = props.setDialogState
+    const setAExercise = (e: Exercise) => setExerciseState({ ...exerciseState, aExercise: e })
 
     const buttonsSetProps = props.buttonsSetProps
-    const SetDialogState = props.setDialogState
 
-    const setAExercise = (e: Exercise) => setExerciseState({ ...exerciseState, aExercise: e })
     const aExercise = exerciseState.aExercise;
+
+    const filteredScheduledItems: ScheduledItem[] = dialogState.isExerciseHistory
+        ? scheduledItemState
+            .scheduledItems
+            .filter(si => si.exercise.name == aExercise.name)
+            .sort((a, b) => {
+                if (a.date.year == b.date.year) {
+                    if (a.date.month == b.date.month) {
+                        return a.date.day - b.date.day
+                    } else return a.date.month - b.date.month
+                } else return a.date.year - b.date.year
+            })
+        : scheduledItemState
+            .scheduledItems
+            .filter(si => si.exercise.name == aExercise.name)
+            .sort((a, b) => {
+                return a.weight * a.reps * a.sets - b.weight * b.reps * b.sets
+            })
+
+    const header = dialogState.isExerciseHistory
+        ? "History"
+        : "Personal Records"
+
+    const buttonTitle = dialogState.isExerciseHistory
+        ? "change to Personal Records"
+        : "change to history"
 
     let textInputStyle, numberInputStyle, buttonStyle
     if (dialogState.isEditable) {
@@ -142,11 +170,60 @@ export function ExerciseDialog(props: any) {
                             badgeProps={{ disabled: !dialogState.isEditable }}
                         />
                     </View>
+
+                    <Modal visible={dialogState.isHistoryDialogVisible} animationType="fade" transparent={true}>
+                        <TouchableOpacity style={styles.overallDialog} onPressIn={() => SetDialogState({ ...dialogState, isHistoryDialogVisible: false })}>
+                            <TouchableOpacity style={styles.innerTouchableOpacity}
+                                onPress={() => { }}
+                                activeOpacity={1}
+                            >
+                                <Text style={{
+
+                                    fontSize: Layout.defaultFontSize
+                                }}>{header}</Text>
+                                <FlatList
+                                    data={filteredScheduledItems}
+                                    renderItem={(item) => {
+                                        if (item === undefined) return (<View><Text></Text></View>);
+                                        let id = Number(item.item.id);
+                                        let set: ScheduledItem | undefined = scheduledItemState.scheduledItems.find(element => {
+                                            return element.id == id;
+                                        });
+                                        if (set == undefined) {
+                                            Toast.show("Error, there is a major set with undefined exercise");
+                                            return (<View></View>);
+                                        }
+                                        else if (set.exercise == undefined) {
+                                            Toast.show("Error, there is a major set with undefined exercise");
+                                            return (<View></View>);
+                                        }
+                                        let labelToShow = set.id + " " + set.exercise.name + " \n" +
+                                            +set.sets + "x" + set.reps + " " +
+                                            set.weight + "kg "
+                                            + ((set.duration_in_seconds != 0)
+                                                ? Math.floor(set.duration_in_seconds / 60) + " minutes " + set.duration_in_seconds % 60 + " seconds "
+                                                : "") +
+                                            +set.percent_complete + "%"
+                                            + set.date.dateString
+                                        return (
+                                            <Text style={{ fontSize: Layout.defaultFontSize, marginTop:Layout.defaultMargin }}>{labelToShow}</Text>
+                                        );
+                                    }}
+                                />
+                                <View style={bases.numberCRUD}>
+                                    <Button onPress={() => SetDialogState({ ...dialogState, isExerciseHistory: !dialogState.isExerciseHistory })} title={buttonTitle} />
+                                    <Button onPress={() => SetDialogState({ ...dialogState, isHistoryDialogVisible: false })} title="cancel"></Button>
+                                </View>
+                            </TouchableOpacity>
+                        </TouchableOpacity>
+                    </Modal>
                     <ButtonSet
                         dialogText={dialogState.dialogText}
                         aExercise={aExercise}
                         aScheduledItem={aScheduledItem}
                         buttonsSetProps={buttonsSetProps}
+                        dialogState={dialogState}
+                        SetDialogState={SetDialogState}
                     />
                 </TouchableOpacity>
             </TouchableOpacity>

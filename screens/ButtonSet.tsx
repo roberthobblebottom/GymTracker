@@ -2,9 +2,10 @@ import {
     View, Button
 } from 'react-native'
 import 'react-native-gesture-handler'
-import React, { } from 'react'
+import React, { Dispatch } from 'react'
 import _default from 'babel-plugin-transform-typescript-metadata'
 import { styles } from '../constants/styles'
+import { DialogState } from '../types'
 export function ButtonSet(props: any) {
     //constant strings
     const ExerciseInformationText = "Exercise Information"
@@ -19,6 +20,9 @@ export function ButtonSet(props: any) {
     const aExercise = props.aExercise
     const aScheduledItem = props.aScheduledItem
     const dialogText = props.dialogText
+    const dialogState:DialogState= props.dialogState
+
+    const SetDialogState:Dispatch<DialogState> = props.SetDialogState
 
     const cancelDialog = buttonsSetProps. cancelDialog
     const deleteExerciseConfirmation = buttonsSetProps.deleteExerciseConfirmation
@@ -41,6 +45,8 @@ export function ButtonSet(props: any) {
                     <Button title="delete" onPress={() => deleteExerciseConfirmation(aExercise)} />
                     <Button title='Edit' onPress={() => { renderExerciseDialogForEdit() }} />
                     <Button title='Cancel' onPress={() => cancelDialog()} />
+                        <Button onPress={()=>
+                            SetDialogState({...dialogState,isHistoryDialogVisible:true})} title="History and Pr"/>
                 </View>
             )
         case CreateExerciseText:
