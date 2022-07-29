@@ -10,16 +10,16 @@ import { TextInput } from "react-native";
 
 function ExercisesScreen() {
   let c = useContext(ExerciseScreenContext);
-  let exercises: Exercise[] = c.exercises;
-  let handleSelected: Function = c.handleSelected;
-  let handleShowCreate: Function = c.handleCreate;
-  let filteredKeyword: string = c.filteredKeyword;
-  let filteredExercises: Function = c.handleFilterExercises;
+  let filteredExercises: Exercise[] = c.contextProps.exerciseState.filteredExercises;
+  let filteredKeyword: string = c.contextProps.exerciseState.filteredExerciseKeyword;
+  let handleSelected: Function = c.contextProps.renderExerciseDialogForViewing;
+  let handleShowCreate: Function = c.contextProps.renderExerciseDialogForCreate;
+  let handleFilterExercises: Function = c.contextProps.handleFilterExercises;
   return (
     <View style={{flexDirection: "column", flex: 1, alignItems: 'flex-start', justifyContent: 'center' }}>
       <FlatList
         style={{ width: '100%'  ,transform:[{rotateX:"180deg"}],}}
-        data={exercises}
+        data={filteredExercises}
         initialNumToRender={15}
         renderItem={
           ({ item}) =>
@@ -44,7 +44,7 @@ function ExercisesScreen() {
           borderTopColor: "white"
         }}
         placeholder="Type here to filter exercises..."
-        onChange={text => filteredExercises(text.nativeEvent.text)}
+        onChange={text => handleFilterExercises(text.nativeEvent.text)}
         value={filteredKeyword}
       />
       <TouchableOpacity

@@ -9,7 +9,7 @@ import React, { useState, useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { init, db, resetTables } from './dbhandler';
-import { DialogState, Emm, Exercise, ExerciseState, MajorMuscle, PushPullEnum, ScheduledItemState } from './types';
+import { ContextProps, DialogState, Emm, Exercise, ExerciseState, MajorMuscle, PushPullEnum, ScheduledItemState } from './types';
 import { ScheduledItem } from './types';
 import Toast from 'react-native-simple-toast';
 import Colors from './constants/Colors';
@@ -48,7 +48,8 @@ export const initialScheduledItemState: ScheduledItemState = {
   scheduledItems: initialScheduledItem,
   aScheduledItem: initialScheduledItem[0],
   filteredScheduledItems: initialScheduledItem,
-  filteredScheduledItemKeyword: ""
+  filteredScheduledItemKeyword: "",
+  selectedScheduledItems: initialScheduledItem
 }
 const initialMajorMuscles: MajorMuscle[] = [{ name: "", notes: "", imageJson: "" }];
 const initialEmm: Emm[] = [{ id: 9999, exercise_name: "", major_muscle_name: "" }];
@@ -62,25 +63,26 @@ const initialDialogState = {
   isPlanDialogVisible: false,
   isHistoryDialogVisible: false,
   planHeader: "Plan " + d.getDate() + "-" + (d.getMonth() + 1) + "-" + d.getFullYear(),
-  isExerciseHistory:true
+  isExerciseHistory: true,
+  isScheduledItemsSelected: false,
 }
-
+const iniitalContextProps: ContextProps={
+  renderScheduledItemDialogForViewing: Function,
+  renderScheduledItemDialogForCreate: Function,
+  handleFilterScheduledItem:Function,
+  handlePlanHeader:Function,
+  scheduledItemState:initialScheduledItemState,
+  setScheduledItemState:()=>{},
+  exerciseState:initialExerciseState,
+  setExerciseState:()=>{},
+  renderExerciseDialogForCreate:Function,
+  renderExerciseDialogForViewing:Function,
+  handleFilterExercises:Function
+}
 //contexts
 export const handleResetDBContext = React.createContext(() => { })
-export const ExerciseScreenContext = React.createContext(
-  {
-    exercises: initialExerciseState.exercises, handleSelected: (exercise: Exercise) => { }, handleCreate: () => { },
-    handleFilterExercises: (keyword: string) => { },
-    filteredKeyword: ""
-  }
-)
-export const ScheduledItemContext = React.createContext({
-  scheduledItems: initialScheduledItem, handleSelected: (majorSet: ScheduledItem) => { },
-  handleCreate: (majorSet: ScheduledItem) => { },
-  handleFilterScheduledItem: (keyword: string) => { },
-  filteredKeyword: "",
-  handlePlanHeader: (date: DateData) => { }
-})
+export const ExerciseScreenContext = React.createContext({ contextProps:iniitalContextProps})
+export const ScheduledItemContext = React.createContext({ contextProps: iniitalContextProps })
 
 export default function App() {
   const [exerciseState, setExerciseState] = useState<ExerciseState>(initialExerciseState)
@@ -359,7 +361,8 @@ export default function App() {
       }))
   }
 
-  function handleFilterExercies(keyword: string) {
+  function handleFilterExercises(keyword: string) {
+    console.log("handleFilterExercises")
     setExerciseState({
       ...exerciseState,
       filteredExercises:
@@ -392,7 +395,7 @@ export default function App() {
     })
     setDropDownExNameSelected(scheduledItem.exercise.name)
   }
-  function commonLogicForScheduledItemEditAndDuplication(dialogText:string) {
+  function commonLogicForScheduledItemEditAndDuplication(dialogText: string) {
     buttonStyle = styles.changeDateButtonEnabled;
     textInputStyle = styles.textInputEditable;
     setScheduledItemState({ ...scheduledItemState, })
@@ -400,17 +403,17 @@ export default function App() {
       ...dialogState,
       isEditable: true,
       isDropDownOpen: false,
-      dialogText:dialogText
+      dialogText: dialogText
     });
     setDropDownExNameSelected(scheduledItemState.aScheduledItem.exercise.name)
   }
   const renderScheduledItemDialogForEdit = () => {
     commonLogicForScheduledItemEditAndDuplication(EditScheduledItemText)
-     }
+  }
 
   const renderScheduledItemDialogForDuplication = () => {
     commonLogicForScheduledItemEditAndDuplication(DuplicateScheduledItemText)
-      }
+  }
 
   function renderScheduledItemDialogForCreate() {
     buttonStyle = styles.changeDateButtonEnabled;
@@ -526,7 +529,7 @@ export default function App() {
       }
     })
     db.transaction(t => {
-      
+
       t.executeSql(`INSERT INTO scheduled_item
            (exercise,reps,percent_complete,sets,duration_in_seconds,weight,notes,date)  
            VALUES(?,?,?,?,?,?,?,?)`,
@@ -586,6 +589,20 @@ export default function App() {
     renderExerciseDialogForViewing: renderExerciseDialogForViewing,
   };
 
+  const contextProps:ContextProps = {
+    renderScheduledItemDialogForViewing: renderScheduledItemDialogForViewing,
+    renderScheduledItemDialogForCreate: renderScheduledItemDialogForCreate,
+    handleFilterScheduledItem: handleFilterScheduledItem,
+    handlePlanHeader: handlePlanHeader,
+    setScheduledItemState:setScheduledItemState,
+    scheduledItemState:scheduledItemState,
+    renderExerciseDialogForCreate:renderExerciseDialogForCreate,
+    renderExerciseDialogForViewing:renderExerciseDialogForViewing,
+    handleFilterExercises:handleFilterExercises,
+    exerciseState:exerciseState,
+    setExerciseState:setExerciseState
+  }
+
   return (
     <>
       <NavigationContainer>
@@ -617,20 +634,9 @@ export default function App() {
           buttonsSetProps={buttonsSetProps}
         />
         <handleResetDBContext.Provider value={handleResetDB}>
-          <ExerciseScreenContext.Provider value={{
-            exercises: exerciseState.filteredExercises,
-            filteredKeyword: exerciseState.filteredExerciseKeyword,
-            handleSelected: renderExerciseDialogForViewing,
-            handleCreate: renderExerciseDialogForCreate,
-            handleFilterExercises: handleFilterExercies
-          }}>
+          <ExerciseScreenContext.Provider value={{ contextProps:contextProps}}>
             <ScheduledItemContext.Provider value={{
-              scheduledItems: scheduledItemState.filteredScheduledItems,
-              filteredKeyword: scheduledItemState.filteredScheduledItemKeyword,
-              handleSelected: renderScheduledItemDialogForViewing,
-              handleCreate: renderScheduledItemDialogForCreate,
-              handleFilterScheduledItem: handleFilterScheduledItem,
-              handlePlanHeader: handlePlanHeader
+              contextProps: contextProps
             }}>
               <Tab.Navigator
                 screenOptions={({ route }) =>

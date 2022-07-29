@@ -6,6 +6,7 @@
 import { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import { CompositeScreenProps, NavigatorScreenParams } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { Dispatch } from 'react';
 import { DateData } from 'react-native-calendars';
 
 declare global {
@@ -15,9 +16,9 @@ declare global {
 }
 declare var Blob: {
   prototype: Blob;
-  new (name:string,description:string,imagesJson:string): Blob;
+  new(name: string, description: string, imagesJson: string): Blob;
 }
-export {Blob};
+export { Blob };
 export type RootStackParamList = {
   Root: NavigatorScreenParams<RootTabParamList> | undefined;
   Modal: undefined;
@@ -38,7 +39,7 @@ export type RootTabScreenProps<Screen extends keyof RootTabParamList> = Composit
   BottomTabScreenProps<RootTabParamList, Screen>,
   NativeStackScreenProps<RootStackParamList>
 >;
-export enum PushPullEnum {Push="Push",Pull="Pull"}
+export enum PushPullEnum { Push = "Push", Pull = "Pull" }
 export type Exercise = {
   name: string,
   description: string,
@@ -60,35 +61,36 @@ export type ScheduledItem = {
 }
 
 export type MajorMuscle = {
-  name:string,
-  notes:string,
-  imageJson:string
+  name: string,
+  notes: string,
+  imageJson: string
 }
 
 export type Emm = {
-  id:number,
-  exercise_name:string,
-  major_muscle_name:string
+  id: number,
+  exercise_name: string,
+  major_muscle_name: string
 }
 
 
-export type ExerciseState={
-  exercises:Exercise[],
-  aExercise:Exercise,
-  filteredExercises:Exercise[],
-  filteredExerciseKeyword:string,
-  oldExerciseName:string
+export type ExerciseState = {
+  exercises: Exercise[],
+  aExercise: Exercise,
+  filteredExercises: Exercise[],
+  filteredExerciseKeyword: string,
+  oldExerciseName: string
 }
 
 export type ScheduledItemState = {
   scheduledItems: ScheduledItem[],
-  aScheduledItem:ScheduledItem,
+  aScheduledItem: ScheduledItem,
   filteredScheduledItems: ScheduledItem[],
-  filteredScheduledItemKeyword:string,
+  filteredScheduledItemKeyword: string,
+  selectedScheduledItems: ScheduledItem[]
   // currentDate:DateData
 }
 
-export type DialogState={
+export type DialogState = {
 
   isExDialogVisible: boolean,
   openPushPullDropDown: boolean,
@@ -98,6 +100,20 @@ export type DialogState={
   isDropDownOpen: boolean,
   isPlanDialogVisible: boolean,
   isHistoryDialogVisible: boolean,
-  planHeader:string,
-  isExerciseHistory:boolean,//no means it is PR History. 
+  planHeader: string,
+  isExerciseHistory: boolean,//no means it is PR History. 
+}
+
+export type ContextProps = {
+  renderScheduledItemDialogForViewing: Function,
+  renderScheduledItemDialogForCreate: Function,
+  handleFilterScheduledItem: Function
+  handlePlanHeader: Function,
+  scheduledItemState: ScheduledItemState,
+  setScheduledItemState: Dispatch<ScheduledItemState>,
+  exerciseState:ExerciseState,
+  setExerciseState:Dispatch<ExerciseState>,
+  renderExerciseDialogForViewing: Function,
+  renderExerciseDialogForCreate: Function
+  handleFilterExercises: Function
 }

@@ -1,9 +1,9 @@
-import { Text, TouchableOpacity, View, StyleSheet, TextInput } from 'react-native';
-import React, { useContext } from 'react';
+import { Text, TouchableOpacity, View, StyleSheet, TextInput, Modal, Pressable } from 'react-native';
+import React, { Dispatch, useContext } from 'react';
 import Colors from '../constants/Colors';
 import { Agenda, AgendaEntry, DateData } from 'react-native-calendars';
 import { ScheduledItemContext, initialDate } from '../App';
-import { ScheduledItem } from '../types';
+import { ScheduledItem, ScheduledItemState } from '../types';
 import Toast from 'react-native-simple-toast';
 import Layout from '../constants/Layout';
 /*
@@ -16,9 +16,12 @@ due to this issue: https://github.com/wix/react-native-calendars/issues/1589#iss
 */
 export function PlanScreen() {
   const context = useContext(ScheduledItemContext);
-  const scheduledItems: ScheduledItem[] = context.scheduledItems;
+  const scheduledItemState: ScheduledItemState = context.contextProps.scheduledItemState
+  const setScheduledItemState: Dispatch<ScheduledItemState> = context.contextProps.setScheduledItemState
+  const contextProps = context.contextProps
+  const scheduledItems: ScheduledItem[] = scheduledItemState.scheduledItems;
+  const majorSetKeyword: string = scheduledItemState.filteredScheduledItemKeyword;
   const a: { [key: string]: AgendaEntry[] } = {}
-
   if (scheduledItems.length > 0)
     scheduledItems.forEach(ms => {
       if (ms == undefined) return;
@@ -27,11 +30,12 @@ export function PlanScreen() {
         [{ name: ms.id.toString(), height: 0, day: "" }];
       else a[ms.date.dateString].push({ name: ms.id.toString(), height: 0, day: "" })
     })
-  const handleCreate: Function = context.handleCreate;
-  const handleSelected: Function = context.handleSelected;
-  const fitlerScheduledItem: Function = context.handleFilterScheduledItem;
-  const majorSetKeyword: string = context.filteredKeyword;
-  const handlePlanHeader: Function = context.handlePlanHeader;
+  const selectedScheduledItems: ScheduledItem[] = scheduledItemState.selectedScheduledItems
+  
+  const handleCreate: Function = contextProps.renderScheduledItemDialogForCreate;
+  const handleSelected: Function = contextProps.renderScheduledItemDialogForViewing;
+  const fitlerScheduledItem: Function = contextProps.handleFilterScheduledItem;
+  const handlePlanHeader: Function = contextProps.handlePlanHeader;
   return (
     <View style={{
       flexDirection: "column", flex: 1,
@@ -80,10 +84,27 @@ export function PlanScreen() {
           let dateString = String(date);
           let dateParts: string[] = dateString.split(" ");
           let dateLabelToShow = dateParts[1] + " " + dateParts[2]
+          let bgc;
+          if (selectedScheduledItems.indexOf(set) > -1) {
+            bgc = { backgroundColor: "gray" }
+          } else {
+
+            bgc = {}
+          }
           return (
-            <View style={{ ...styles.listStyle, flexDirection: "row" }}>
-              <TouchableOpacity style={{
-              }} onPress={() => { handleSelected(set) }}>
+            <View style={{ ...styles.listStyle, ...bgc }}>
+              <TouchableOpacity style={{}}
+                onPress={() => { handleSelected(set) }}
+                onLongPress={() => {
+                  console.log("onlongpress")
+                  let ssi = scheduledItemState.selectedScheduledItems.slice();
+                  if (ssi.find(e=>e.id==set?.id)==undefined)
+                    ssi.push(set!)
+                  else
+                    ssi.splice(ssi.indexOf(set!), 1)
+                  setScheduledItemState({ ...scheduledItemState, selectedScheduledItems: ssi })
+                }}
+              >
                 <Text style={{ fontSize: Layout.defaultFontSize }}>{labelToShow}</Text>
               </TouchableOpacity>
             </View>
@@ -91,7 +112,6 @@ export function PlanScreen() {
         }}
 
         renderItem={(item, isFirst) => {
-          let header;
           if (item === undefined || isFirst) return (<View><Text></Text></View>);
           let id = Number(item.name);
           let set: ScheduledItem | undefined = scheduledItems.find(element => {
@@ -105,6 +125,15 @@ export function PlanScreen() {
             Toast.show("Error, there is a major set with undefined exercise");
             return (<View></View>);
           }
+
+          // console.log("selectedScheduledItems")
+          // console.log(selectedScheduledItems)
+          let bgc
+          if (selectedScheduledItems.indexOf(set) > -1)
+            bgc = { backgroundColor: "gray" }
+          else
+            bgc = {}
+          // console.log(bgc)
           let labelToShow = set.id + " " + set.exercise.name + " \n" +
             +set.sets + "x" + set.reps + " " +
             set.weight + "kg "
@@ -113,10 +142,26 @@ export function PlanScreen() {
               : "") +
             +set.percent_complete + "%"
           return (
-            <View style={{ ...styles.listStyle }}>
+            <View style={{ ...styles.listStyle, ...bgc }}>
               {/* {header} */}
-              <TouchableOpacity style={{
-              }} onPress={() => { handleSelected(set) }}>
+              <TouchableOpacity
+                style={{
+                }}
+                onLongPress={() => {
+                  let ssi = selectedScheduledItems.slice();
+                  console.log("long press")
+                  //  ssi.forEach(s=>console.log(s.id+s.exercise.name)) 
+                  if (ssi.find(e => e.id == set!.id) == undefined)
+                    ssi.push(set!)
+                  else {
+                    const i = ssi.indexOf(set!);
+                    ssi.splice(i, 1)
+                    console.log(i)
+                  }
+                  // console.log(ssi)
+                  setScheduledItemState({ ...scheduledItemState, selectedScheduledItems: ssi })
+                }}
+                onPress={() => { handleSelected(set) }}>
                 <Text style={{ fontSize: Layout.defaultFontSize }}>{labelToShow}</Text>
               </TouchableOpacity>
             </View>
@@ -125,7 +170,24 @@ export function PlanScreen() {
 
 
       />
-      <TextInput
+
+      <Pressable
+
+        style={{
+          borderRadius: 45,
+          backgroundColor: "red",
+          height: 60, width: 60,
+          bottom: '35%',
+          start: '80%',
+          marginBottom: "-20%",
+          display: selectedScheduledItems.length > 0 ? "flex" : "none"
+        }}
+        onPress={() => { setScheduledItemState({ ...scheduledItemState, selectedScheduledItems: [] }) }}
+      >
+
+      </Pressable>
+
+      < TextInput
         style={{
           display: 'flex',
           justifyContent: 'flex-end',
