@@ -14,11 +14,7 @@ declare global {
     interface RootParamList extends RootStackParamList { }
   }
 }
-declare var Blob: {
-  prototype: Blob;
-  new(name: string, description: string, imagesJson: string): Blob;
-}
-export { Blob };
+
 export type RootStackParamList = {
   Root: NavigatorScreenParams<RootTabParamList> | undefined;
   Modal: undefined;
@@ -39,7 +35,9 @@ export type RootTabScreenProps<Screen extends keyof RootTabParamList> = Composit
   BottomTabScreenProps<RootTabParamList, Screen>,
   NativeStackScreenProps<RootStackParamList>
 >;
+
 export enum PushPullEnum { Push = "Push", Pull = "Pull" }
+
 export type Exercise = {
   name: string,
   description: string,
@@ -72,7 +70,6 @@ export type Emm = {
   major_muscle_name: string
 }
 
-
 export type ExerciseState = {
   exercises: Exercise[],
   aExercise: Exercise,
@@ -87,7 +84,6 @@ export type ScheduledItemState = {
   filteredScheduledItems: ScheduledItem[],
   filteredScheduledItemKeyword: string,
   selectedScheduledItems: ScheduledItem[]
-  // currentDate:DateData
 }
 
 export type DialogState = {
@@ -101,7 +97,7 @@ export type DialogState = {
   isPlanDialogVisible: boolean,
   isHistoryDialogVisible: boolean,
   planHeader: string,
-  isExerciseHistory: boolean,//no means it is PR History. 
+  isExerciseHistory: boolean,//false means it is PR History. 
 }
 
 export type ContextProps = {
@@ -117,5 +113,6 @@ export type ContextProps = {
   renderExerciseDialogForCreate: Function
   handleFilterExercises: Function,
   deleteScheduledItemWithoutStateUpdate:Function,
-  commonScheduledItemCRUD:Function
+  commonScheduledItemCRUD:Function,
+  createScheduledItem2:Function
 }

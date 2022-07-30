@@ -28,10 +28,10 @@ export function ExerciseDialog(props: any) {
     const setAExercise = (e: Exercise) => setExerciseState({ ...exerciseState, aExercise: e })
 
     const buttonsSetProps = props.buttonsSetProps
-
     const aExercise = exerciseState.aExercise;
-
-    const filteredScheduledItems: ScheduledItem[] = dialogState.isExerciseHistory
+    let filteredScheduledItems:ScheduledItem[]
+    if(scheduledItemState.scheduledItems[0])
+    filteredScheduledItems= dialogState.isExerciseHistory
         ? scheduledItemState
             .scheduledItems
             .filter(si => si.exercise.name == aExercise.name)
@@ -48,7 +48,8 @@ export function ExerciseDialog(props: any) {
             .sort((a, b) => {
                 return a.weight * a.reps * a.sets - b.weight * b.reps * b.sets
             })
-
+            else filteredScheduledItems = []
+    // const filteredScheduledItems: any[] = []
     const header = dialogState.isExerciseHistory
         ? "History"
         : "Personal Records"
@@ -204,9 +205,9 @@ export function ExerciseDialog(props: any) {
                                                 ? Math.floor(set.duration_in_seconds / 60) + " minutes " + set.duration_in_seconds % 60 + " seconds "
                                                 : "") +
                                             +set.percent_complete + "%"
-                                            + set.date.dateString
+                                            + " " + set.date.day + "-" + set.date.month + "-" + set.date.year
                                         return (
-                                            <Text style={{ fontSize: Layout.defaultFontSize, marginTop:Layout.defaultMargin }}>{labelToShow}</Text>
+                                            <Text style={{ fontSize: Layout.defaultFontSize, marginTop: Layout.defaultMargin }}>{labelToShow}</Text>
                                         );
                                     }}
                                 />

@@ -45,8 +45,7 @@ export function ButtonSet(props: any) {
                     <Button title="delete" onPress={() => deleteExerciseConfirmation(aExercise)} />
                     <Button title='Edit' onPress={() => { renderExerciseDialogForEdit() }} />
                     <Button title='Cancel' onPress={() => cancelDialog()} />
-                        <Button onPress={()=>
-                            SetDialogState({...dialogState,isHistoryDialogVisible:true})} title="History and Pr"/>
+                        <Button onPress={()=> SetDialogState({...dialogState,isHistoryDialogVisible:true})} title="History and Pr"/>
                 </View>
             )
         case CreateExerciseText:

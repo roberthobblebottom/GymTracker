@@ -65,24 +65,25 @@ const initialDialogState = {
   planHeader: "Plan " + d.getDate() + "-" + (d.getMonth() + 1) + "-" + d.getFullYear(),
   isExerciseHistory: true,
 }
-const iniitalContextProps: ContextProps={
+const iniitalContextProps: ContextProps = {
   renderScheduledItemDialogForViewing: Function,
   renderScheduledItemDialogForCreate: Function,
-  handleFilterScheduledItem:Function,
-  handlePlanHeader:Function,
-  scheduledItemState:initialScheduledItemState,
-  setScheduledItemState:()=>{},
-  exerciseState:initialExerciseState,
-  setExerciseState:()=>{},
-  renderExerciseDialogForCreate:Function,
-renderExerciseDialogForViewing:Function,
-  handleFilterExercises:Function,
-  deleteScheduledItemWithoutStateUpdate:Function,
-  commonScheduledItemCRUD:Function
+  handleFilterScheduledItem: Function,
+  handlePlanHeader: Function,
+  scheduledItemState: initialScheduledItemState,
+  setScheduledItemState: () => { },
+  exerciseState: initialExerciseState,
+  setExerciseState: () => { },
+  renderExerciseDialogForCreate: Function,
+  renderExerciseDialogForViewing: Function,
+  handleFilterExercises: Function,
+  deleteScheduledItemWithoutStateUpdate: Function,
+  commonScheduledItemCRUD: Function,
+  createScheduledItem2: Function
 }
 //contexts
 export const handleResetDBContext = React.createContext(() => { })
-export const ExerciseScreenContext = React.createContext({ contextProps:iniitalContextProps})
+export const ExerciseScreenContext = React.createContext({ contextProps: iniitalContextProps })
 export const ScheduledItemContext = React.createContext({ contextProps: iniitalContextProps })
 
 export default function App() {
@@ -158,20 +159,19 @@ export default function App() {
         },
         (_, e) => { console.log(e); return true; }
       ))
-    if (majorMuscles[0] == initialMajorMuscles[0]) {
+    else if (majorMuscles[0] == initialMajorMuscles[0]) {
       db.transaction(t => t.executeSql("SELECT * from major_muscle", undefined,
         (_, results) => {
           setMajorMuscles(results.rows._array)
         }, (_, err) => { console.log(err); return true; }))
     }
-    if (emm[0] == initialEmm[0])
+    else if (emm[0] == initialEmm[0])
       db.transaction(t => t.executeSql("SELECT * from exercise_major_muscle_one_to_many;", undefined,
         (_, results) => {
           let temp_emm_one_to_many = results.rows._array;
           setEmm(temp_emm_one_to_many)
         }, (_, err) => { console.log(err); return true; }))
-
-    if (majorMuscles.length > 1 && exerciseState.exercises.length > 1 && emm.length > 1) {
+    else if (majorMuscles.length > 1 && exerciseState.exercises.length > 1 && emm.length > 1) {
       emm.forEach(x => {
         let ex = exerciseState.exercises.find(e => e.name == x.exercise_name)
         let mm2 = majorMuscles.find(mm => mm.name == x.major_muscle_name)
@@ -186,7 +186,6 @@ export default function App() {
       setEmm([])
     }
   }, [scheduledItemState, exerciseState, majorMuscles])
-
   init()
 
   let textInputStyle, numberInputStyle, buttonStyle;
@@ -204,6 +203,7 @@ export default function App() {
     resetTables()
     setExerciseState(initialExerciseState)
     setScheduledItemState(initialScheduledItemState)
+    SetDialogState(initialDialogState)
     setMajorMuscles(initialMajorMuscles)
   }
   function cancelDialog() {
@@ -227,7 +227,6 @@ export default function App() {
       dialogText: ExerciseInformationText,
       isEditable: false,
       isDropDownOpen: false,
-
     });
   }
 
@@ -380,6 +379,7 @@ export default function App() {
 
 
   //Scheduled Item Functions: 
+  //renders:
   function renderScheduledItemDialogForViewing(scheduledItem: ScheduledItem) {
     buttonStyle = styles.changeDateButtonDisabled;
     textInputStyle = styles.textInputViewOnly;
@@ -443,25 +443,28 @@ export default function App() {
     setScheduledItemState({ ...scheduledItemState, aScheduledItem: { ...aScheduledItem } })
   }
 
+  //db:
   function commonScheduledItemCRUD(si: ScheduledItem[]) {
-    setScheduledItemState({ ...scheduledItemState, scheduledItems: [...si],
-       filteredScheduledItems: [...si],
-      selectedScheduledItems:[] })
+    setScheduledItemState({
+      ...scheduledItemState, scheduledItems: [...si],
+      filteredScheduledItems: [...si],
+      selectedScheduledItems: []
+    })
     // setFilteredExerciseKeyword("")
     cancelDialog()
   }
   let deleteScheduledItemConfirmation = (ms: ScheduledItem) => {
     Alert.alert(
       "Confirmation",
-      "Are you sure you want to delete this major set?",
+      "Are you sure you want to delete this scheduled item?",
       [{ text: "Yes", onPress: () => deleteScheduledItem(ms.id) },
       { text: "No", onPress: () => renderScheduledItemDialogForViewing(ms) }],//warning, recursive
       { cancelable: true }
     )
   };
-  function deleteScheduledItemsWithoutStateUpdate (id:number){
+  function deleteScheduledItemsWithoutStateUpdate(id: number) {
     db.transaction(t => t.executeSql("DELETE FROM scheduled_item where id= ?", [id],
-      () => {},
+      () => { },
       (_, err) => {
         console.log(err)
         return true;
@@ -479,7 +482,7 @@ export default function App() {
           }
         })
         //correct way of removing element from a array for me. Not using delete keyword which leaves a undefined space
-        Toast.show("The major set is deleted.")
+        Toast.show("The scheduled item is deleted.")
         commonScheduledItemCRUD(si)
       },
       (_, err) => {
@@ -530,6 +533,31 @@ export default function App() {
 
   }
 
+  function createScheduledItem2(si: ScheduledItem) {
+    db.transaction(t => {
+      t.executeSql(`INSERT INTO scheduled_item
+           (exercise,reps,percent_complete,sets,duration_in_seconds,weight,notes,date)  
+           VALUES(?,?,?,?,?,?,?,?)`,
+        [dropDownExNameSelected, si.reps, si.percent_complete, si.sets,
+          si.duration_in_seconds, si.weight,
+          si.notes, JSON.stringify(si.date)],
+        (_, r) => {
+          // si={...si}
+          // si.id = r.insertId!
+          // let s = scheduledItemState.scheduledItems.slice()
+          // console.log("create scheduled item 2")
+          // console.log(si)
+          // scheduledItemState.scheduledItems.push(si)
+          // setScheduledItemState({ ...scheduledItemState, scheduledItems: s ,filteredScheduledItems:s,selectedScheduledItems:[]})
+        },
+        (_, e) => {
+          console.log(e)
+          cancelDialog()
+          return true
+        }
+      )
+    })
+  }
   function createScheduledItem() {
     let e1: Exercise
     const aScheduledItem = scheduledItemState.aScheduledItem
@@ -537,7 +565,6 @@ export default function App() {
     exerciseState.exercises.forEach(e => {
       if (e.name == dropDownExNameSelected) {
         aScheduledItem.exercise = e
-        console.log(exerciseState.exercises)
       }
     })
     db.transaction(t => {
@@ -601,20 +628,21 @@ export default function App() {
     renderExerciseDialogForViewing: renderExerciseDialogForViewing,
   };
 
-  const contextProps:ContextProps = {
+  const contextProps: ContextProps = {
     renderScheduledItemDialogForViewing: renderScheduledItemDialogForViewing,
     renderScheduledItemDialogForCreate: renderScheduledItemDialogForCreate,
     handleFilterScheduledItem: handleFilterScheduledItem,
     handlePlanHeader: handlePlanHeader,
-    setScheduledItemState:setScheduledItemState,
-    scheduledItemState:scheduledItemState,
-    renderExerciseDialogForCreate:renderExerciseDialogForCreate,
-    renderExerciseDialogForViewing:renderExerciseDialogForViewing,
-    handleFilterExercises:handleFilterExercises,
-    exerciseState:exerciseState,
-    setExerciseState:setExerciseState,
-    deleteScheduledItemWithoutStateUpdate:deleteScheduledItemsWithoutStateUpdate,
-    commonScheduledItemCRUD:commonScheduledItemCRUD
+    setScheduledItemState: setScheduledItemState,
+    scheduledItemState: scheduledItemState,
+    renderExerciseDialogForCreate: renderExerciseDialogForCreate,
+    renderExerciseDialogForViewing: renderExerciseDialogForViewing,
+    handleFilterExercises: handleFilterExercises,
+    exerciseState: exerciseState,
+    setExerciseState: setExerciseState,
+    deleteScheduledItemWithoutStateUpdate: deleteScheduledItemsWithoutStateUpdate,
+    commonScheduledItemCRUD: commonScheduledItemCRUD,
+    createScheduledItem2: createScheduledItem2
   }
 
   return (
@@ -648,7 +676,7 @@ export default function App() {
           buttonsSetProps={buttonsSetProps}
         />
         <handleResetDBContext.Provider value={handleResetDB}>
-          <ExerciseScreenContext.Provider value={{ contextProps:contextProps}}>
+          <ExerciseScreenContext.Provider value={{ contextProps: contextProps }}>
             <ScheduledItemContext.Provider value={{
               contextProps: contextProps
             }}>

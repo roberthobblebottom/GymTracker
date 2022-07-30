@@ -32,14 +32,24 @@ export function PlanScreen() {
       else a[ms.date.dateString].push({ name: ms.id.toString(), height: 0, day: "" })
     })
   const selectedScheduledItems: ScheduledItem[] = scheduledItemState.selectedScheduledItems
-console.log(selectedScheduledItems)
   const handleCreate: Function = contextProps.renderScheduledItemDialogForCreate;
   const handleSelected: Function = contextProps.renderScheduledItemDialogForViewing;
   const fitlerScheduledItem: Function = contextProps.handleFilterScheduledItem;
   const handlePlanHeader: Function = contextProps.handlePlanHeader;
   const deleteScheduledItemsWithoutStateUpdate: Function = contextProps.deleteScheduledItemWithoutStateUpdate;
   const commonScheduledItemCRUD: Function = contextProps.commonScheduledItemCRUD
-  contextProps.commonScheduledItemCRUD
+  const createScheduledItem2: Function = contextProps.createScheduledItem2
+  function selectItem(set: ScheduledItem) {
+
+    let ssi = selectedScheduledItems.slice();
+    if (ssi.find(e => e.id == set!.id) == undefined)
+      ssi.push(set!)
+    else {
+      const i = ssi.indexOf(set!);
+      ssi.splice(i, 1)
+    }
+    setScheduledItemState({ ...scheduledItemState, selectedScheduledItems: ssi })
+  }
   return (
     <View style={{
       flexDirection: "column", flex: 1,
@@ -54,9 +64,7 @@ console.log(selectedScheduledItems)
         }}
         showScrollIndicator={true}
         showClosingKnob={true}
-        onDayPress={(date: DateData) =>
-          handlePlanHeader(date)
-        }
+        onDayPress={(date: DateData) => handlePlanHeader(date)}
         renderEmptyDate={() => {
           return (
             <View style={styles.listStyle}>
@@ -78,7 +86,7 @@ console.log(selectedScheduledItems)
             return element.id == id;
           });
           if (set == undefined) return (<View></View>);
-          let labelToShow = set.id + " " + set.exercise.name + " \n" +
+          let labelToShow = set.exercise.name + " \n" +
             +set.sets + "x" + set.reps + " " +
             set.weight + "kg "
             + ((set.duration_in_seconds != 0)
@@ -89,24 +97,19 @@ console.log(selectedScheduledItems)
           let dateParts: string[] = dateString.split(" ");
           let dateLabelToShow = dateParts[1] + " " + dateParts[2]
           let bgc;
-          if (selectedScheduledItems.indexOf(set) > -1) {
+          if (selectedScheduledItems.indexOf(set) > -1)
             bgc = { backgroundColor: "gray" }
-          } else {
+          else bgc = {}
 
-            bgc = {}
-          }
           return (
             <View style={{ ...styles.listStyle, ...bgc }}>
               <TouchableOpacity style={{}}
-                onPress={() => { handleSelected(set) }}
+                onPress={() => {
+                  if (selectedScheduledItems.length > 0) selectItem(set!)
+                  else handleSelected(set)
+                }}
                 onLongPress={() => {
-                  console.log("onlongpress")
-                  let ssi = scheduledItemState.selectedScheduledItems.slice();
-                  if (ssi.find(e => e.id == set?.id) == undefined)
-                    ssi.push(set!)
-                  else
-                    ssi.splice(ssi.indexOf(set!), 1)
-                  setScheduledItemState({ ...scheduledItemState, selectedScheduledItems: ssi })
+                  selectItem(set!)
                 }}
               >
                 <Text style={{ fontSize: Layout.defaultFontSize }}>{labelToShow}</Text>
@@ -122,11 +125,11 @@ console.log(selectedScheduledItems)
             return element.id == id;
           });
           if (set == undefined) {
-            Toast.show("Error, there is a major set with undefined exercise");
+            Toast.show("1 Error, there is a scheduled item that is undefined");
             return (<View></View>);
           }
           else if (set.exercise == undefined) {
-            Toast.show("Error, there is a major set with undefined exercise");
+            Toast.show("2 Error, there is a scheduled item with undefined exercise " + set.id);
             return (<View></View>);
           }
 
@@ -135,7 +138,7 @@ console.log(selectedScheduledItems)
             bgc = { backgroundColor: "gray" }
           else
             bgc = {}
-          let labelToShow = set.id + " " + set.exercise.name + " \n" +
+          let labelToShow = set.exercise.name + " \n" +
             +set.sets + "x" + set.reps + " " +
             set.weight + "kg "
             + ((set.duration_in_seconds != 0)
@@ -149,25 +152,45 @@ console.log(selectedScheduledItems)
                 style={{
                 }}
                 onLongPress={() => {
-                  let ssi = selectedScheduledItems.slice();
-                  //  ssi.forEach(s=>console.log(s.id+s.exercise.name)) 
-                  if (ssi.find(e => e.id == set!.id) == undefined)
-                    ssi.push(set!)
-                  else {
-                    const i = ssi.indexOf(set!);
-                    ssi.splice(i, 1)
-                  }
-                  setScheduledItemState({ ...scheduledItemState, selectedScheduledItems: ssi })
+                  selectItem(set!)
                 }}
-                onPress={() => { handleSelected(set) }}>
+                onPress={() => {
+                  if (selectedScheduledItems.length > 0) selectItem(set!)
+                  else handleSelected(set)
+                }}>
                 <Text style={{ fontSize: Layout.defaultFontSize }}>{labelToShow}</Text>
               </TouchableOpacity>
             </View>
           );
         }}
-
-
       />
+
+      <Pressable
+        style={{
+          borderRadius: 45,
+          backgroundColor: "green",
+          height: 60, width: 60,
+          bottom: '56%',
+          start: '80%',
+          marginBottom: "-20%",
+          display: selectedScheduledItems.length > 0 ? "flex" : "none"
+        }}
+        onPress={() => {
+          console.log("yes")
+          let i = 1
+          let arr: ScheduledItem[] = []
+          selectedScheduledItems.forEach(e => {
+            let t = { ...e }
+            t.id = Math.floor(Math.random() * (10000000 - 10000) + 10000)
+            createScheduledItem2(t)
+            arr.push(t)
+          })
+          let si = arr.concat(scheduledItems)
+          commonScheduledItemCRUD(si)
+        }}
+      >
+        <Ionicons style={{ bottom: "-14%", right: "-17%" }} name="duplicate-outline" size={Layout.defaultMargin + 30} color="white" />
+      </Pressable>
 
       <Pressable
         style={{
@@ -177,7 +200,7 @@ console.log(selectedScheduledItems)
           bottom: '43%',
           start: '80%',
           marginBottom: "-20%",
-          display: selectedScheduledItems.length>0? "flex" : "none"
+          display: selectedScheduledItems.length > 0 ? "flex" : "none"
         }}
         onPress={() => {
           Alert.alert("confirmation", "Are you sure you like to delete all selected?", [{
@@ -196,24 +219,38 @@ console.log(selectedScheduledItems)
         <MaterialCommunityIcons style={{ bottom: "-14%", right: "-17%" }} name="delete" size={Layout.defaultMargin + 30} color="white" />
       </Pressable>
 
-
       <Pressable
         style={{
           borderRadius: 45,
-          backgroundColor: "red",
+          backgroundColor: "",
           height: 60, width: 60,
           bottom: '30%',
           start: '80%',
           marginBottom: "-20%",
-          display: selectedScheduledItems.length>0? "flex" : "none"
+          display: selectedScheduledItems.length > 0 ? "flex" : "none"
         }}
         onPress={() => { setScheduledItemState({ ...scheduledItemState, selectedScheduledItems: [] }) }}
       >
-        <MaterialCommunityIcons style={{ bottom: "-14%", right: "-17%" }}
+        <MaterialCommunityIcons
+          style={{ bottom: "-14%", right: "-17%" }}
           name="selection-remove"
           size={Layout.defaultMargin + 30}
           color="white" />
       </Pressable>
+
+      <TouchableOpacity
+        style={{
+          borderRadius: 45,
+          backgroundColor: Colors.light.tint,
+          height: 60, width: 60,
+          bottom: '17%',
+          start: '80%',
+          marginBottom: "-20%"
+        }}
+        onPress={() => { handleCreate() }}
+      >
+        <Ionicons style={{ bottom: "-5%", right: "-10%" }} name="add-outline" size={Layout.defaultMargin + 40} color="white" />
+      </TouchableOpacity>
 
       < TextInput
         style={{
@@ -232,20 +269,7 @@ console.log(selectedScheduledItems)
         value={majorSetKeyword}
       />
 
-      <TouchableOpacity
-        style={{
-          borderRadius: 45,
-          backgroundColor: Colors.light.tint,
-          height: 60, width: 60,
-          bottom: '25%',
-          start: '80%',
-          marginBottom: "-20%"
-        }}
-        onPress={() => { handleCreate() }}
-      >
-        <Ionicons style={{ bottom: "-5%", right: "-10%" }} name="add-outline" size={Layout.defaultMargin + 40} color="white" />
 
-      </TouchableOpacity>
     </View>
   );
 
@@ -254,7 +278,5 @@ const styles = StyleSheet.create({
   listStyle: {
     width: "100%", transform: [{ rotateX: "180deg" }],
     marginHorizontal: Layout.defaultMargin,
-    // marginTop: Layout.defaultMargin * 2
-
   }
 })
