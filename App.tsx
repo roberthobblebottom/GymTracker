@@ -50,7 +50,8 @@ export const initialScheduledItemState: ScheduledItemState = {
   aScheduledItem: initialScheduledItem[0],
   filteredScheduledItems: initialScheduledItem,
   filteredScheduledItemKeyword: "",
-  selectedScheduledItems: []
+  selectedScheduledItems: [],
+  isMovingScheduledItems: false
 }
 const initialMajorMuscles: MajorMuscle[] = [{ name: "", notes: "", imageJson: "" }];
 const initialEmm: Emm[] = [{ id: 9999, exercise_name: "", major_muscle_name: "" }];
@@ -81,8 +82,9 @@ const iniitalContextProps: ContextProps = {
   deleteScheduledItemWithoutStateUpdate: Function,
   commonScheduledItemCRUD: Function,
   createScheduledItem2: Function,
-  setDialogState:Function,
-dialogState:Function
+  setDialogState: Function,
+  dialogState: initialDialogState,
+  
 }
 //contexts
 export const handleResetDBContext = React.createContext(() => { })
@@ -526,6 +528,16 @@ export default function App() {
       }))
 
   }
+  const updateScheduledItemWithoutStateUpdate = (si: ScheduledItem) => {
+    db.transaction(t => t.executeSql(`UPDATE scheduled_item 
+    SET exercise=?,reps=?,percent_complete=?,sets=?,duration_in_seconds=?,weight=?,notes=?,date=? 
+    WHERE id=?`,
+      [si.exercise.name, si.reps, si.percent_complete, si.sets,
+        si.duration_in_seconds, si.weight,
+        si.notes, JSON.stringify(si.date), si.id],
+      undefined,
+      (_, err) => {console.log(err);return true;}))
+  }
 
   function createScheduledItem2(si: ScheduledItem) {
     console.log("2222")
@@ -628,8 +640,8 @@ export default function App() {
     deleteScheduledItemWithoutStateUpdate: deleteScheduledItemsWithoutStateUpdate,
     commonScheduledItemCRUD: commonScheduledItemCRUD,
     createScheduledItem2: createScheduledItem2,
-    setDialogState:SetDialogState,
-    dialogState:dialogState,
+    setDialogState: SetDialogState,
+    dialogState: dialogState,
   }
 
   return (
@@ -670,7 +682,8 @@ export default function App() {
           setDialogState={SetDialogState}
 
           commonScheduledItemCRUD={commonScheduledItemCRUD}
-          createScheduledItem2={createScheduledItem2} />
+          createScheduledItem2={createScheduledItem2}
+          updateScheduledItemWithoutStateUpdate={updateScheduledItemWithoutStateUpdate} />
         <handleResetDBContext.Provider value={handleResetDB}>
           <ExerciseScreenContext.Provider value={{ contextProps: contextProps }}>
             <ScheduledItemContext.Provider value={{ contextProps: contextProps }}>

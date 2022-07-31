@@ -84,7 +84,7 @@ export type ScheduledItemState = {
   filteredScheduledItems: ScheduledItem[],
   filteredScheduledItemKeyword: string,
   selectedScheduledItems: ScheduledItem[],
-  isMovingScheduledItems:boolean
+  isMovingScheduledItems: boolean
 }
 
 export type DialogState = {
@@ -108,14 +108,14 @@ export type ContextProps = {
   handlePlanHeader: Function,
   scheduledItemState: ScheduledItemState,
   setScheduledItemState: Dispatch<ScheduledItemState>,
-  exerciseState:ExerciseState,
-  setExerciseState:Dispatch<ExerciseState>,
+  exerciseState: ExerciseState,
+  setExerciseState: Dispatch<ExerciseState>,
   renderExerciseDialogForViewing: Function,
   renderExerciseDialogForCreate: Function
   handleFilterExercises: Function,
-  deleteScheduledItemWithoutStateUpdate:Function,
-  commonScheduledItemCRUD:Function,
-  createScheduledItem2:Function,
-    setDialogState:Function,
-dialogState:DialogState
+  deleteScheduledItemWithoutStateUpdate: Function,
+  commonScheduledItemCRUD: Function,
+  createScheduledItem2: Function,
+  setDialogState: Function,
+  dialogState: DialogState,
 }
