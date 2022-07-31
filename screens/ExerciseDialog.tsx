@@ -11,6 +11,7 @@ import { bases, styles } from '../constants/styles'
 import { DialogState, Exercise, PushPullEnum, ScheduledItem, ScheduledItemState } from '../types'
 import { ButtonSet } from './ButtonSet'
 import Toast from 'react-native-simple-toast'
+import { initialScheduledItem } from '../App'
 export function ExerciseDialog(props: any) {
     const exerciseState = props.exerciseState;
     const majorMuscles = props.majorMuscles
@@ -29,27 +30,24 @@ export function ExerciseDialog(props: any) {
 
     const buttonsSetProps = props.buttonsSetProps
     const aExercise = exerciseState.aExercise;
-    let filteredScheduledItems:ScheduledItem[]
-    if(scheduledItemState.scheduledItems[0])
-    filteredScheduledItems= dialogState.isExerciseHistory
-        ? scheduledItemState
-            .scheduledItems
-            .filter(si => si.exercise.name == aExercise.name)
-            .sort((a, b) => {
-                if (a.date.year == b.date.year) {
-                    if (a.date.month == b.date.month) {
-                        return a.date.day - b.date.day
-                    } else return a.date.month - b.date.month
-                } else return a.date.year - b.date.year
-            })
-        : scheduledItemState
-            .scheduledItems
-            .filter(si => si.exercise.name == aExercise.name)
-            .sort((a, b) => {
-                return a.weight * a.reps * a.sets - b.weight * b.reps * b.sets
-            })
-            else filteredScheduledItems = []
-    // const filteredScheduledItems: any[] = []
+    let filteredScheduledItems: ScheduledItem[]
+    if (scheduledItemState.scheduledItems === initialScheduledItem)
+        filteredScheduledItems = dialogState.isExerciseHistory
+            ? scheduledItemState
+                .scheduledItems
+                .filter(si => si.exercise.name == aExercise.name)
+                .sort((a, b) => {
+                    if (a.date.year == b.date.year) 
+                        if (a.date.month == b.date.month) 
+                            return a.date.day - b.date.day
+                         else return a.date.month - b.date.month
+                     else return a.date.year - b.date.year
+                })
+            : scheduledItemState
+                .scheduledItems
+                .filter(si => si.exercise.name == aExercise.name)
+                .sort((a, b) => a.weight * a.reps * a.sets - b.weight * b.reps * b.sets)
+    else filteredScheduledItems = []
     const header = dialogState.isExerciseHistory
         ? "History"
         : "Personal Records"
@@ -178,10 +176,7 @@ export function ExerciseDialog(props: any) {
                                 onPress={() => { }}
                                 activeOpacity={1}
                             >
-                                <Text style={{
-
-                                    fontSize: Layout.defaultFontSize
-                                }}>{header}</Text>
+                                <Text style={{ fontSize: Layout.defaultFontSize }}>{header}</Text>
                                 <FlatList
                                     data={filteredScheduledItems}
                                     renderItem={(item) => {

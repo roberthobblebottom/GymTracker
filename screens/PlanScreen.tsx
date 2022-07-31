@@ -3,7 +3,7 @@ import React, { Dispatch, useContext } from 'react';
 import Colors from '../constants/Colors';
 import { Agenda, AgendaEntry, DateData } from 'react-native-calendars';
 import { ScheduledItemContext, initialDate, initialScheduledItem } from '../App';
-import { ScheduledItem, ScheduledItemState } from '../types';
+import { DialogState, ScheduledItem, ScheduledItemState } from '../types';
 import Toast from 'react-native-simple-toast';
 import Layout from '../constants/Layout';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
@@ -38,7 +38,8 @@ export function PlanScreen() {
   const handlePlanHeader: Function = contextProps.handlePlanHeader;
   const deleteScheduledItemsWithoutStateUpdate: Function = contextProps.deleteScheduledItemWithoutStateUpdate;
   const commonScheduledItemCRUD: Function = contextProps.commonScheduledItemCRUD
-  const createScheduledItem2: Function = contextProps.createScheduledItem2
+  const setDialogState: Function = contextProps.setDialogState;
+  const dialogState: DialogState = contextProps.dialogState;
   function selectItem(set: ScheduledItem) {
 
     let ssi = selectedScheduledItems.slice();
@@ -97,10 +98,8 @@ export function PlanScreen() {
           let dateParts: string[] = dateString.split(" ");
           let dateLabelToShow = dateParts[1] + " " + dateParts[2]
           let bgc;
-          if (selectedScheduledItems.indexOf(set) > -1)
-            bgc = { backgroundColor: "gray" }
+          if (selectedScheduledItems.indexOf(set) > -1) bgc = { backgroundColor: "gray" }
           else bgc = {}
-
           return (
             <View style={{ ...styles.listStyle, ...bgc }}>
               <TouchableOpacity style={{}}
@@ -108,9 +107,7 @@ export function PlanScreen() {
                   if (selectedScheduledItems.length > 0) selectItem(set!)
                   else handleSelected(set)
                 }}
-                onLongPress={() => {
-                  selectItem(set!)
-                }}
+                onLongPress={() => selectItem(set!)}
               >
                 <Text style={{ fontSize: Layout.defaultFontSize }}>{labelToShow}</Text>
               </TouchableOpacity>
@@ -134,10 +131,8 @@ export function PlanScreen() {
           }
 
           let bgc
-          if (selectedScheduledItems.indexOf(set) > -1)
-            bgc = { backgroundColor: "gray" }
-          else
-            bgc = {}
+          if (selectedScheduledItems.indexOf(set) > -1) bgc = { backgroundColor: "gray" }
+          else bgc = {}
           let labelToShow = set.exercise.name + " \n" +
             +set.sets + "x" + set.reps + " " +
             set.weight + "kg "
@@ -151,9 +146,7 @@ export function PlanScreen() {
               <TouchableOpacity
                 style={{
                 }}
-                onLongPress={() => {
-                  selectItem(set!)
-                }}
+                onLongPress={() => selectItem(set!)}
                 onPress={() => {
                   if (selectedScheduledItems.length > 0) selectItem(set!)
                   else handleSelected(set)
@@ -168,6 +161,24 @@ export function PlanScreen() {
       <Pressable
         style={{
           borderRadius: 45,
+          backgroundColor: "grey",
+          height: 60, width: 60,
+          bottom: '64%',
+          start: '80%',
+          marginBottom: "-20%",
+          display: selectedScheduledItems.length > 0 ? "flex" : "none"
+        }}
+        onPress={() => {
+          setScheduledItemState({ ...scheduledItemState, isMovingScheduledItems: true })
+          setDialogState({ ...dialogState, isCalendarDialogVisible: true });
+        }}>
+        <MaterialCommunityIcons name="file-move-outline" size={Layout.defaultMargin+30} color="white" />
+      </Pressable>
+
+
+      <Pressable
+        style={{
+          borderRadius: 45,
           backgroundColor: "green",
           height: 60, width: 60,
           bottom: '56%',
@@ -176,17 +187,7 @@ export function PlanScreen() {
           display: selectedScheduledItems.length > 0 ? "flex" : "none"
         }}
         onPress={() => {
-          console.log("yes")
-          let i = 1
-          let arr: ScheduledItem[] = []
-          selectedScheduledItems.forEach(e => {
-            let t = { ...e }
-            t.id = Math.floor(Math.random() * (10000000 - 10000) + 10000)
-            createScheduledItem2(t)
-            arr.push(t)
-          })
-          let si = arr.concat(scheduledItems)
-          commonScheduledItemCRUD(si)
+          setDialogState({ ...dialogState, isCalendarDialogVisible: true });
         }}
       >
         <Ionicons style={{ bottom: "-14%", right: "-17%" }} name="duplicate-outline" size={Layout.defaultMargin + 30} color="white" />
@@ -205,8 +206,8 @@ export function PlanScreen() {
         onPress={() => {
           Alert.alert("confirmation", "Are you sure you like to delete all selected?", [{
             text: "Yes", onPress: () => {
-              selectedScheduledItems.forEach(si => deleteScheduledItemsWithoutStateUpdate(si.id))
               selectedScheduledItems.forEach(si => {
+                deleteScheduledItemsWithoutStateUpdate(si.id)
                 const i = scheduledItems.indexOf(si)
                 scheduledItems.splice(i, 1)
               })
@@ -222,7 +223,7 @@ export function PlanScreen() {
       <Pressable
         style={{
           borderRadius: 45,
-          backgroundColor: "",
+          backgroundColor: "orange",
           height: 60, width: 60,
           bottom: '30%',
           start: '80%',

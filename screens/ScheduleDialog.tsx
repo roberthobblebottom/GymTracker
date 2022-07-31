@@ -377,26 +377,7 @@ export function ScheduleDialog(props: any) {
               }}>CHANGE DATE</Text>
             </Pressable>
           </View>
-          <Modal visible={dialogState.isCalendarDialogVisible} animationType="fade" transparent={true} >
-            <TouchableOpacity style={styles.overallDialog} onPressIn={() => setDialogState({ ...dialogState, isCalendarDialogVisible: false })}>
-              <TouchableOpacity style={styles.innerTouchableOpacity}
-                onPress={() => { }}
-                activeOpacity={1}
-              >
-                <Text style={{ fontSize: Layout.defaultFontSize }} >Select a date</Text>
-                <Calendar
-                  initialDate={aScheduledItem.date.dateString}
-                  onDayPress={day => {
-                    const s = Object.assign({}, aScheduledItem)
-                    s.date = day
-                    setScheduledItemState({ ...scheduledItemState, aScheduledItem: s })
-                    setDialogState({ ...dialogState, isCalendarDialogVisible: false })
-                  }} />
-                <Button title='Cancel' onPress={() => setDialogState({ ...dialogState, isCalendarDialogVisible: false })} />
-              </TouchableOpacity>
-            </TouchableOpacity>
-          </Modal>
-          <ButtonSet
+                   <ButtonSet
             dialogText={dialogState.dialogText}
             aExercise={aExercise}
             aScheduledItem={aScheduledItem}

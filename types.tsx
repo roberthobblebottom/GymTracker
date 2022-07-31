@@ -83,7 +83,8 @@ export type ScheduledItemState = {
   aScheduledItem: ScheduledItem,
   filteredScheduledItems: ScheduledItem[],
   filteredScheduledItemKeyword: string,
-  selectedScheduledItems: ScheduledItem[]
+  selectedScheduledItems: ScheduledItem[],
+  isMovingScheduledItems:boolean
 }
 
 export type DialogState = {
@@ -114,5 +115,7 @@ export type ContextProps = {
   handleFilterExercises: Function,
   deleteScheduledItemWithoutStateUpdate:Function,
   commonScheduledItemCRUD:Function,
-  createScheduledItem2:Function
+  createScheduledItem2:Function,
+    setDialogState:Function,
+dialogState:DialogState
 }
