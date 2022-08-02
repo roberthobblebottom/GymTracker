@@ -5,7 +5,7 @@ import { ExercisesScreen } from './screens/ExercisesScreen';
 import { SettingsScreen } from './screens/SettingsScreen';
 import { PlanScreen } from './screens/PlanScreen';
 import 'react-native-gesture-handler';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Dispatch } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { init, db, resetTables } from './dbhandler';
@@ -82,9 +82,9 @@ const iniitalContextProps: ContextProps = {
   deleteScheduledItemWithoutStateUpdate: Function,
   commonScheduledItemCRUD: Function,
   createScheduledItem2: Function,
-  setDialogState: Function,
+  setDialogState: ()=>{},
   dialogState: initialDialogState,
-  
+
 }
 //contexts
 export const handleResetDBContext = React.createContext(() => { })
@@ -441,9 +441,9 @@ export default function App() {
     setScheduledItemState({
       ...scheduledItemState, scheduledItems: [...si],
       filteredScheduledItems: [...si],
-      selectedScheduledItems: []
+      selectedScheduledItems: [],
+      isMovingScheduledItems: false
     })
-    // setFilteredExerciseKeyword("")
     cancelDialog()
   }
 
@@ -460,10 +460,7 @@ export default function App() {
   function deleteScheduledItemsWithoutStateUpdate(id: number) {
     db.transaction(t => t.executeSql("DELETE FROM scheduled_item where id= ?", [id],
       undefined,
-      (_, err) => {
-        console.log(err)
-        return true;
-      }
+      (_, err) => { console.log(err); return true; }
     ))
   }
 
@@ -533,10 +530,10 @@ export default function App() {
     SET exercise=?,reps=?,percent_complete=?,sets=?,duration_in_seconds=?,weight=?,notes=?,date=? 
     WHERE id=?`,
       [si.exercise.name, si.reps, si.percent_complete, si.sets,
-        si.duration_in_seconds, si.weight,
-        si.notes, JSON.stringify(si.date), si.id],
+      si.duration_in_seconds, si.weight,
+      si.notes, JSON.stringify(si.date), si.id],
       undefined,
-      (_, err) => {console.log(err);return true;}))
+      (_, err) => { console.log(err); return true; }))
   }
 
   function createScheduledItem2(si: ScheduledItem) {

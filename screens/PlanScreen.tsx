@@ -6,7 +6,7 @@ import { ScheduledItemContext, initialDate, initialScheduledItem } from '../App'
 import { DialogState, ScheduledItem, ScheduledItemState } from '../types';
 import Toast from 'react-native-simple-toast';
 import Layout from '../constants/Layout';
-import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { Ionicons, MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 /*
 Note:
 this.renderWeekDayNames is commented out from line 325 of ./node_modules/react-native-calendars/src/agenda/index.js
@@ -38,10 +38,9 @@ export function PlanScreen() {
   const handlePlanHeader: Function = contextProps.handlePlanHeader;
   const deleteScheduledItemsWithoutStateUpdate: Function = contextProps.deleteScheduledItemWithoutStateUpdate;
   const commonScheduledItemCRUD: Function = contextProps.commonScheduledItemCRUD
-  const setDialogState: Function = contextProps.setDialogState;
+  const setDialogState: Dispatch<DialogState>= contextProps.setDialogState;
   const dialogState: DialogState = contextProps.dialogState;
   function selectItem(set: ScheduledItem) {
-
     let ssi = selectedScheduledItems.slice();
     if (ssi.find(e => e.id == set!.id) == undefined)
       ssi.push(set!)
@@ -157,7 +156,38 @@ export function PlanScreen() {
           );
         }}
       />
+      <Pressable
+        style={{
+          borderRadius: 45,
+          backgroundColor: "blue",
+          height: 60, width: 60,
+          bottom: '75%',
+          start: '80%',
+          marginBottom: "-20%",
+          display: selectedScheduledItems.length > 0 ? "flex" : "none"
+        }}
+        onPress={() => {
 
+    let parts: string[] = dialogState.planHeader.split(" ")[1].split("-")
+          let monthNumber: number = Number(parts[1])
+          let month: string = monthNumber < 10 ? "0" + monthNumber.toString() : monthNumber.toString()
+          let day: string = Number(parts[0]) < 10 ? "0" + parts[0] : parts[0];
+          let date: DateData = {
+            year: Number(parts[2]), month: monthNumber, day: Number(parts[0]), timestamp: 0,
+            dateString: parts[2] + "-" + month + "-" + day
+          }
+          let selectedDateScheduledItems = scheduledItems.filter(si => si.date.dateString == date.dateString)
+          selectedDateScheduledItems.forEach(si => {
+            if (!selectedScheduledItems.includes(si))
+              selectedScheduledItems.push(si)
+          })
+          setScheduledItemState({ ...scheduledItemState, selectedScheduledItems:[...selectedScheduledItems]})//not tested
+
+          setScheduledItemState({ ...scheduledItemState, })
+        }}>
+        <MaterialIcons name="select-all" size={Layout.defaultMargin + 30} color="white" />
+        {/* <MaterialCommunityIcons name="" size={Layout.defaultMargin+30} color="white" /> */}
+      </Pressable>
       <Pressable
         style={{
           borderRadius: 45,
@@ -169,10 +199,12 @@ export function PlanScreen() {
           display: selectedScheduledItems.length > 0 ? "flex" : "none"
         }}
         onPress={() => {
-          setScheduledItemState({ ...scheduledItemState, isMovingScheduledItems: true })
-          setDialogState({ ...dialogState, isCalendarDialogVisible: true });
+
+          setDialogState({ ...dialogState, isCalendarDialogVisible: true })
+          setScheduledItemState({...scheduledItemState,isMovingScheduledItems:true})
+      
         }}>
-        <MaterialCommunityIcons name="file-move-outline" size={Layout.defaultMargin+30} color="white" />
+        <MaterialCommunityIcons name="file-move-outline" size={Layout.defaultMargin + 30} color="white" />
       </Pressable>
 
 

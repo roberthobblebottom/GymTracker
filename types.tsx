@@ -88,7 +88,6 @@ export type ScheduledItemState = {
 }
 
 export type DialogState = {
-
   isExDialogVisible: boolean,
   openPushPullDropDown: boolean,
   dialogText: string,
@@ -116,6 +115,6 @@ export type ContextProps = {
   deleteScheduledItemWithoutStateUpdate: Function,
   commonScheduledItemCRUD: Function,
   createScheduledItem2: Function,
-  setDialogState: Function,
+  setDialogState: Dispatch<DialogState>,
   dialogState: DialogState,
 }

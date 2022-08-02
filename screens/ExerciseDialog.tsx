@@ -25,7 +25,7 @@ export function ExerciseDialog(props: any) {
     const setDropDownPushPullSelected = props.setDropDownPushPullSelected
     const setExerciseState: Dispatch<any> = props.setExerciseState;
     const setMajorMuscleValues: Dispatch<any> = props.setMajorMuscleValues
-    const SetDialogState: Dispatch<DialogState> = props.setDialogState
+    const SetDialogState: Dispatch<DialogState> = props.setDialogState  
     const setAExercise = (e: Exercise) => setExerciseState({ ...exerciseState, aExercise: e })
 
     const buttonsSetProps = props.buttonsSetProps

@@ -19,6 +19,11 @@ export function SelectDateDialog(props: any) {
     const commonScheduledItemCRUD: Function = props.commonScheduledItemCRUD
     const createScheduledItem2: Function = props.createScheduledItem2
     const updateScheduledItemWithoutStateUpdate = props.updateScheduledItemWithoutStateUpdate
+    const text = selectedScheduledItems.length > 0 ?
+        isMovingScheduledItems
+            ? "Select a date to move the scheduled item(s) to"
+            : "Selected a date to duplicate the scheduled items(s) to"
+        : "Select a date"
     return (
         <Modal visible={dialogState.isCalendarDialogVisible} animationType="fade" transparent={true} >
             <TouchableOpacity style={styles.overallDialog} onPressIn={() => setDialogState({ ...dialogState, isCalendarDialogVisible: false })
@@ -27,7 +32,7 @@ export function SelectDateDialog(props: any) {
                     onPress={() => { }}
                     activeOpacity={1}
                 >
-                    <Text style={{ fontSize: Layout.defaultFontSize }}> Select a date </Text>
+                    <Text style={{ fontSize: Layout.defaultFontSize }}> {text} </Text>
                     <Calendar
                         initialDate={aScheduledItem.date.dateString}
                         onDayPress={day => {
@@ -46,7 +51,6 @@ export function SelectDateDialog(props: any) {
                                         updateScheduledItemWithoutStateUpdate(s)
                                     })
                                     commonScheduledItemCRUD(si)
-                                    setScheduledItemState({ ...scheduledItemState, isMovingScheduledItems: false })
                                 }
                                 else {
                                     let arr: ScheduledItem[] = []
