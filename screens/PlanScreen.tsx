@@ -38,7 +38,7 @@ export function PlanScreen() {
   const handlePlanHeader: Function = contextProps.handlePlanHeader;
   const deleteScheduledItemsWithoutStateUpdate: Function = contextProps.deleteScheduledItemWithoutStateUpdate;
   const commonScheduledItemCRUD: Function = contextProps.commonScheduledItemCRUD
-  const setDialogState: Dispatch<DialogState>= contextProps.setDialogState;
+  const setDialogState: Dispatch<DialogState> = contextProps.setDialogState;
   const dialogState: DialogState = contextProps.dialogState;
   function selectItem(set: ScheduledItem) {
     let ssi = selectedScheduledItems.slice();
@@ -53,15 +53,16 @@ export function PlanScreen() {
   return (
     <View style={{
       flexDirection: "column", flex: 1,
-      justifyContent: 'flex-end', display: "flex"
+      justifyContent: 'space-evenly', display: "flex", 
     }}>
       <Agenda items={a}
         showOnlySelectedDayItems={true}
         initialNumToRender={2}
         style={{
           width: '100%',
-          transform: [{ rotateX: "180deg" }]
+          transform: [{ rotateX: "180deg" }],
         }}
+        
         showScrollIndicator={true}
         showClosingKnob={true}
         onDayPress={(date: DateData) => handlePlanHeader(date)}
@@ -156,19 +157,19 @@ export function PlanScreen() {
           );
         }}
       />
+
       <Pressable
         style={{
           borderRadius: 45,
           backgroundColor: "blue",
           height: 60, width: 60,
-          bottom: '75%',
+          bottom: '65%',
           start: '80%',
-          marginBottom: "-20%",
+          position:'absolute',
           display: selectedScheduledItems.length > 0 ? "flex" : "none"
         }}
         onPress={() => {
-
-    let parts: string[] = dialogState.planHeader.split(" ")[1].split("-")
+          let parts: string[] = dialogState.planHeader.split(" ")[1].split("-")
           let monthNumber: number = Number(parts[1])
           let month: string = monthNumber < 10 ? "0" + monthNumber.toString() : monthNumber.toString()
           let day: string = Number(parts[0]) < 10 ? "0" + parts[0] : parts[0];
@@ -181,41 +182,38 @@ export function PlanScreen() {
             if (!selectedScheduledItems.includes(si))
               selectedScheduledItems.push(si)
           })
-          setScheduledItemState({ ...scheduledItemState, selectedScheduledItems:[...selectedScheduledItems]})//not tested
+          setScheduledItemState({ ...scheduledItemState, selectedScheduledItems: [...selectedScheduledItems] })//not tested
 
           setScheduledItemState({ ...scheduledItemState, })
         }}>
-        <MaterialIcons name="select-all" size={Layout.defaultMargin + 30} color="white" />
-        {/* <MaterialCommunityIcons name="" size={Layout.defaultMargin+30} color="white" /> */}
+        <MaterialIcons style={{ bottom: "-14%", right: "-17%" }} name="select-all" size={Layout.defaultMargin + 30} color="white" />
       </Pressable>
+
       <Pressable
         style={{
           borderRadius: 45,
           backgroundColor: "grey",
           height: 60, width: 60,
-          bottom: '64%',
+          bottom: '55%',
           start: '80%',
-          marginBottom: "-20%",
+          position:'absolute',
           display: selectedScheduledItems.length > 0 ? "flex" : "none"
         }}
         onPress={() => {
-
           setDialogState({ ...dialogState, isCalendarDialogVisible: true })
-          setScheduledItemState({...scheduledItemState,isMovingScheduledItems:true})
-      
+          setScheduledItemState({ ...scheduledItemState, isMovingScheduledItems: true })
         }}>
-        <MaterialCommunityIcons name="file-move-outline" size={Layout.defaultMargin + 30} color="white" />
+        <MaterialCommunityIcons style={{ bottom: "-14%", right: "-17%" }} name="file-move-outline" size={Layout.defaultMargin + 30} color="white" />
       </Pressable>
-
 
       <Pressable
         style={{
           borderRadius: 45,
           backgroundColor: "green",
           height: 60, width: 60,
-          bottom: '56%',
+          bottom: '45%',
           start: '80%',
-          marginBottom: "-20%",
+          position:"absolute",
           display: selectedScheduledItems.length > 0 ? "flex" : "none"
         }}
         onPress={() => {
@@ -230,9 +228,9 @@ export function PlanScreen() {
           borderRadius: 45,
           backgroundColor: "red",
           height: 60, width: 60,
-          bottom: '43%',
+          bottom: '35%',
           start: '80%',
-          marginBottom: "-20%",
+          position:'absolute',
           display: selectedScheduledItems.length > 0 ? "flex" : "none"
         }}
         onPress={() => {
@@ -257,9 +255,9 @@ export function PlanScreen() {
           borderRadius: 45,
           backgroundColor: "orange",
           height: 60, width: 60,
-          bottom: '30%',
+          bottom: '25%',
           start: '80%',
-          marginBottom: "-20%",
+          position:'absolute',
           display: selectedScheduledItems.length > 0 ? "flex" : "none"
         }}
         onPress={() => { setScheduledItemState({ ...scheduledItemState, selectedScheduledItems: [] }) }}
@@ -271,19 +269,19 @@ export function PlanScreen() {
           color="white" />
       </Pressable>
 
-      <TouchableOpacity
+      <Pressable
         style={{
           borderRadius: 45,
           backgroundColor: Colors.light.tint,
           height: 60, width: 60,
-          bottom: '17%',
+          bottom: '15%',
           start: '80%',
-          marginBottom: "-20%"
+          position:"absolute"
         }}
         onPress={() => { handleCreate() }}
       >
         <Ionicons style={{ bottom: "-5%", right: "-10%" }} name="add-outline" size={Layout.defaultMargin + 40} color="white" />
-      </TouchableOpacity>
+      </Pressable>
 
       < TextInput
         style={{
@@ -294,7 +292,6 @@ export function PlanScreen() {
           paddingBottom: Layout.defaultMargin + 5,
           paddingTop: Layout.defaultMargin - 5,
           fontSize: Layout.defaultFontSize,
-          marginBottom: "2%",
           backgroundColor: "white",
         }}
         placeholder="Type here to filter items per day..."
