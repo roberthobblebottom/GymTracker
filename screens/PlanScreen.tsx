@@ -7,6 +7,7 @@ import { DialogState, ScheduledItem, ScheduledItemState } from '../types';
 import Toast from 'react-native-simple-toast';
 import Layout from '../constants/Layout';
 import { Ionicons, MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
+import { styles } from '../constants/styles';
 /*
 Note:
 this.renderWeekDayNames is commented out from line 325 of ./node_modules/react-native-calendars/src/agenda/index.js
@@ -53,7 +54,7 @@ export function PlanScreen() {
   return (
     <View style={{
       flexDirection: "column", flex: 1,
-      justifyContent: 'space-evenly', display: "flex", 
+      justifyContent: 'space-evenly', display: "flex",
     }}>
       <Agenda items={a}
         showOnlySelectedDayItems={true}
@@ -62,7 +63,7 @@ export function PlanScreen() {
           width: '100%',
           transform: [{ rotateX: "180deg" }],
         }}
-        
+
         showScrollIndicator={true}
         showClosingKnob={true}
         onDayPress={(date: DateData) => handlePlanHeader(date)}
@@ -98,7 +99,7 @@ export function PlanScreen() {
           let dateParts: string[] = dateString.split(" ");
           let dateLabelToShow = dateParts[1] + " " + dateParts[2]
           let bgc;
-          if (selectedScheduledItems.indexOf(set) > -1) bgc = { backgroundColor: "gray" }
+          if (selectedScheduledItems.indexOf(set) > -1) bgc = { backgroundColor: Colors.light.tint }
           else bgc = {}
           return (
             <View style={{ ...styles.listStyle, ...bgc }}>
@@ -160,12 +161,9 @@ export function PlanScreen() {
 
       <Pressable
         style={{
-          borderRadius: 45,
+          ...styles.planScreenPressable,
           backgroundColor: "blue",
-          height: 60, width: 60,
           bottom: '65%',
-          start: '80%',
-          position:'absolute',
           display: selectedScheduledItems.length > 0 ? "flex" : "none"
         }}
         onPress={() => {
@@ -183,7 +181,6 @@ export function PlanScreen() {
               selectedScheduledItems.push(si)
           })
           setScheduledItemState({ ...scheduledItemState, selectedScheduledItems: [...selectedScheduledItems] })//not tested
-
           setScheduledItemState({ ...scheduledItemState, })
         }}>
         <MaterialIcons style={{ bottom: "-14%", right: "-17%" }} name="select-all" size={Layout.defaultMargin + 30} color="white" />
@@ -191,12 +188,8 @@ export function PlanScreen() {
 
       <Pressable
         style={{
-          borderRadius: 45,
-          backgroundColor: "grey",
-          height: 60, width: 60,
+          ...styles.planScreenPressable,
           bottom: '55%',
-          start: '80%',
-          position:'absolute',
           display: selectedScheduledItems.length > 0 ? "flex" : "none"
         }}
         onPress={() => {
@@ -208,12 +201,9 @@ export function PlanScreen() {
 
       <Pressable
         style={{
-          borderRadius: 45,
+          ...styles.planScreenPressable,
           backgroundColor: "green",
-          height: 60, width: 60,
           bottom: '45%',
-          start: '80%',
-          position:"absolute",
           display: selectedScheduledItems.length > 0 ? "flex" : "none"
         }}
         onPress={() => {
@@ -225,12 +215,9 @@ export function PlanScreen() {
 
       <Pressable
         style={{
-          borderRadius: 45,
+          ...styles.planScreenPressable,
           backgroundColor: "red",
-          height: 60, width: 60,
           bottom: '35%',
-          start: '80%',
-          position:'absolute',
           display: selectedScheduledItems.length > 0 ? "flex" : "none"
         }}
         onPress={() => {
@@ -252,12 +239,9 @@ export function PlanScreen() {
 
       <Pressable
         style={{
-          borderRadius: 45,
+          ...styles.planScreenPressable,
           backgroundColor: "orange",
-          height: 60, width: 60,
           bottom: '25%',
-          start: '80%',
-          position:'absolute',
           display: selectedScheduledItems.length > 0 ? "flex" : "none"
         }}
         onPress={() => { setScheduledItemState({ ...scheduledItemState, selectedScheduledItems: [] }) }}
@@ -271,29 +255,17 @@ export function PlanScreen() {
 
       <Pressable
         style={{
-          borderRadius: 45,
+          ...styles.planScreenPressable,
           backgroundColor: Colors.light.tint,
-          height: 60, width: 60,
           bottom: '15%',
-          start: '80%',
-          position:"absolute"
         }}
         onPress={() => { handleCreate() }}
       >
         <Ionicons style={{ bottom: "-5%", right: "-10%" }} name="add-outline" size={Layout.defaultMargin + 40} color="white" />
-      </Pressable>
+    </Pressable>
 
       < TextInput
-        style={{
-          display: 'flex',
-          justifyContent: 'flex-end',
-          width: "100%",
-          paddingHorizontal: Layout.defaultMargin,
-          paddingBottom: Layout.defaultMargin + 5,
-          paddingTop: Layout.defaultMargin - 5,
-          fontSize: Layout.defaultFontSize,
-          backgroundColor: "white",
-        }}
+        style={styles.filterScheduledItemTextInput}
         placeholder="Type here to filter items per day..."
         onChange={text => fitlerScheduledItem(text.nativeEvent.text)}
         value={majorSetKeyword}
@@ -304,9 +276,3 @@ export function PlanScreen() {
   );
 
 }
-const styles = StyleSheet.create({
-  listStyle: {
-    width: "100%", transform: [{ rotateX: "180deg" }],
-    marginHorizontal: Layout.defaultMargin,
-  }
-})

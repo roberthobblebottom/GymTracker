@@ -1,26 +1,23 @@
 
 import { View, Button, Alert } from 'react-native';
 import React, { useContext } from 'react';
-import {handleResetDBContext} from '../App';
-import layoutConstants from '../constants/Layout';//can give any name if it is not mentioned in orginal file.
-function confirmation(handleFunc:Function) {
+import { SettingsScreenContext } from '../App';
+import { styles } from '../constants/styles';
+function confirmation(handleFunc: Function) {
     return Alert.alert(
         "Comfirmation",
         "Are you sure you want to reset the database?",
-        [{ text: "Yes", onPress: () => handleFunc()}, { text: "No" }]
+        [{ text: "Yes", onPress: () => handleFunc() }, { text: "No" }]
     )
 }
 
 export function SettingsScreen() {
-    const handleFunc:Function = useContext(handleResetDBContext);
+    const context = useContext(SettingsScreenContext);
     return (
-        <View style={{
-            flex: 1,
-            alignItems: 'stretch',
-            justifyContent: 'flex-start',
-            margin: layoutConstants.defaultMargin
-        }}>
-            <Button title='Reset Database' onPress={() => confirmation(handleFunc)} />
+        <View style={styles.settingsScreen}>
+            <Button title='Reset Database' onPress={() => confirmation(context.handleResetDB)} />
+            {/* <Button title='export to directory of the app' onPress={()=>context.handleExport()} /> */}
+            {/* <Button title='import' onPress={()=>{}} /> */}
         </View>
     );
 }

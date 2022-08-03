@@ -20,6 +20,8 @@ import { ScheduleDialog } from './screens/ScheduleDialog';
 import { ExerciseDialog } from './screens/ExerciseDialog';
 import { styles } from './constants/styles';
 import { SelectDateDialog } from './screens/SelectDateDialog';
+import * as Filesystem from 'expo-file-system';
+import { StorageAccessFramework } from 'expo-file-system'
 LogBox.ignoreLogs(['Require cycle:'])
 const Tab = createBottomTabNavigator()
 
@@ -82,12 +84,16 @@ const iniitalContextProps: ContextProps = {
   deleteScheduledItemWithoutStateUpdate: Function,
   commonScheduledItemCRUD: Function,
   createScheduledItem2: Function,
-  setDialogState: ()=>{},
+  setDialogState: () => { },
   dialogState: initialDialogState,
 
 }
+
 //contexts
-export const handleResetDBContext = React.createContext(() => { })
+export const SettingsScreenContext = React.createContext({
+  handleResetDB: () => { },
+  handleExport: () => { }
+})
 export const ExerciseScreenContext = React.createContext({ contextProps: iniitalContextProps })
 export const ScheduledItemContext = React.createContext({ contextProps: iniitalContextProps })
 
@@ -198,6 +204,21 @@ export default function App() {
     SetDialogState(initialDialogState)
     setMajorMuscles(initialMajorMuscles)
   }
+
+  async function handleExport() {
+    console.log("handle expoort")
+    const exportData = {
+      exercises: exerciseState.exercises,
+      majorMuscles: majorMuscles,
+      scheduledItems: scheduledItemState.scheduledItems
+    }
+    await Filesystem.writeAsStringAsync(
+      Filesystem.documentDirectory! + "GymTracker-Data.json",
+      JSON.stringify(exportData)
+    )
+    Alert.alert("Export Successful", "Export is located at " +
+      Filesystem.documentDirectory + "GymTracker-Data.json")
+  }
   function cancelDialog() {
     SetDialogState({ ...dialogState, isExDialogVisible: false, isCalendarDialogVisible: false, isPlanDialogVisible: false });
   }
@@ -235,8 +256,8 @@ export default function App() {
       isExDialogVisible: true,
       openPushPullDropDown: false,
       dialogText: CreateExerciseText,
-      isEditable: true
-      , isDropDownOpen: false
+      isEditable: true,
+      isDropDownOpen: false
     });
     setDropDownPushPullSelected(PushPullEnum.Push)
   }
@@ -487,7 +508,6 @@ export default function App() {
 
   const updateScheduledItem = () => {
     const aScheduledItem = scheduledItemState.aScheduledItem
-    // const currentDate = scheduledItemState.currentDate
 
     if (dropDownExNameSelected == undefined || dropDownExNameSelected == "") {
       Toast.show("exercise must be selected")
@@ -681,7 +701,10 @@ export default function App() {
           commonScheduledItemCRUD={commonScheduledItemCRUD}
           createScheduledItem2={createScheduledItem2}
           updateScheduledItemWithoutStateUpdate={updateScheduledItemWithoutStateUpdate} />
-        <handleResetDBContext.Provider value={handleResetDB}>
+        <SettingsScreenContext.Provider value={{
+          handleResetDB: handleResetDB,
+          handleExport: handleExport
+        }}>
           <ExerciseScreenContext.Provider value={{ contextProps: contextProps }}>
             <ScheduledItemContext.Provider value={{ contextProps: contextProps }}>
               <Tab.Navigator
@@ -712,7 +735,7 @@ export default function App() {
               </Tab.Navigator>
             </ScheduledItemContext.Provider>
           </ExerciseScreenContext.Provider>
-        </handleResetDBContext.Provider>
+        </SettingsScreenContext.Provider>
       </NavigationContainer >
     </>
   )

@@ -1,7 +1,7 @@
 import { Platform, StyleSheet } from "react-native"
-import Colors  from "./Colors"
+import Colors from "./Colors"
 import Layout from "./Layout"
-
+import layoutConstants from './Layout'
 export const bases = StyleSheet.create({
   textInputBase: {
     fontSize: Layout.defaultFontSize,
@@ -39,7 +39,8 @@ export const bases = StyleSheet.create({
   },
 
   numberCRUD: {
-    flexDirection: "row", marginTop: 20, display: 'flex', justifyContent: "space-between", maxHeight: 40
+    flexDirection: "row", marginTop: 20,
+    display: 'flex', justifyContent: "space-between", maxHeight: 40
   }, incrementButton:
     { color: "white", fontSize: Layout.defaultFontSize, marginTop: -7 }
 
@@ -90,8 +91,58 @@ export const styles = StyleSheet.create({
   }
   ,
   dialogRow: { flexDirection: "row", marginTop: 20 },
-  buttonsRow:{ flexDirection: "row", justifyContent: "space-around", marginTop: 20 },
-  overallDialog:{ flex: 1, display: "flex", justifyContent: "flex-end" },
-  numberElementsOnTheLeftOfScheduleItemDialog:{ flexDirection: "row", justifyContent: "space-evenly", },
-  dialogRow2:{ flexDirection: "row", marginTop: 10, display: 'flex', justifyContent: "space-between" }
+  buttonsRow: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    marginTop: 20
+  },
+  overallDialog: {
+    flex: 1,
+    display: "flex",
+    justifyContent: "flex-end"
+  },
+  numberElementsOnTheLeftOfScheduleItemDialog: {
+    flexDirection: "row",
+    justifyContent: "space-evenly",
+  },
+  dialogRow2: {
+    flexDirection: "row",
+    marginTop: 10,
+    display: 'flex',
+    justifyContent: "space-between"
+  },
+  justBackgroundColor: { backgroundColor: Colors.light.tint },
+  listStyle: {
+    width: "100%", transform: [{ rotateX: "180deg" }],
+    marginHorizontal: Layout.defaultMargin,
+  },
+  settingsScreen: {
+    flex: 1,
+    alignItems: 'stretch',
+    justifyContent: 'flex-start',
+    margin: layoutConstants.defaultMargin
+  },
+  planScreenPressable: {
+    borderRadius: 45,
+    height: 60, width: 60,
+    start: '80%',
+    position: 'absolute',
+  },
+  filterScheduledItemTextInput: {
+    display: 'flex',
+    justifyContent: 'flex-end',
+    width: "100%",
+    paddingHorizontal: Layout.defaultMargin,
+    paddingBottom: Layout.defaultMargin + 5,
+    paddingTop: Layout.defaultMargin - 5,
+    fontSize: Layout.defaultFontSize,
+    backgroundColor: "white",
+  },
+  filterExercisesTextInput: {
+    width: "100%",
+    padding: layoutConstants.defaultMargin,
+    fontSize: Layout.defaultFontSize,
+    borderTopWidth: 2,
+    borderTopColor: "white"
+  }
 })

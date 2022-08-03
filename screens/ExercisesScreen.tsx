@@ -8,6 +8,7 @@ import Layout from "../constants/Layout";
 import Colors from "../constants/Colors";
 import { TextInput } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { styles } from "../constants/styles";
 
 function ExercisesScreen() {
   let c = useContext(ExerciseScreenContext);
@@ -37,25 +38,16 @@ function ExercisesScreen() {
         }
       />
       <TextInput
-        style={{
-          width: "100%",
-          padding: layoutConstants.defaultMargin,
-          fontSize: Layout.defaultFontSize,
-          borderTopWidth: 2,
-          borderTopColor: "white"
-        }}
+        style={styles.filterExercisesTextInput}
         placeholder="Type here to filter exercises..."
         onChange={text => handleFilterExercises(text.nativeEvent.text)}
         value={filteredKeyword}
       />
       <TouchableOpacity
         style={{
-          borderRadius: 45,
+          ...styles.planScreenPressable,
           backgroundColor: Colors.light.tint,
-          height: 60, width: 60,
-          marginBottom: -60,
-          bottom: "12%",
-          start: '80%'
+          bottom: "5%",
         }}
         onPress={() => handleShowCreate()}
       >
