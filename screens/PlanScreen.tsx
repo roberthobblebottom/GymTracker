@@ -230,7 +230,6 @@ export function PlanScreen() {
           Alert.alert("confirmation", "Are you sure you like to delete all selected?", [{
             text: "Yes", onPress: () => {
               selectedScheduledItems.forEach(si => {
-                // deleteScheduledItemsWithoutStateUpdate(si.id)
                 deleteScheduledItem(si.id)
                 const i = scheduledItems.indexOf(si)
                 scheduledItems.splice(i, 1)

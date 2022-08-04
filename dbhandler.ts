@@ -3,6 +3,7 @@ import Toast from 'react-native-simple-toast';
 import FileSystem from 'expo-file-system';
 import * as Asset from 'expo-asset';
 import { ScheduledItem } from './types';
+import { SQLStatementCallback } from 'expo-sqlite';
 const db = SQLite.openDatabase('GymTracker.db');
 function init() {
     // resetTables();
@@ -43,14 +44,14 @@ function resetTables() {
 //     );
 //     // return SQLite.openDatabase('GymTracker.db');
 //   }
-export let deleteScheduledItem = (id: number) => {
+export let deleteScheduledItem = (id: number,dbCallback?:SQLStatementCallback) => {
     db.transaction(t => t.executeSql("DELETE FROM scheduled_item where id= ?", [id],
-        undefined,
+        dbCallback,
         (_, err) => { console.log(err); return true; }
     ))
 }
 
-export const createScheduledItem = (si: ScheduledItem) => {
+export const createScheduledItem = (si: ScheduledItem,dbCallback?:SQLStatementCallback) => {
     db.transaction(t => {
         t.executeSql(`INSERT INTO scheduled_item
            (exercise,reps,percent_complete,sets,duration_in_seconds,weight,notes,date)  
@@ -58,7 +59,7 @@ export const createScheduledItem = (si: ScheduledItem) => {
             [si.exercise.name, si.reps, si.percent_complete, si.sets,
             si.duration_in_seconds, si.weight,
             si.notes, JSON.stringify(si.date)],
-            undefined,
+            dbCallback,
             (_, e) => {
                 console.log(e)
                 //   cancelDialog()
@@ -67,14 +68,14 @@ export const createScheduledItem = (si: ScheduledItem) => {
         )
     })
 }
-export const updateScheduledItem = (si: ScheduledItem) => {
+export const updateScheduledItem = (si: ScheduledItem,dbCallback?:SQLStatementCallback) => {
     db.transaction(t => t.executeSql(`UPDATE scheduled_item 
     SET exercise=?,reps=?,percent_complete=?,sets=?,duration_in_seconds=?,weight=?,notes=?,date=? 
     WHERE id=?`,
         [si.exercise.name, si.reps, si.percent_complete, si.sets,
         si.duration_in_seconds, si.weight,
         si.notes, JSON.stringify(si.date), si.id],
-        undefined,
+        dbCallback,
         (_, err) => { console.log(err); return true; }))
 }
 export { resetTables, init, db };//TODO: remove dropTables in production.

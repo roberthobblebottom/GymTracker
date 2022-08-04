@@ -8,7 +8,7 @@ import 'react-native-gesture-handler';
 import React, { useState, useEffect, Dispatch } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { init, db, resetTables } from './dbhandler';
+import { init, db, resetTables, createScheduledItem, deleteScheduledItem, updateScheduledItem } from './dbhandler';
 import { ContextProps, DialogState, Emm, Exercise, ExerciseState, MajorMuscle, PushPullEnum, ScheduledItemState } from './types';
 import { ScheduledItem } from './types';
 import Toast from 'react-native-simple-toast';
@@ -82,7 +82,6 @@ const initalContextProps: ContextProps = {
   renderExerciseDialogForViewing: Function,
   handleFilterExercises: Function,
   commonScheduledItemCRUD: Function,
-  createScheduledItemWithoutStateUpdate: Function,
   setDialogState: () => { },
   dialogState: initialDialogState,
 }
@@ -211,10 +210,10 @@ export default function App() {
       scheduledItems: scheduledItemState.scheduledItems
     }
 
-//     const permissions = await StorageAccessFramework.requestDirectoryPermissionsAsync()
+    //     const permissions = await StorageAccessFramework.requestDirectoryPermissionsAsync()
 
-//     if(!permissions.granted)
-// return
+    //     if(!permissions.granted)
+    // return
 
 
 
@@ -478,41 +477,28 @@ export default function App() {
     Alert.alert(
       "Confirmation",
       "Are you sure you want to delete this scheduled item?",
-      [{ text: "Yes", onPress: () => deleteScheduledItem(ms.id) },
+      [{ text: "Yes", onPress: () => deleteScheduledItemWithStateUpdate(ms.id) },
       { text: "No", onPress: () => renderScheduledItemDialogForViewing(ms) }],//warning, recursive
       { cancelable: true }
     )
   };
 
-  // function deleteScheduledItemsWithoutStateUpdate(id: number) {
-  //   db.transaction(t => t.executeSql("DELETE FROM scheduled_item where id= ?", [id],
-  //     undefined,
-  //     (_, err) => { console.log(err); return true; }
-  //   ))
-  // }
-
-  let deleteScheduledItem = (id: number) => {
-    db.transaction(t => t.executeSql("DELETE FROM scheduled_item where id= ?", [id],
-      () => {
-        let si = scheduledItemState.scheduledItems.slice()
-        si.forEach((ms1, i) => {
-          if (ms1.id == id) {
-            si.splice(i, 1)
-            return;
-          }
-        })
-        //correct way of removing element from a array for me. Not using delete keyword which leaves a undefined space
-        Toast.show("The scheduled item is deleted.")
-        commonScheduledItemCRUD(si)
-      },
-      (_, err) => {
-        console.log(err)
-        return true;
-      }
-    ))
+  let deleteScheduledItemWithStateUpdate = (id: number) => {
+    deleteScheduledItem(id, () => {
+      let si = scheduledItemState.scheduledItems.slice()
+      si.forEach((ms1, i) => {
+        if (ms1.id == id) {
+          si.splice(i, 1)
+          return;
+        }
+      })
+      //correct way of removing element from a array for me. Not using delete keyword which leaves a undefined space
+      Toast.show("The scheduled item is deleted.")
+      commonScheduledItemCRUD(si)
+    })
   }
 
-  const updateScheduledItem = () => {
+  const updateScheduledItemWithStateUpdate = () => {
     const aScheduledItem = scheduledItemState.aScheduledItem
     if (dropDownExNameSelected == undefined || dropDownExNameSelected == "") {
       Toast.show("exercise must be selected")
@@ -521,12 +507,7 @@ export default function App() {
     let theexercise = exerciseState.exercises.filter((e, i, a) => {
       if (e.name == dropDownExNameSelected) return e;
     })[0];
-    db.transaction(t => t.executeSql(`UPDATE scheduled_item 
-    SET exercise=?,reps=?,percent_complete=?,sets=?,duration_in_seconds=?,weight=?,notes=?,date=? 
-    WHERE id=?`,
-      [dropDownExNameSelected, aScheduledItem.reps, aScheduledItem.percent_complete, aScheduledItem.sets,
-        aScheduledItem.duration_in_seconds, aScheduledItem.weight,
-        aScheduledItem.notes, JSON.stringify(aScheduledItem.date), aScheduledItem.id],
+    updateScheduledItem(aScheduledItem,
       (_, result) => {
         let toBeUpdated: ScheduledItem = {
           id: aScheduledItem.id, exercise: theexercise, reps: aScheduledItem.reps,
@@ -544,44 +525,29 @@ export default function App() {
         commonScheduledItemCRUD(ms)
         Toast.show("The major set is updated.")
       },
-      (_, err) => {
-        console.log(err)
-        return true;
-      }))
-
+    )
   }
 
-  function createScheduledItem() {
+  function createScheduledItemWithStateUpdate() {
     let e1: Exercise
     const aScheduledItem = scheduledItemState.aScheduledItem
     exerciseState.exercises.forEach(e => {
-      if (e.name == dropDownExNameSelected)
+      if (e.name == dropDownExNameSelected) {
         aScheduledItem.exercise = e
+        return
+      }
     })
-    db.transaction(t => {
-      t.executeSql(`INSERT INTO scheduled_item
-           (exercise,reps,percent_complete,sets,duration_in_seconds,weight,notes,date)  
-           VALUES(?,?,?,?,?,?,?,?)`,
-        [dropDownExNameSelected, aScheduledItem.reps, aScheduledItem.percent_complete, aScheduledItem.sets,
-          aScheduledItem.duration_in_seconds, aScheduledItem.weight,
-          aScheduledItem.notes, JSON.stringify(aScheduledItem.date)],
-        (_, r) => {
-          let tempScheduledItem = Object.assign({}, aScheduledItem)
-          tempScheduledItem.id = r.insertId!
-          tempScheduledItem.date = aScheduledItem.date
-          tempScheduledItem.duration_in_seconds = aScheduledItem.duration_in_seconds
-          let m = scheduledItemState.scheduledItems.slice()
-          m.push(tempScheduledItem)
-          commonScheduledItemCRUD(m)
-          Toast.show("Scheduled item created.")
-        },
-        (_, e) => {
-          console.log(e)
-          cancelDialog()
-          return true
-        }
-      )
-    })
+    createScheduledItem(aScheduledItem,
+      (_, r) => {
+        let tempScheduledItem = Object.assign({}, aScheduledItem)
+        tempScheduledItem.id = r.insertId!
+        tempScheduledItem.date = aScheduledItem.date
+        tempScheduledItem.duration_in_seconds = aScheduledItem.duration_in_seconds
+        let m = scheduledItemState.scheduledItems.slice()
+        m.push(tempScheduledItem)
+        commonScheduledItemCRUD(m)
+        Toast.show("Scheduled item created.")
+      })
   }
 
   function handleFilterScheduledItem(keyword: string) {
@@ -606,8 +572,8 @@ export default function App() {
   const buttonsSetProps = {
     cancelDialog: cancelDialog,
     deleteScheduledItemConfirmation: deleteScheduledItemConfirmation,
-    createScheduledItem: createScheduledItem,
-    updateScheduledItem: updateScheduledItem,
+    createScheduledItem: createScheduledItemWithStateUpdate,
+    updateScheduledItem: updateScheduledItemWithStateUpdate,
     deleteExerciseConfirmation: deleteExerciseConfirmation,
     createExercise: createExercise,
     updateExercise: updateExercise,
@@ -678,7 +644,7 @@ export default function App() {
           setDialogState={SetDialogState}
 
           commonScheduledItemCRUD={commonScheduledItemCRUD}
-          />
+        />
         <SettingsScreenContext.Provider value={{
           handleResetDB: handleResetDB,
           handleExport: handleExport
