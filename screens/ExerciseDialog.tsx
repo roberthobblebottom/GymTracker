@@ -156,6 +156,7 @@ export function ExerciseDialog(props: any) {
                             items={majorMuscles as ItemType<string>[]}
                             value={dropDownMajorMuscleNameSelected}
                             setValue={setMajorMuscleValues}
+                            // onChangeValue={v=>console.log(v)}
                             open={dialogState.isDropDownOpen}
                             setOpen={o => SetDialogState({ ...dialogState, isDropDownOpen: o })}
                             disabled={!dialogState.isEditable}

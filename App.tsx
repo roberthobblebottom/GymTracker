@@ -8,7 +8,9 @@ import 'react-native-gesture-handler';
 import React, { useState, useEffect, Dispatch } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { init, db, resetTables, createScheduledItem, deleteScheduledItem, updateScheduledItem, createExerciseMajorMuscleRelationship, createExercise, deleteExerciseMajorMuscleRelationship, deleteExercise, updateExercise } from './dbhandler';
+import { init, db, resetTables, createScheduledItem, deleteScheduledItem, updateScheduledItem, 
+  createExerciseMajorMuscleRelationship, createExercise, deleteExerciseMajorMuscleRelationship, deleteExercise, updateExercise } 
+  from './dbhandler';
 import { ButtonSetProps, ContextProps, DialogState, Emm, Exercise, ExerciseState, MajorMuscle, PushPullEnum, ScheduledItemState } from './types';
 import { ScheduledItem } from './types';
 import Toast from 'react-native-simple-toast';
@@ -176,8 +178,8 @@ export default function App() {
           Toast.show("There is an error is extracting major muscles from each exercises")
           return;
         }
-        if (ex!.major_muscles == initialMajorMuscles) ex!.major_muscles = [mm2!];
-        else ex!.major_muscles.push(mm2!)
+        if (ex!.major_muscles == initialMajorMuscles) ex!.major_muscles = [mm2!]
+        else if(!ex!.major_muscles.find(x=>x.name==mm2?.name)) ex!.major_muscles.push(mm2!)
       })
     }
   }, [scheduledItemState, exerciseState, majorMuscles, emm])
@@ -200,29 +202,18 @@ export default function App() {
     setScheduledItemState(initialScheduledItemState)
     SetDialogState(initialDialogState)
     setMajorMuscles(initialMajorMuscles)
+    setEmm(initialEmm)
   }
 
   async function handleExport() {
-    console.log("handle expoort")
     const exportData = {
       exercises: exerciseState.exercises,
       majorMuscles: majorMuscles,
       scheduledItems: scheduledItemState.scheduledItems
     }
-
     //     const permissions = await StorageAccessFramework.requestDirectoryPermissionsAsync()
-
     //     if(!permissions.granted)
     // return
-
-
-
-    // await Filesystem.writeAsStringAsync(
-    //   Filesystem.documentDirectory! + "GymTracker-Data.json",
-    //   JSON.stringify(exportData)
-    // )
-    // Alert.alert("Export Successful", "Export is located at " +
-    //   Filesystem.documentDirectory + "GymTracker-Data.json")
   }
   function cancelDialog() {
     SetDialogState({ ...dialogState, isExDialogVisible: false, isCalendarDialogVisible: false, isPlanDialogVisible: false });
@@ -306,11 +297,17 @@ export default function App() {
     const oldExerciseName = exerciseState.oldExerciseName
     const pushPullDropDownValue = dropDownPushPullSelected
     let selected: MajorMuscle[] = majorMuscles.filter(x => dropDownMajorMuscleNameSelected.includes(x.name))
-    let toBeUpdated = selected.filter(x => aExercise.major_muscles.includes(x))
-    toBeUpdated.forEach(x => {
-      if (toBeUpdated != undefined) createExerciseMajorMuscleRelationship(aExercise.name, x.name)
-    })
-    let toBeDeleted: MajorMuscle[] = selected.filter(x => !aExercise.major_muscles.includes(x))
+    let toBeCreated: MajorMuscle[] = selected.filter(x => !aExercise.major_muscles.find(t=>t.name==x.name))
+    let toBeDeleted:MajorMuscle[]=aExercise.major_muscles.filter(x=>!selected.find(t=>t.name==x.name))
+    console.log("mm")
+    console.log(aExercise.major_muscles)
+    console.log("selected")
+    console.log(selected)
+    console.log("toBeCreated")
+    console.log(toBeCreated)
+    console.log("tobedeleted")
+console.log(toBeDeleted)
+    toBeCreated.forEach(x =>createExerciseMajorMuscleRelationship(aExercise.name, x.name))
     toBeDeleted.forEach(x => deleteExerciseMajorMuscleRelationship(aExercise.name, x.name))
     aExercise.push_or_pull = pushPullDropDownValue
     updateExercise(aExercise, oldExerciseName,
@@ -335,9 +332,10 @@ export default function App() {
     const aExercise = exerciseState.aExercise;
     let selected: MajorMuscle[] = majorMuscles.filter(x => dropDownMajorMuscleNameSelected.includes(x.name))
     selected.forEach(x => createExerciseMajorMuscleRelationship(aExercise.name, x.name))
+
     aExercise.push_or_pull = dropDownPushPullSelected
-    createExercise(aExercise,
-      (_, result) => {
+    console.log(aExercise.push_or_pull)
+    createExercise(aExercise,(_, result) => {
         const es: Exercise[] = exerciseState.exercises.slice()
         es.push({
           name: aExercise.name, description: aExercise.description, imagesJson: aExercise.imagesJson, major_muscles: selected,
@@ -459,8 +457,7 @@ export default function App() {
           si.splice(i, 1)
           return;
         }
-      })
-      //correct way of removing element from a array for me. Not using delete keyword which leaves a undefined space
+      }) //correct way of removing element from a array for me. Not using delete keyword which leaves a undefined space
       Toast.show("The scheduled item is deleted.")
       commonScheduledItemCRUD(si)
     })

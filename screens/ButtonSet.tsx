@@ -91,7 +91,7 @@ export function ButtonSet(props: any) {
                                 createScheduledItemWithStateUpdate()
                                 break
                         }
-                    }}></Button>
+                    }}/>
                     <Button title='Back' onPress={() => renderScheduledItemDialogForViewing(aScheduledItem)} />
                     <Button title='Cancel' onPress={() => cancelDialog()} />
                 </View>

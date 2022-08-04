@@ -81,6 +81,7 @@ export const updateScheduledItem = (si: ScheduledItem, dbCallback?: SQLStatement
 
 export const createExerciseMajorMuscleRelationship = (exerciseName: string,
     majorMuscleName: string) => {
+        console.log(exerciseName+majorMuscleName)
     db.transaction(t => t.executeSql(
         "INSERT INTO exercise_major_muscle_one_to_many (exercise_name, major_muscle_name)VALUES (?,?)",
         [exerciseName, majorMuscleName], undefined,
@@ -99,7 +100,7 @@ export const deleteExerciseMajorMuscleRelationship = (exerciseName: string, majo
 
 export const createExercise = (exercise: Exercise, dbCallback?: SQLStatementCallback) => {
     db.transaction(t => t.executeSql("INSERT INTO exercise VALUES (?,?,?,?)",
-        [exercise.name, exercise.description, exercise.imagesJson, exercise.push_or_pull],
+        [exercise.name,exercise.push_or_pull, exercise.description, exercise.imagesJson],
         dbCallback, (_, err) => {
             console.log(err)
             return true;
@@ -127,7 +128,7 @@ export const deleteExercise = (exerciseName: string, dbCallback: SQLStatementCal
     ))
 }
 
-export { resetTables, init, db };//TODO: remove dropTables in production.
+export { resetTables, init, db }
 const commands = `
 CREATE TABLE IF NOT EXISTS "scheduled_item" (
 	"id"	INTEGER PRIMARY KEY AUTOINCREMENT,

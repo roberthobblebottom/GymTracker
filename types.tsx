@@ -116,20 +116,20 @@ export type ContextProps = {
   setDialogState: Dispatch<DialogState>,
   dialogState: DialogState,
 }
-export type ButtonSetProps ={
-cancelDialog: Function,
-deleteScheduledItemConfirmation: Function,
-deleteExerciseConfirmation: Function,
+export type ButtonSetProps = {
+  cancelDialog: Function,
 
-createExerciseWithStateUpdate:Function,
-updateExerciseWithStateUpdate:Function,
+  createExerciseWithStateUpdate: Function,
+  updateExerciseWithStateUpdate: Function,
+  deleteExerciseConfirmation: Function,
 
-createScheduledItemWithStateUpdate:Function,
-updateScheduledItemWithStateUpdate:Function,
+  createScheduledItemWithStateUpdate: Function,
+  updateScheduledItemWithStateUpdate: Function,
+  deleteScheduledItemConfirmation: Function,
 
-renderScheduledItemDialogForViewing: Function,
-renderScheduledItemDialogForDuplication: Function,
-renderScheduledItemDialogForEdit: Function,
-renderExerciseDialogForEdit: Function,
-renderExerciseDialogForViewing: Function,
+  renderScheduledItemDialogForViewing: Function,
+  renderScheduledItemDialogForDuplication: Function,
+  renderScheduledItemDialogForEdit: Function,
+  renderExerciseDialogForEdit: Function,
+  renderExerciseDialogForViewing: Function,
 }
