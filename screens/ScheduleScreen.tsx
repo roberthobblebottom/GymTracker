@@ -23,7 +23,7 @@ export function PlanScreen() {
   const setScheduledItemState: Dispatch<ScheduledItemState> = context.contextProps.setScheduledItemState
   const contextProps = context.contextProps
 
-  const scheduledItems: ScheduledItem[] = scheduledItemState.scheduledItems;
+  const scheduledItems: ScheduledItem[] = scheduledItemState.filteredScheduledItems;
   const selectedScheduledItems: ScheduledItem[] = scheduledItemState.selectedScheduledItems
   const majorSetKeyword: string = scheduledItemState.filteredScheduledItemKeyword;
 

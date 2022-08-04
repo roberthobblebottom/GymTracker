@@ -3,7 +3,7 @@ import {
 } from 'react-native';
 import { ExercisesScreen } from './screens/ExercisesScreen';
 import { SettingsScreen } from './screens/SettingsScreen';
-import { PlanScreen } from './screens/PlanScreen';
+import { PlanScreen } from './screens/ScheduleScreen';
 import 'react-native-gesture-handler';
 import React, { useState, useEffect, Dispatch } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
@@ -130,8 +130,7 @@ export default function App() {
               })
             })
         setExerciseState({
-          ...exerciseState,
-          exercises: tempExercises, filteredExercises: tempExercises
+          ...exerciseState,exercises: tempExercises, filteredExercises: tempExercises
         })
       })
     if (majorMuscles[0] == initialMajorMuscles[0])

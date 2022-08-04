@@ -15,7 +15,7 @@ export const bases = StyleSheet.create({
     width: 30, textAlign: "center"
 
   },
-  changeDateButtonBase: {
+  changeButtonBase: {
     paddingHorizontal: Layout.defaultMargin,
     paddingTop: 10,
     height: 30,
@@ -84,11 +84,11 @@ export const styles = StyleSheet.create({
   },
   changeButtonEnabled: {
     backgroundColor: '#2196F3',
-    ...bases.changeDateButtonBase
+    ...bases.changeButtonBase
   },
   changeButtonDisabled: {
     backgroundColor: Colors.light.altBackground,
-    ...bases.changeDateButtonBase
+    ...bases.changeButtonBase
   }
   ,
   dialogRow: { flexDirection: "row", marginTop: 20 },
