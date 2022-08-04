@@ -8,8 +8,10 @@ import 'react-native-gesture-handler';
 import React, { useState, useEffect, Dispatch } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { init, db, resetTables, createScheduledItem, deleteScheduledItem, updateScheduledItem, 
-  createExerciseMajorMuscleRelationship, createExercise, deleteExerciseMajorMuscleRelationship, deleteExercise, updateExercise } 
+import {
+  init, db, resetTables, createScheduledItem, deleteScheduledItem, updateScheduledItem,
+  createExerciseMajorMuscleRelationship, createExercise, deleteExerciseMajorMuscleRelationship, deleteExercise, updateExercise, retrieveExerciseMajorMuscleRelationships, retrieveMajorMuscles, retrieveScheduledItems, retrieveExercises
+}
   from './dbhandler';
 import { ButtonSetProps, ContextProps, DialogState, Emm, Exercise, ExerciseState, MajorMuscle, PushPullEnum, ScheduledItemState } from './types';
 import { ScheduledItem } from './types';
@@ -24,6 +26,7 @@ import { styles } from './constants/styles';
 import { SelectDateDialog } from './screens/SelectDateDialog';
 import * as Filesystem from 'expo-file-system';
 import { StorageAccessFramework } from 'expo-file-system'
+import { ExerciseInformationText, EditExerciseText, CreateExerciseText, ScheduledItemInformation, EditScheduledItemText, DuplicateScheduledItemText, CreateScheduledItemText } from './constants/strings';
 LogBox.ignoreLogs(['Require cycle:'])
 const Tab = createBottomTabNavigator()
 
@@ -39,15 +42,9 @@ export const initialExerciseState: ExerciseState = {
   , oldExerciseName: ""
 };
 export const initialScheduledItem: ScheduledItem[] = [{
-  id: 0,
-  exercise: initialExerciseState.aExercise,
-  reps: 0,
-  percent_complete: 0,
-  sets: 0,
-  duration_in_seconds: 0,
-  weight: 0,
-  notes: "",
-  date: initialDate
+  id: 0, exercise: initialExerciseState.aExercise,
+  reps: 0, percent_complete: 0, sets: 0,
+  duration_in_seconds: 0, weight: 0, notes: "", date: initialDate
 }];
 export const initialScheduledItemState: ScheduledItemState = {
   scheduledItems: initialScheduledItem,
@@ -89,10 +86,7 @@ const initalContextProps: ContextProps = {
 }
 
 //contexts
-export const SettingsScreenContext = React.createContext({
-  handleResetDB: () => { },
-  handleExport: () => { }
-})
+export const SettingsScreenContext = React.createContext({ handleResetDB: () => { }, handleExport: () => { } })
 export const ExerciseScreenContext = React.createContext({ contextProps: initalContextProps })
 export const ScheduledItemContext = React.createContext({ contextProps: initalContextProps })
 
@@ -102,21 +96,11 @@ export default function App() {
   const [majorMuscles, setMajorMuscles] = useState(initialMajorMuscles)
   const [emm, setEmm] = useState(initialEmm)
 
-
   //Various Drop downs
   const [dropDownMajorMuscleNameSelected, setMajorMuscleValues] = useState([""])
   const [dropDownExNameSelected, setDropDownExNameSelected] = useState("")
   const [dropDownPushPullSelected, setDropDownPushPullSelected] = useState(PushPullEnum.Push)
   const [dialogState, SetDialogState] = useState<DialogState>(initialDialogState)
-
-  //constant strings
-  const ExerciseInformationText = "Exercise Information";
-  const EditExerciseText = "Edit Exercise:";
-  const CreateExerciseText = "Create Exercise:";
-  const CreateScheduledItemText = "Create:";
-  const ScheduledItemInformation = "Information:";
-  const EditScheduledItemText: string = "Edit";
-  const DuplicateScheduledItemText: string = "Duplicate:";
 
   function handlePlanHeader(date: DateData) {
     let s: string = ("Plan " + date.day + "-" + date.month + "-" + date.year)
@@ -125,61 +109,43 @@ export default function App() {
   useEffect(() => {
     let tempExercises: Exercise[];
     if (exerciseState.exercises[0].name == "" || exerciseState.exercises.length <= 0)
-      db.transaction(t => t.executeSql(
-        "SELECT * from exercise",
-        undefined,
-        (_, r) => {
-          tempExercises = r.rows._array;
-          tempExercises.forEach(ex => ex.major_muscles = initialMajorMuscles)
-          if (scheduledItemState.scheduledItems[0] != undefined)
-            if (scheduledItemState.scheduledItems[0].exercise == initialExerciseState.aExercise)
-              db.transaction(
-                t =>
-                  t.executeSql("SELECT * FROM scheduled_item", [],
-                    (_, results) => {
-                      let tempScheduledItems: ScheduledItem[] = results.rows._array;
-                      let a = results.rows._array.slice()
-                      tempScheduledItems.forEach((ms, index) => {
-                        ms.date = JSON.parse(ms.date.toString())
-                        let t = tempExercises.find(ex => {
-                          return ex.name == a[index].exercise
-                        })
-                        tempScheduledItems[index].exercise = t!;
-                      })
-                      setScheduledItemState({
-                        ...scheduledItemState,
-                        scheduledItems: tempScheduledItems,
-                        filteredScheduledItems: tempScheduledItems
-                      })
-                    },
-                    (_, err) => { console.log(err); return true; })
-              )
-          setExerciseState({
-            ...exerciseState,
-            exercises: tempExercises,
-            filteredExercises: tempExercises
-          })
-        },
-        (_, e) => { console.log(e); return true; }
-      ))
+      retrieveExercises((_, r) => {
+        tempExercises = r.rows._array;
+        tempExercises.forEach(ex => ex.major_muscles = initialMajorMuscles)
+        if (scheduledItemState.scheduledItems[0].exercise == initialExerciseState.aExercise)
+          retrieveScheduledItems(
+            (_, results) => {
+              let tempScheduledItems: ScheduledItem[] = results.rows._array;
+              let a = results.rows._array.slice()
+              tempScheduledItems.forEach((ms, index) => {
+                ms.date = JSON.parse(ms.date.toString())
+                let t = tempExercises.find(ex => {
+                  return ex.name == a[index].exercise
+                })
+                tempScheduledItems[index].exercise = t!;
+              })
+              setScheduledItemState({
+                ...scheduledItemState,
+                scheduledItems: tempScheduledItems,
+                filteredScheduledItems: tempScheduledItems
+              })
+            })
+        setExerciseState({
+          ...exerciseState,
+          exercises: tempExercises, filteredExercises: tempExercises
+        })
+      })
     if (majorMuscles[0] == initialMajorMuscles[0])
-      db.transaction(t => t.executeSql("SELECT * from major_muscle", undefined,
-        (_, results) => setMajorMuscles(results.rows._array)
-        , (_, err) => { console.log(err); return true; }))
+      retrieveMajorMuscles((_, results) => setMajorMuscles(results.rows._array))
     if (emm[0] == initialEmm[0])
-      db.transaction(t => t.executeSql("SELECT * from exercise_major_muscle_one_to_many;", undefined,
-        (_, results) => setEmm(results.rows._array)
-        , (_, err) => { console.log(err); return true; }))
+      retrieveExerciseMajorMuscleRelationships((_, results) => setEmm(results.rows._array))
     if (majorMuscles.length > 1 && exerciseState.exercises.length > 1 && emm.length > 1) {
       emm.forEach(x => {
         let ex = exerciseState.exercises.find(e => e.name == x.exercise_name)
         let mm2 = majorMuscles.find(mm => mm.name == x.major_muscle_name)
-        if (ex == undefined) {
-          Toast.show("There is an error is extracting major muscles from each exercises")
-          return;
-        }
-        if (ex!.major_muscles == initialMajorMuscles) ex!.major_muscles = [mm2!]
-        else if(!ex!.major_muscles.find(x=>x.name==mm2?.name)) ex!.major_muscles.push(mm2!)
+        if (ex == undefined) return;
+        if (ex.major_muscles == initialMajorMuscles) ex.major_muscles = [mm2!]
+        else if (!ex.major_muscles.find(x => x.name == mm2?.name)) ex.major_muscles.push(mm2!)
       })
     }
   }, [scheduledItemState, exerciseState, majorMuscles, emm])
@@ -297,17 +263,9 @@ export default function App() {
     const oldExerciseName = exerciseState.oldExerciseName
     const pushPullDropDownValue = dropDownPushPullSelected
     let selected: MajorMuscle[] = majorMuscles.filter(x => dropDownMajorMuscleNameSelected.includes(x.name))
-    let toBeCreated: MajorMuscle[] = selected.filter(x => !aExercise.major_muscles.find(t=>t.name==x.name))
-    let toBeDeleted:MajorMuscle[]=aExercise.major_muscles.filter(x=>!selected.find(t=>t.name==x.name))
-    console.log("mm")
-    console.log(aExercise.major_muscles)
-    console.log("selected")
-    console.log(selected)
-    console.log("toBeCreated")
-    console.log(toBeCreated)
-    console.log("tobedeleted")
-console.log(toBeDeleted)
-    toBeCreated.forEach(x =>createExerciseMajorMuscleRelationship(aExercise.name, x.name))
+    let toBeCreated: MajorMuscle[] = selected.filter(x => !aExercise.major_muscles.find(t => t.name == x.name))
+    let toBeDeleted: MajorMuscle[] = aExercise.major_muscles.filter(x => !selected.find(t => t.name == x.name))
+    toBeCreated.forEach(x => createExerciseMajorMuscleRelationship(aExercise.name, x.name))
     toBeDeleted.forEach(x => deleteExerciseMajorMuscleRelationship(aExercise.name, x.name))
     aExercise.push_or_pull = pushPullDropDownValue
     updateExercise(aExercise, oldExerciseName,
@@ -335,15 +293,15 @@ console.log(toBeDeleted)
 
     aExercise.push_or_pull = dropDownPushPullSelected
     console.log(aExercise.push_or_pull)
-    createExercise(aExercise,(_, result) => {
-        const es: Exercise[] = exerciseState.exercises.slice()
-        es.push({
-          name: aExercise.name, description: aExercise.description, imagesJson: aExercise.imagesJson, major_muscles: selected,
-          push_or_pull: dropDownPushPullSelected
-        })
-        commonExercisesCRUD(es)
-        Toast.show("The exercise " + aExercise.name + " is created.")
+    createExercise(aExercise, (_, result) => {
+      const es: Exercise[] = exerciseState.exercises.slice()
+      es.push({
+        name: aExercise.name, description: aExercise.description, imagesJson: aExercise.imagesJson, major_muscles: selected,
+        push_or_pull: dropDownPushPullSelected
       })
+      commonExercisesCRUD(es)
+      Toast.show("The exercise " + aExercise.name + " is created.")
+    })
   }
 
   function handleFilterExercises(keyword: string) {
@@ -540,8 +498,8 @@ console.log(toBeDeleted)
     deleteExerciseConfirmation: deleteExerciseConfirmation,
     createExerciseWithStateUpdate: createExerciseWithStateUpdate,
     updateExerciseWithStateUpdate: updateExerciseWithStateUpdate,
-    createScheduledItemWithStateUpdate:createScheduledItemWithStateUpdate,
-    updateScheduledItemWithStateUpdate:updateScheduledItemWithStateUpdate,
+    createScheduledItemWithStateUpdate: createScheduledItemWithStateUpdate,
+    updateScheduledItemWithStateUpdate: updateScheduledItemWithStateUpdate,
     renderScheduledItemDialogForViewing: renderScheduledItemDialogForViewing,
     renderScheduledItemDialogForDuplication: renderScheduledItemDialogForDuplication,
     renderScheduledItemDialogForEdit: renderScheduledItemDialogForEdit,

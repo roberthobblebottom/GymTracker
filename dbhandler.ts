@@ -44,12 +44,7 @@ function resetTables() {
 //     );
 //     // return SQLite.openDatabase('GymTracker.db');
 //   }
-export let deleteScheduledItem = (id: number, dbCallback?: SQLStatementCallback) => {
-    db.transaction(t => t.executeSql("DELETE FROM scheduled_item where id= ?", [id],
-        dbCallback,
-        (_, err) => { console.log(err); return true; }
-    ))
-}
+
 
 export const createScheduledItem = (si: ScheduledItem, dbCallback?: SQLStatementCallback) => {
     db.transaction(t => {
@@ -68,6 +63,13 @@ export const createScheduledItem = (si: ScheduledItem, dbCallback?: SQLStatement
         )
     })
 }
+export const retrieveScheduledItems = (dbCallback: SQLStatementCallback) => {
+    db.transaction(
+        t => t.executeSql("SELECT * FROM scheduled_item", [],
+            dbCallback,
+            (_, err) => { console.log(err); return true; })
+    )
+}
 export const updateScheduledItem = (si: ScheduledItem, dbCallback?: SQLStatementCallback) => {
     db.transaction(t => t.executeSql(`UPDATE scheduled_item 
     SET exercise=?,reps=?,percent_complete=?,sets=?,duration_in_seconds=?,weight=?,notes=?,date=? 
@@ -79,15 +81,26 @@ export const updateScheduledItem = (si: ScheduledItem, dbCallback?: SQLStatement
         (_, err) => { console.log(err); return true; }))
 }
 
+export let deleteScheduledItem = (id: number, dbCallback?: SQLStatementCallback) => {
+    db.transaction(t => t.executeSql("DELETE FROM scheduled_item where id= ?", [id],
+        dbCallback,
+        (_, err) => { console.log(err); return true; }
+    ))
+}
 export const createExerciseMajorMuscleRelationship = (exerciseName: string,
     majorMuscleName: string) => {
-        console.log(exerciseName+majorMuscleName)
+    console.log(exerciseName + majorMuscleName)
     db.transaction(t => t.executeSql(
         "INSERT INTO exercise_major_muscle_one_to_many (exercise_name, major_muscle_name)VALUES (?,?)",
         [exerciseName, majorMuscleName], undefined,
         (_, err) => { console.log(err); return true; }
     )
     )
+}
+export const retrieveExerciseMajorMuscleRelationships = (dbCallBack: SQLStatementCallback) => {
+    db.transaction(t => t.executeSql("SELECT * from exercise_major_muscle_one_to_many;", undefined,
+        dbCallBack, (_, err) => { console.log(err); return true; }))
+
 }
 export const deleteExerciseMajorMuscleRelationship = (exerciseName: string, majorMuscleName: string) => {
     db.transaction(t => t.executeSql(
@@ -100,7 +113,7 @@ export const deleteExerciseMajorMuscleRelationship = (exerciseName: string, majo
 
 export const createExercise = (exercise: Exercise, dbCallback?: SQLStatementCallback) => {
     db.transaction(t => t.executeSql("INSERT INTO exercise VALUES (?,?,?,?)",
-        [exercise.name,exercise.push_or_pull, exercise.description, exercise.imagesJson],
+        [exercise.name, exercise.push_or_pull, exercise.description, exercise.imagesJson],
         dbCallback, (_, err) => {
             console.log(err)
             return true;
@@ -108,14 +121,21 @@ export const createExercise = (exercise: Exercise, dbCallback?: SQLStatementCall
     ))
 }
 
-export const updateExercise = (exercise:Exercise,oldExerciseName:string,dbCallBack?:SQLStatementCallback)=>{
+export const retrieveExercises = (dbCallback: SQLStatementCallback) => {
+    db.transaction(t => t.executeSql(
+        "SELECT * from exercise", undefined, dbCallback,
+        (_, e) => { console.log(e); return true; }
+    ))
+}
+
+export const updateExercise = (exercise: Exercise, oldExerciseName: string, dbCallBack?: SQLStatementCallback) => {
     db.transaction(t => t.executeSql("UPDATE exercise SET name = ?, description = ?,imagesJson=?,push_or_pull=? where name = ?",
-      [exercise.name, exercise.description, exercise.imagesJson, exercise.push_or_pull, oldExerciseName],
-      dbCallBack,
-      (_, err) => {
-        console.log(err)
-        return true;
-      }))
+        [exercise.name, exercise.description, exercise.imagesJson, exercise.push_or_pull, oldExerciseName],
+        dbCallBack,
+        (_, err) => {
+            console.log(err)
+            return true;
+        }))
 }
 
 export const deleteExercise = (exerciseName: string, dbCallback: SQLStatementCallback) => {
@@ -128,6 +148,11 @@ export const deleteExercise = (exerciseName: string, dbCallback: SQLStatementCal
     ))
 }
 
+
+export const retrieveMajorMuscles = (dbCallback: SQLStatementCallback) => {
+    db.transaction(t => t.executeSql("SELECT * from major_muscle", undefined,
+        dbCallback, (_, err) => { console.log(err); return true; }))
+}
 export { resetTables, init, db }
 const commands = `
 CREATE TABLE IF NOT EXISTS "scheduled_item" (

@@ -6,16 +6,8 @@ import React, { Dispatch } from 'react'
 import _default from 'babel-plugin-transform-typescript-metadata'
 import { styles } from '../constants/styles'
 import { ButtonSetProps, DialogState } from '../types'
+import { ExerciseInformationText, CreateExerciseText, EditExerciseText, CreateScheduledItemText, ScheduledItemInformation, DuplicateScheduledItemText, EditScheduledItemText } from '../constants/strings'
 export function ButtonSet(props: any) {
-    //constant strings
-    const ExerciseInformationText = "Exercise Information"
-    const EditExerciseText = "Edit Exercise:"
-    const CreateExerciseText = "Create Exercise:"
-    const CreateScheduledItemText = "Create:"
-    const ScheduledItemInformation = "Information:"
-    const EditScheduledItemText: string = "Edit"
-    const DuplicateScheduledItemText: string = "Duplicate:"
-
     const buttonsSetProps: ButtonSetProps = props.buttonsSetProps
     const aExercise = props.aExercise
     const aScheduledItem = props.aScheduledItem
@@ -43,8 +35,8 @@ export function ButtonSet(props: any) {
                 <View style={styles.buttonsRow}>
                     <Button title="delete" onPress={() => deleteExerciseConfirmation(aExercise)} />
                     <Button title='Edit' onPress={() => { renderExerciseDialogForEdit() }} />
-                    <Button title='Cancel' onPress={() => cancelDialog()} />
                     <Button onPress={() => SetDialogState({ ...dialogState, isHistoryDialogVisible: true })} title="History and Pr" />
+                    <Button title='Cancel' onPress={() => cancelDialog()} />
                 </View>
             )
         case CreateExerciseText:
