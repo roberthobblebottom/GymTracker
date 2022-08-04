@@ -8,6 +8,7 @@ import Toast from 'react-native-simple-toast';
 import Layout from '../constants/Layout';
 import { Ionicons, MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 import { styles } from '../constants/styles';
+import { deleteScheduledItem } from '../dbhandler';
 /*
 Note:
 this.renderWeekDayNames is commented out from line 325 of ./node_modules/react-native-calendars/src/agenda/index.js
@@ -21,8 +22,19 @@ export function PlanScreen() {
   const scheduledItemState: ScheduledItemState = context.contextProps.scheduledItemState
   const setScheduledItemState: Dispatch<ScheduledItemState> = context.contextProps.setScheduledItemState
   const contextProps = context.contextProps
+
   const scheduledItems: ScheduledItem[] = scheduledItemState.scheduledItems;
+  const selectedScheduledItems: ScheduledItem[] = scheduledItemState.selectedScheduledItems
   const majorSetKeyword: string = scheduledItemState.filteredScheduledItemKeyword;
+
+  const handleCreate: Function = contextProps.renderScheduledItemDialogForCreate;
+  const handleSelected: Function = contextProps.renderScheduledItemDialogForViewing;
+  const fitlerScheduledItem: Function = contextProps.handleFilterScheduledItem;
+  const handlePlanHeader: Function = contextProps.handlePlanHeader;
+  const commonScheduledItemCRUD: Function = contextProps.commonScheduledItemCRUD
+  const setDialogState: Dispatch<DialogState> = contextProps.setDialogState;
+  const dialogState: DialogState = contextProps.dialogState;
+
   const a: { [key: string]: AgendaEntry[] } = {}
   if (scheduledItems.length > 0)
     scheduledItems.forEach(ms => {
@@ -32,15 +44,7 @@ export function PlanScreen() {
         [{ name: ms.id.toString(), height: 0, day: "" }];
       else a[ms.date.dateString].push({ name: ms.id.toString(), height: 0, day: "" })
     })
-  const selectedScheduledItems: ScheduledItem[] = scheduledItemState.selectedScheduledItems
-  const handleCreate: Function = contextProps.renderScheduledItemDialogForCreate;
-  const handleSelected: Function = contextProps.renderScheduledItemDialogForViewing;
-  const fitlerScheduledItem: Function = contextProps.handleFilterScheduledItem;
-  const handlePlanHeader: Function = contextProps.handlePlanHeader;
-  const deleteScheduledItemsWithoutStateUpdate: Function = contextProps.deleteScheduledItemWithoutStateUpdate;
-  const commonScheduledItemCRUD: Function = contextProps.commonScheduledItemCRUD
-  const setDialogState: Dispatch<DialogState> = contextProps.setDialogState;
-  const dialogState: DialogState = contextProps.dialogState;
+
   function selectItem(set: ScheduledItem) {
     let ssi = selectedScheduledItems.slice();
     if (ssi.find(e => e.id == set!.id) == undefined)
@@ -117,7 +121,7 @@ export function PlanScreen() {
         }}
 
         renderItem={(item, isFirst) => {
-          if (item === undefined || isFirst) return (<View><Text></Text></View>);
+          if (item === undefined || isFirst) return (<View></View>);
           let id = Number(item.name);
           let set: ScheduledItem | undefined = scheduledItems.find(element => {
             return element.id == id;
@@ -196,7 +200,8 @@ export function PlanScreen() {
           setDialogState({ ...dialogState, isCalendarDialogVisible: true })
           setScheduledItemState({ ...scheduledItemState, isMovingScheduledItems: true })
         }}>
-        <MaterialCommunityIcons style={{ bottom: "-14%", right: "-17%" }} name="file-move-outline" size={Layout.defaultMargin + 30} color="white" />
+        <MaterialCommunityIcons style={{ bottom: "-14%", right: "-17%" }} 
+        name="file-move-outline" size={Layout.defaultMargin + 30} color="white" />
       </Pressable>
 
       <Pressable
@@ -210,7 +215,8 @@ export function PlanScreen() {
           setDialogState({ ...dialogState, isCalendarDialogVisible: true });
         }}
       >
-        <Ionicons style={{ bottom: "-14%", right: "-17%" }} name="duplicate-outline" size={Layout.defaultMargin + 30} color="white" />
+        <Ionicons style={{ bottom: "-14%", right: "-17%" }}
+         name="duplicate-outline" size={Layout.defaultMargin + 30} color="white" />
       </Pressable>
 
       <Pressable
@@ -224,7 +230,8 @@ export function PlanScreen() {
           Alert.alert("confirmation", "Are you sure you like to delete all selected?", [{
             text: "Yes", onPress: () => {
               selectedScheduledItems.forEach(si => {
-                deleteScheduledItemsWithoutStateUpdate(si.id)
+                // deleteScheduledItemsWithoutStateUpdate(si.id)
+                deleteScheduledItem(si.id)
                 const i = scheduledItems.indexOf(si)
                 scheduledItems.splice(i, 1)
               })
@@ -234,7 +241,8 @@ export function PlanScreen() {
           }, { text: "No", onPress: () => { } }], { cancelable: true })
         }}
       >
-        <MaterialCommunityIcons style={{ bottom: "-14%", right: "-17%" }} name="delete" size={Layout.defaultMargin + 30} color="white" />
+        <MaterialCommunityIcons style={{ bottom: "-14%", right: "-17%" }} 
+        name="delete" size={Layout.defaultMargin + 30} color="white" />
       </Pressable>
 
       <Pressable
@@ -262,7 +270,7 @@ export function PlanScreen() {
         onPress={() => { handleCreate() }}
       >
         <Ionicons style={{ bottom: "-5%", right: "-10%" }} name="add-outline" size={Layout.defaultMargin + 40} color="white" />
-    </Pressable>
+      </Pressable>
 
       < TextInput
         style={styles.filterScheduledItemTextInput}
@@ -270,7 +278,6 @@ export function PlanScreen() {
         onChange={text => fitlerScheduledItem(text.nativeEvent.text)}
         value={majorSetKeyword}
       />
-
 
     </View>
   );

@@ -2,7 +2,8 @@ import * as SQLite from 'expo-sqlite';
 import Toast from 'react-native-simple-toast';
 import FileSystem from 'expo-file-system';
 import * as Asset from 'expo-asset';
-const db = SQLite. openDatabase('GymTracker.db');
+import { ScheduledItem } from './types';
+const db = SQLite.openDatabase('GymTracker.db');
 function init() {
     // resetTables();
     db.transaction(t =>
@@ -14,7 +15,7 @@ function init() {
             }
         ));
 }
- function createData(showResetAlert: boolean) {
+function createData(showResetAlert: boolean) {
     console.log("creating tables and inserting data");
     let splittedCommands: Array<string> = commands.split(";");
     splittedCommands.forEach(c => db.transaction(t => t.executeSql(c, undefined, undefined,
@@ -42,7 +43,40 @@ function resetTables() {
 //     );
 //     // return SQLite.openDatabase('GymTracker.db');
 //   }
-  
+export let deleteScheduledItem = (id: number) => {
+    db.transaction(t => t.executeSql("DELETE FROM scheduled_item where id= ?", [id],
+        undefined,
+        (_, err) => { console.log(err); return true; }
+    ))
+}
+
+export const createScheduledItem = (si: ScheduledItem) => {
+    db.transaction(t => {
+        t.executeSql(`INSERT INTO scheduled_item
+           (exercise,reps,percent_complete,sets,duration_in_seconds,weight,notes,date)  
+           VALUES(?,?,?,?,?,?,?,?)`,
+            [si.exercise.name, si.reps, si.percent_complete, si.sets,
+            si.duration_in_seconds, si.weight,
+            si.notes, JSON.stringify(si.date)],
+            undefined,
+            (_, e) => {
+                console.log(e)
+                //   cancelDialog()
+                return true
+            }
+        )
+    })
+}
+export const updateScheduledItem = (si: ScheduledItem) => {
+    db.transaction(t => t.executeSql(`UPDATE scheduled_item 
+    SET exercise=?,reps=?,percent_complete=?,sets=?,duration_in_seconds=?,weight=?,notes=?,date=? 
+    WHERE id=?`,
+        [si.exercise.name, si.reps, si.percent_complete, si.sets,
+        si.duration_in_seconds, si.weight,
+        si.notes, JSON.stringify(si.date), si.id],
+        undefined,
+        (_, err) => { console.log(err); return true; }))
+}
 export { resetTables, init, db };//TODO: remove dropTables in production.
 const commands = `
 CREATE TABLE IF NOT EXISTS "scheduled_item" (

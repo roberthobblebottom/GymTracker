@@ -69,7 +69,7 @@ const initialDialogState = {
   planHeader: "Plan " + d.getDate() + "-" + (d.getMonth() + 1) + "-" + d.getFullYear(),
   isExerciseHistory: true,
 }
-const iniitalContextProps: ContextProps = {
+const initalContextProps: ContextProps = {
   renderScheduledItemDialogForViewing: Function,
   renderScheduledItemDialogForCreate: Function,
   handleFilterScheduledItem: Function,
@@ -81,12 +81,10 @@ const iniitalContextProps: ContextProps = {
   renderExerciseDialogForCreate: Function,
   renderExerciseDialogForViewing: Function,
   handleFilterExercises: Function,
-  deleteScheduledItemWithoutStateUpdate: Function,
   commonScheduledItemCRUD: Function,
-  createScheduledItem2: Function,
+  createScheduledItemWithoutStateUpdate: Function,
   setDialogState: () => { },
   dialogState: initialDialogState,
-
 }
 
 //contexts
@@ -94,8 +92,8 @@ export const SettingsScreenContext = React.createContext({
   handleResetDB: () => { },
   handleExport: () => { }
 })
-export const ExerciseScreenContext = React.createContext({ contextProps: iniitalContextProps })
-export const ScheduledItemContext = React.createContext({ contextProps: iniitalContextProps })
+export const ExerciseScreenContext = React.createContext({ contextProps: initalContextProps })
+export const ScheduledItemContext = React.createContext({ contextProps: initalContextProps })
 
 export default function App() {
   const [exerciseState, setExerciseState] = useState<ExerciseState>(initialExerciseState)
@@ -212,12 +210,20 @@ export default function App() {
       majorMuscles: majorMuscles,
       scheduledItems: scheduledItemState.scheduledItems
     }
-    await Filesystem.writeAsStringAsync(
-      Filesystem.documentDirectory! + "GymTracker-Data.json",
-      JSON.stringify(exportData)
-    )
-    Alert.alert("Export Successful", "Export is located at " +
-      Filesystem.documentDirectory + "GymTracker-Data.json")
+
+//     const permissions = await StorageAccessFramework.requestDirectoryPermissionsAsync()
+
+//     if(!permissions.granted)
+// return
+
+
+
+    // await Filesystem.writeAsStringAsync(
+    //   Filesystem.documentDirectory! + "GymTracker-Data.json",
+    //   JSON.stringify(exportData)
+    // )
+    // Alert.alert("Export Successful", "Export is located at " +
+    //   Filesystem.documentDirectory + "GymTracker-Data.json")
   }
   function cancelDialog() {
     SetDialogState({ ...dialogState, isExDialogVisible: false, isCalendarDialogVisible: false, isPlanDialogVisible: false });
@@ -478,12 +484,12 @@ export default function App() {
     )
   };
 
-  function deleteScheduledItemsWithoutStateUpdate(id: number) {
-    db.transaction(t => t.executeSql("DELETE FROM scheduled_item where id= ?", [id],
-      undefined,
-      (_, err) => { console.log(err); return true; }
-    ))
-  }
+  // function deleteScheduledItemsWithoutStateUpdate(id: number) {
+  //   db.transaction(t => t.executeSql("DELETE FROM scheduled_item where id= ?", [id],
+  //     undefined,
+  //     (_, err) => { console.log(err); return true; }
+  //   ))
+  // }
 
   let deleteScheduledItem = (id: number) => {
     db.transaction(t => t.executeSql("DELETE FROM scheduled_item where id= ?", [id],
@@ -508,7 +514,6 @@ export default function App() {
 
   const updateScheduledItem = () => {
     const aScheduledItem = scheduledItemState.aScheduledItem
-
     if (dropDownExNameSelected == undefined || dropDownExNameSelected == "") {
       Toast.show("exercise must be selected")
       return;
@@ -544,35 +549,6 @@ export default function App() {
         return true;
       }))
 
-  }
-  const updateScheduledItemWithoutStateUpdate = (si: ScheduledItem) => {
-    db.transaction(t => t.executeSql(`UPDATE scheduled_item 
-    SET exercise=?,reps=?,percent_complete=?,sets=?,duration_in_seconds=?,weight=?,notes=?,date=? 
-    WHERE id=?`,
-      [si.exercise.name, si.reps, si.percent_complete, si.sets,
-      si.duration_in_seconds, si.weight,
-      si.notes, JSON.stringify(si.date), si.id],
-      undefined,
-      (_, err) => { console.log(err); return true; }))
-  }
-
-  function createScheduledItem2(si: ScheduledItem) {
-    console.log("2222")
-    db.transaction(t => {
-      t.executeSql(`INSERT INTO scheduled_item
-           (exercise,reps,percent_complete,sets,duration_in_seconds,weight,notes,date)  
-           VALUES(?,?,?,?,?,?,?,?)`,
-        [dropDownExNameSelected, si.reps, si.percent_complete, si.sets,
-          si.duration_in_seconds, si.weight,
-          si.notes, JSON.stringify(si.date)],
-        undefined,
-        (_, e) => {
-          console.log(e)
-          cancelDialog()
-          return true
-        }
-      )
-    })
   }
 
   function createScheduledItem() {
@@ -630,35 +606,38 @@ export default function App() {
   const buttonsSetProps = {
     cancelDialog: cancelDialog,
     deleteScheduledItemConfirmation: deleteScheduledItemConfirmation,
-    renderScheduledItemDialogForEdit: renderScheduledItemDialogForEdit,
     createScheduledItem: createScheduledItem,
     updateScheduledItem: updateScheduledItem,
-    renderScheduledItemDialogForViewing: renderScheduledItemDialogForViewing,
-    renderScheduledItemDialogForDuplication: renderScheduledItemDialogForDuplication,
     deleteExerciseConfirmation: deleteExerciseConfirmation,
-    renderExerciseDialogForEdit: renderExerciseDialogForEdit,
     createExercise: createExercise,
     updateExercise: updateExercise,
+
+    renderScheduledItemDialogForViewing: renderScheduledItemDialogForViewing,
+    renderScheduledItemDialogForDuplication: renderScheduledItemDialogForDuplication,
+    renderScheduledItemDialogForEdit: renderScheduledItemDialogForEdit,
+    renderExerciseDialogForEdit: renderExerciseDialogForEdit,
     renderExerciseDialogForViewing: renderExerciseDialogForViewing,
   };
 
   const contextProps: ContextProps = {
     renderScheduledItemDialogForViewing: renderScheduledItemDialogForViewing,
     renderScheduledItemDialogForCreate: renderScheduledItemDialogForCreate,
-    handleFilterScheduledItem: handleFilterScheduledItem,
-    handlePlanHeader: handlePlanHeader,
-    setScheduledItemState: setScheduledItemState,
-    scheduledItemState: scheduledItemState,
     renderExerciseDialogForCreate: renderExerciseDialogForCreate,
     renderExerciseDialogForViewing: renderExerciseDialogForViewing,
+
+    handleFilterScheduledItem: handleFilterScheduledItem,
+    handlePlanHeader: handlePlanHeader,
     handleFilterExercises: handleFilterExercises,
-    exerciseState: exerciseState,
-    setExerciseState: setExerciseState,
-    deleteScheduledItemWithoutStateUpdate: deleteScheduledItemsWithoutStateUpdate,
+
     commonScheduledItemCRUD: commonScheduledItemCRUD,
-    createScheduledItem2: createScheduledItem2,
-    setDialogState: SetDialogState,
+
+    scheduledItemState: scheduledItemState,
     dialogState: dialogState,
+    exerciseState: exerciseState,
+
+    setDialogState: SetDialogState,
+    setScheduledItemState: setScheduledItemState,
+    setExerciseState: setExerciseState,
   }
 
   return (
@@ -699,8 +678,7 @@ export default function App() {
           setDialogState={SetDialogState}
 
           commonScheduledItemCRUD={commonScheduledItemCRUD}
-          createScheduledItem2={createScheduledItem2}
-          updateScheduledItemWithoutStateUpdate={updateScheduledItemWithoutStateUpdate} />
+          />
         <SettingsScreenContext.Provider value={{
           handleResetDB: handleResetDB,
           handleExport: handleExport

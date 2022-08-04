@@ -112,9 +112,7 @@ export type ContextProps = {
   renderExerciseDialogForViewing: Function,
   renderExerciseDialogForCreate: Function
   handleFilterExercises: Function,
-  deleteScheduledItemWithoutStateUpdate: Function,
   commonScheduledItemCRUD: Function,
-  createScheduledItem2: Function,
   setDialogState: Dispatch<DialogState>,
   dialogState: DialogState,
 }

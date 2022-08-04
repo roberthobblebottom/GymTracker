@@ -4,6 +4,7 @@ import { styles } from "../constants/styles";
 import Layout from "../constants/Layout";
 import { Calendar } from "react-native-calendars";
 import { DialogState, ScheduledItem, ScheduledItemState } from "../types";
+import {createScheduledItem, updateScheduledItem} from '../dbhandler';
 export function SelectDateDialog(props: any) {
     const dialogState: DialogState = props.dialogState
     const scheduledItemState: ScheduledItemState = props.scheduledItemState
@@ -17,13 +18,12 @@ export function SelectDateDialog(props: any) {
 
     const selectedScheduledItems: ScheduledItem[] = scheduledItemState.selectedScheduledItems;
     const commonScheduledItemCRUD: Function = props.commonScheduledItemCRUD
-    const createScheduledItem2: Function = props.createScheduledItem2
-    const updateScheduledItemWithoutStateUpdate = props.updateScheduledItemWithoutStateUpdate
     const text = selectedScheduledItems.length > 0 ?
         isMovingScheduledItems
             ? "Select a date to move the scheduled item(s) to"
             : "Selected a date to duplicate the scheduled items(s) to"
         : "Select a date"
+
     return (
         <Modal visible={dialogState.isCalendarDialogVisible} animationType="fade" transparent={true} >
             <TouchableOpacity style={styles.overallDialog} onPressIn={() => setDialogState({ ...dialogState, isCalendarDialogVisible: false })
@@ -48,7 +48,7 @@ export function SelectDateDialog(props: any) {
                                                 return;
                                             }
                                         })
-                                        updateScheduledItemWithoutStateUpdate(s)
+                                        updateScheduledItem(s)
                                     })
                                     commonScheduledItemCRUD(si)
                                 }
@@ -58,7 +58,7 @@ export function SelectDateDialog(props: any) {
                                         let t = { ...e }
                                         t.id = Math.floor(Math.random() * (1000000000 - 10000) + 10000)//WARNING: May cause issues of clashes of scheduled item of the same number
                                         t.date = day
-                                        createScheduledItem2(t)
+                                        createScheduledItem(t)
                                         arr.push(t)
                                     })
                                     let si = arr.concat(scheduledItems)
