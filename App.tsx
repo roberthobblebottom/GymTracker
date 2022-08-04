@@ -8,8 +8,8 @@ import 'react-native-gesture-handler';
 import React, { useState, useEffect, Dispatch } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { init, db, resetTables, createScheduledItem, deleteScheduledItem, updateScheduledItem } from './dbhandler';
-import { ContextProps, DialogState, Emm, Exercise, ExerciseState, MajorMuscle, PushPullEnum, ScheduledItemState } from './types';
+import { init, db, resetTables, createScheduledItem, deleteScheduledItem, updateScheduledItem, createExerciseMajorMuscleRelationship, createExercise, deleteExerciseMajorMuscleRelationship, deleteExercise, updateExercise } from './dbhandler';
+import { ButtonSetProps, ContextProps, DialogState, Emm, Exercise, ExerciseState, MajorMuscle, PushPullEnum, ScheduledItemState } from './types';
 import { ScheduledItem } from './types';
 import Toast from 'react-native-simple-toast';
 import Colors from './constants/Colors';
@@ -277,60 +277,43 @@ export default function App() {
     Alert.alert(
       "Confirmation",
       "Are you sure you want to delete this exercise?",
-      [{ text: "Yes", onPress: () => deleteExercise(exercise) },
+      [{ text: "Yes", onPress: () => deleteExerciseWithStateUpdate(exercise) },
       { text: "No", onPress: () => renderExerciseDialogForViewing(exercise) }],//warning, recursive-
       { cancelable: true }
     )
   };
 
-  let deleteExercise = (exercise: Exercise) => {
+  let deleteExerciseWithStateUpdate = (exercise: Exercise) => {
     let selected: MajorMuscle[] = majorMuscles.filter(x => dropDownMajorMuscleNameSelected.includes(x.name))
-    selected.forEach(x =>
-      db.transaction(t => t.executeSql(
-        "DELETE FROM exercise_major_muscle_one_to_many WHERE exercise_name=? AND major_muscle_name=?",
-        [exercise.name, x.name], undefined,
-        (_, err) => { console.log(err); return true; }
-      ))
-    )
-    db.transaction(t => t.executeSql("DELETE FROM exercise where name= ?", [exercise.name],
-      () => {
-        let deletedName = exercise.name;
-        let es: Exercise[] = exerciseState.exercises.slice()
-        es.forEach((currentExercise, i) => {
-          if (currentExercise.name == deletedName) {
-            es.splice(i, 1)
-            return;
-          }
-        })
-        //correct way of removing element from a array for me. Not using delete keyword which leaves a undefined space
-        Toast.show("The exercise " + deletedName + " has is deleted.")
-        commonExercisesCRUD(es)
-      },
-      (_, err) => {
-        console.log(err)
-        return true;
-      }
-    ))
+    selected.forEach(x => deleteExerciseMajorMuscleRelationship(exercise.name, x.name))
+    deleteExercise(exercise.name, () => {
+      let deletedName = exercise.name;
+      let es: Exercise[] = exerciseState.exercises.slice()
+      es.forEach((currentExercise, i) => {
+        if (currentExercise.name == deletedName) {
+          es.splice(i, 1)
+          return;
+        }
+      })
+      //correct way of removing element from a array for me. Not using delete keyword which leaves a undefined space
+      Toast.show("The exercise " + deletedName + " has is deleted.")
+      commonExercisesCRUD(es)
+    })
   }
 
-  const updateExercise = () => {
+  const updateExerciseWithStateUpdate = () => {
     const aExercise = exerciseState.aExercise
     const oldExerciseName = exerciseState.oldExerciseName
     const pushPullDropDownValue = dropDownPushPullSelected
     let selected: MajorMuscle[] = majorMuscles.filter(x => dropDownMajorMuscleNameSelected.includes(x.name))
     let toBeUpdated = selected.filter(x => aExercise.major_muscles.includes(x))
     toBeUpdated.forEach(x => {
-      if (toBeUpdated != undefined) db.transaction(t => t.executeSql(
-        "INSERT INTO exercise_major_muscle_one_to_many (exercise_name,major_muscle_name) values (?,?)",
-        [aExercise.name, x.name],
-        undefined, (_, err) => { console.log(err); return true }
-      ))
+      if (toBeUpdated != undefined) createExerciseMajorMuscleRelationship(aExercise.name, x.name)
     })
     let toBeDeleted: MajorMuscle[] = selected.filter(x => !aExercise.major_muscles.includes(x))
-    toBeDeleted.forEach(x => db.transaction(t => t.executeSql("DELETE FROM exercise_major_muscle_one_to_many WHERE exercise_name =? AND major_muscle_name=?",
-      [aExercise.name, x.name], undefined, (_, err) => { console.log(err); return true; })))
-    db.transaction(t => t.executeSql("UPDATE exercise SET name = ?, description = ?,imagesJson=?,push_or_pull=? where name = ?",
-      [aExercise.name, aExercise.description, aExercise.imagesJson, pushPullDropDownValue, oldExerciseName],
+    toBeDeleted.forEach(x => deleteExerciseMajorMuscleRelationship(aExercise.name, x.name))
+    aExercise.push_or_pull = pushPullDropDownValue
+    updateExercise(aExercise, oldExerciseName,
       (_, result) => {
         let exerciseToBeUpdated: Exercise = {
           name: aExercise.name, description: aExercise.description, imagesJson: aExercise.imagesJson,
@@ -345,26 +328,15 @@ export default function App() {
         })
         commonExercisesCRUD(es)
         Toast.show("The exercise is updated.")
-      },
-      (_, err) => {
-        console.log(err)
-        return true;
-      }))
-
+      })
   }
 
-  function createExercise() {
+  function createExerciseWithStateUpdate() {
     const aExercise = exerciseState.aExercise;
     let selected: MajorMuscle[] = majorMuscles.filter(x => dropDownMajorMuscleNameSelected.includes(x.name))
-    selected.forEach(x =>
-      db.transaction(t => t.executeSql(
-        "INSERT INTO exercise_major_muscle_one_to_many (exercise_name, major_muscle_name)VALUES (?,?)",
-        [aExercise.name, x.name], undefined,
-        (_, err) => { console.log(err); return true; }
-      ))
-    )
-    db.transaction(t => t.executeSql("INSERT INTO exercise VALUES (?,?,?,?)",
-      [aExercise.name, aExercise.description, aExercise.imagesJson, dropDownPushPullSelected],
+    selected.forEach(x => createExerciseMajorMuscleRelationship(aExercise.name, x.name))
+    aExercise.push_or_pull = dropDownPushPullSelected
+    createExercise(aExercise,
       (_, result) => {
         const es: Exercise[] = exerciseState.exercises.slice()
         es.push({
@@ -373,11 +345,7 @@ export default function App() {
         })
         commonExercisesCRUD(es)
         Toast.show("The exercise " + aExercise.name + " is created.")
-      },
-      (_, err) => {
-        console.log(err)
-        return true;
-      }))
+      })
   }
 
   function handleFilterExercises(keyword: string) {
@@ -569,15 +537,14 @@ export default function App() {
     )
     setScheduledItemState({ ...scheduledItemState, filteredScheduledItems: filtered, filteredScheduledItemKeyword: keyword })
   }
-  const buttonsSetProps = {
+  const buttonsSetProps: ButtonSetProps = {
     cancelDialog: cancelDialog,
     deleteScheduledItemConfirmation: deleteScheduledItemConfirmation,
-    createScheduledItem: createScheduledItemWithStateUpdate,
-    updateScheduledItem: updateScheduledItemWithStateUpdate,
     deleteExerciseConfirmation: deleteExerciseConfirmation,
-    createExercise: createExercise,
-    updateExercise: updateExercise,
-
+    createExerciseWithStateUpdate: createExerciseWithStateUpdate,
+    updateExerciseWithStateUpdate: updateExerciseWithStateUpdate,
+    createScheduledItemWithStateUpdate:createScheduledItemWithStateUpdate,
+    updateScheduledItemWithStateUpdate:updateScheduledItemWithStateUpdate,
     renderScheduledItemDialogForViewing: renderScheduledItemDialogForViewing,
     renderScheduledItemDialogForDuplication: renderScheduledItemDialogForDuplication,
     renderScheduledItemDialogForEdit: renderScheduledItemDialogForEdit,
@@ -619,6 +586,8 @@ export default function App() {
           setDialogState={SetDialogState}
           setDropDownExNameSelected={setDropDownExNameSelected}
 
+          createExerciseWithStateUpdate={createExerciseWithStateUpdate}
+          updateExerciseWithStateUpdate={updateExerciseWithStateUpdate}
           buttonsSetProps={buttonsSetProps}
         />
         <ExerciseDialog
