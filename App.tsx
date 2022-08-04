@@ -43,8 +43,8 @@ export const initialExerciseState: ExerciseState = {
 };
 export const initialScheduledItem: ScheduledItem[] = [{
   id: 0, exercise: initialExerciseState.aExercise,
-  reps: 0, percent_complete: 0, sets: 0,
-  duration_in_seconds: 0, weight: 0, notes: "", date: initialDate
+  reps: 1, percent_complete: 0, sets: 1,
+  duration_in_seconds: 0, weight: 1, notes: "", date: initialDate
 }];
 export const initialScheduledItemState: ScheduledItemState = {
   scheduledItems: initialScheduledItem,
@@ -112,16 +112,15 @@ export default function App() {
       retrieveExercises((_, r) => {
         tempExercises = r.rows._array;
         tempExercises.forEach(ex => ex.major_muscles = initialMajorMuscles)
-        if (scheduledItemState.scheduledItems[0].exercise == initialExerciseState.aExercise)
+        if (scheduledItemState.scheduledItems[0].exercise == initialExerciseState.aExercise ||
+          scheduledItemState.scheduledItems == undefined)
           retrieveScheduledItems(
             (_, results) => {
               let tempScheduledItems: ScheduledItem[] = results.rows._array;
               let a = results.rows._array.slice()
               tempScheduledItems.forEach((ms, index) => {
                 ms.date = JSON.parse(ms.date.toString())
-                let t = tempExercises.find(ex => {
-                  return ex.name == a[index].exercise
-                })
+                const t = tempExercises.find(ex => ex.name == a[index].exercise)
                 tempScheduledItems[index].exercise = t!;
               })
               setScheduledItemState({
@@ -155,11 +154,11 @@ export default function App() {
   if (dialogState.isEditable) {
     textInputStyle = styles.textInputEditable
     numberInputStyle = styles.numberInputEditable
-    buttonStyle = styles.changeDateButtonEnabled
+    buttonStyle = styles.changeButtonEnabled
   } else {
     textInputStyle = styles.textInputViewOnly
     numberInputStyle = styles.numberInputViewOnly
-    buttonStyle = styles.changeDateButtonDisabled
+    buttonStyle = styles.changeButtonDisabled
   }
 
   const handleResetDB = () => {
@@ -260,6 +259,11 @@ export default function App() {
 
   const updateExerciseWithStateUpdate = () => {
     const aExercise = exerciseState.aExercise
+    console.log("111" + aExercise.name + "111")
+    if (aExercise.name.trim() == "") {
+      Toast.show("name cannot be empty")
+      return
+    }
     const oldExerciseName = exerciseState.oldExerciseName
     const pushPullDropDownValue = dropDownPushPullSelected
     let selected: MajorMuscle[] = majorMuscles.filter(x => dropDownMajorMuscleNameSelected.includes(x.name))
@@ -288,6 +292,10 @@ export default function App() {
 
   function createExerciseWithStateUpdate() {
     const aExercise = exerciseState.aExercise;
+    if (aExercise.name == "") {
+      Toast.show("name cannot be empty")
+      return
+    }
     let selected: MajorMuscle[] = majorMuscles.filter(x => dropDownMajorMuscleNameSelected.includes(x.name))
     selected.forEach(x => createExerciseMajorMuscleRelationship(aExercise.name, x.name))
 
@@ -324,7 +332,7 @@ export default function App() {
   //Scheduled Item Functions: 
   //renders:
   function renderScheduledItemDialogForViewing(scheduledItem: ScheduledItem) {
-    buttonStyle = styles.changeDateButtonDisabled;
+    buttonStyle = styles.changeButtonDisabled;
     textInputStyle = styles.textInputViewOnly;
     numberInputStyle = styles.numberInputViewOnly;
     setScheduledItemState({ ...scheduledItemState, aScheduledItem: scheduledItem })
@@ -340,7 +348,7 @@ export default function App() {
   }
 
   function commonLogicForScheduledItemEditAndDuplication(dialogText: string) {
-    buttonStyle = styles.changeDateButtonEnabled;
+    buttonStyle = styles.changeButtonEnabled;
     textInputStyle = styles.textInputEditable;
     setScheduledItemState({ ...scheduledItemState, })
     SetDialogState({
@@ -352,16 +360,8 @@ export default function App() {
     setDropDownExNameSelected(scheduledItemState.aScheduledItem.exercise.name)
   }
 
-  const renderScheduledItemDialogForEdit = () => {
-    commonLogicForScheduledItemEditAndDuplication(EditScheduledItemText)
-  }
-
-  const renderScheduledItemDialogForDuplication = () => {
-    commonLogicForScheduledItemEditAndDuplication(DuplicateScheduledItemText)
-  }
-
   function renderScheduledItemDialogForCreate() {
-    buttonStyle = styles.changeDateButtonEnabled;
+    buttonStyle = styles.changeButtonEnabled;
     textInputStyle = styles.textInputEditable;
     numberInputStyle = styles.numberInputEditable;
     setScheduledItemState({ ...scheduledItemState, aScheduledItem: initialScheduledItem[0] })
@@ -373,11 +373,11 @@ export default function App() {
       isDropDownOpen: false,
     })
     setDropDownExNameSelected(exerciseState.exercises[0].name)
-    let parts: string[] = dialogState.planHeader.split(" ")[1].split("-")
-    let monthNumber: number = Number(parts[1])
-    let month: string = monthNumber < 10 ? "0" + monthNumber.toString() : monthNumber.toString()
-    let day: string = Number(parts[0]) < 10 ? "0" + parts[0] : parts[0];
-    let date: DateData = {
+    const parts: string[] = dialogState.planHeader.split(" ")[1].split("-")
+    const monthNumber: number = Number(parts[1])
+    const month: string = monthNumber < 10 ? "0" + monthNumber.toString() : monthNumber.toString()
+    const day: string = Number(parts[0]) < 10 ? "0" + parts[0] : parts[0];
+    const date: DateData = {
       year: Number(parts[2]), month: monthNumber, day: Number(parts[0]), timestamp: 0,
       dateString: parts[2] + "-" + month + "-" + day
     }
@@ -452,7 +452,6 @@ export default function App() {
   }
 
   function createScheduledItemWithStateUpdate() {
-    let e1: Exercise
     const aScheduledItem = scheduledItemState.aScheduledItem
     exerciseState.exercises.forEach(e => {
       if (e.name == dropDownExNameSelected) {
@@ -474,6 +473,7 @@ export default function App() {
   }
 
   function handleFilterScheduledItem(keyword: string) {
+    console.log("here")
     let filtered = scheduledItemState.scheduledItems.filter(si => {
       let sec = si.duration_in_seconds % 60;
       let min = Math.floor(si.duration_in_seconds / 60)
@@ -501,8 +501,8 @@ export default function App() {
     createScheduledItemWithStateUpdate: createScheduledItemWithStateUpdate,
     updateScheduledItemWithStateUpdate: updateScheduledItemWithStateUpdate,
     renderScheduledItemDialogForViewing: renderScheduledItemDialogForViewing,
-    renderScheduledItemDialogForDuplication: renderScheduledItemDialogForDuplication,
-    renderScheduledItemDialogForEdit: renderScheduledItemDialogForEdit,
+    renderScheduledItemDialogForDuplication: () => commonLogicForScheduledItemEditAndDuplication(DuplicateScheduledItemText),
+    renderScheduledItemDialogForEdit: () => commonLogicForScheduledItemEditAndDuplication(EditScheduledItemText),
     renderExerciseDialogForEdit: renderExerciseDialogForEdit,
     renderExerciseDialogForViewing: renderExerciseDialogForViewing,
   };
@@ -569,10 +569,7 @@ export default function App() {
 
           commonScheduledItemCRUD={commonScheduledItemCRUD}
         />
-        <SettingsScreenContext.Provider value={{
-          handleResetDB: handleResetDB,
-          handleExport: handleExport
-        }}>
+        <SettingsScreenContext.Provider value={{ handleResetDB: handleResetDB, handleExport: handleExport }}>
           <ExerciseScreenContext.Provider value={{ contextProps: contextProps }}>
             <ScheduledItemContext.Provider value={{ contextProps: contextProps }}>
               <Tab.Navigator

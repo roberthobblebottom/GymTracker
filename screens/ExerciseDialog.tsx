@@ -60,11 +60,11 @@ export function ExerciseDialog(props: any) {
     if (dialogState.isEditable) {
         textInputStyle = styles.textInputEditable
         numberInputStyle = styles.numberInputEditable
-        buttonStyle = styles.changeDateButtonEnabled
+        buttonStyle = styles.changeButtonEnabled
     } else {
         textInputStyle = styles.textInputViewOnly
         numberInputStyle = styles.numberInputViewOnly
-        buttonStyle = styles.changeDateButtonDisabled
+        buttonStyle = styles.changeButtonDisabled
     }
 
     return (

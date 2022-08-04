@@ -6,7 +6,7 @@ export const bases = StyleSheet.create({
   textInputBase: {
     fontSize: Layout.defaultFontSize,
     color: "black", marginTop: -5,
-    justifyContent: "flex-end", flex: 1, textAlign: "right", paddingRight: 5
+    justifyContent: "flex-end", flex: 1,  paddingRight: 5
   },
   numberTextInput: {
     height: 30,
@@ -21,6 +21,7 @@ export const bases = StyleSheet.create({
     height: 30,
     marginStart: 7,
     marginBottom: 7,
+    marginLeft:0,
     elevation: 4,
     // Material design blue from https://material.google.com/style/color.html#color-color-palette
     ...Platform.select({
@@ -81,11 +82,11 @@ export const styles = StyleSheet.create({
     backgroundColor: "white",
     ...bases.textInputBase
   },
-  changeDateButtonEnabled: {
+  changeButtonEnabled: {
     backgroundColor: '#2196F3',
     ...bases.changeDateButtonBase
   },
-  changeDateButtonDisabled: {
+  changeButtonDisabled: {
     backgroundColor: Colors.light.altBackground,
     ...bases.changeDateButtonBase
   }

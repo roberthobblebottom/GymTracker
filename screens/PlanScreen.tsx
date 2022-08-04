@@ -86,7 +86,7 @@ export function PlanScreen() {
             </View>);
         }}
         renderDay={(date: DateData, item) => {
-          if (item === undefined || date === undefined) return (<View><Text></Text></View>);
+          if (item === undefined || date === undefined) return (<View></View>);
           let id = Number(item.name);
           let set: ScheduledItem | undefined = scheduledItems.find(element => {
             return element.id == id;
