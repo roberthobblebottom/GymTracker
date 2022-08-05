@@ -105,21 +105,23 @@ export function ExerciseDialog(props: any) {
                             }}
                             editable={dialogState.isEditable} />
                     </View>
-                    <View style={styles.dialogRow}>
-                        <Text style={{ fontSize: Layout.defaultFontSize }}>Push Or Pull: </Text>
+                    <View style={{...styles.dialogRow}}>
+                        {/* <Text style={{ fontSize: Layout.defaultFontSize,alignSelf:'flex-start' }}>Push Or Pull: </Text> */}
                         <DropDownPicker
                             style={{
-                                width: "100%", minHeight: 30,
+                              minHeight: 30,
                                 transform: [{ rotateX: "180deg" }],
-                                backgroundColor: Colors.light.altBackground, borderWidth: 0, borderRadius: 0, maxWidth: 100
+                                backgroundColor: Colors.light.altBackground, borderWidth: 0, borderRadius: 0, 
                             }}
                             disabledStyle={{ borderWidth: 0, backgroundColor: "white" }}
                             dropDownContainerStyle={{
+                                alignSelf:'flex-end',
                                 transform: [{ rotateX: "180deg" }],
                                 backgroundColor: Colors.light.altBackground, borderWidth: 0,
-                                borderRadius: 0, minHeight: 500, maxWidth: 100
+                                borderRadius: 0, minHeight: 500,borderTopWidth:1,borderTopColor:"white"
                             }}
-                            textStyle={{ fontSize: Layout.defaultFontSize, transform: [{ rotateX: "180deg" }] }}
+
+                            textStyle={{ fontSize: Layout.defaultFontSize, transform: [{ rotateX: "180deg" }],textAlign:'right' }}
                             searchTextInputStyle={{ borderWidth: 0, zIndex: -1 }}
                             placeholderStyle={{ color: "#9E9E9E" }}
                             items={[
@@ -148,7 +150,7 @@ export function ExerciseDialog(props: any) {
                                 backgroundColor: Colors.light.altBackground, borderWidth: 0,
                                 borderRadius: 0, minHeight: 500,
                             }}
-                            textStyle={{ fontSize: Layout.defaultFontSize, transform: [{ rotateX: "180deg" }] }}
+                            textStyle={{ fontSize: Layout.defaultFontSize, transform: [{ rotateX: "180deg" }],textAlign:'right' }}
                             searchTextInputStyle={{ borderWidth: 0, zIndex: -1 }}
                             placeholderStyle={{ color: "#9E9E9E" }}
                             showBadgeDot={false}

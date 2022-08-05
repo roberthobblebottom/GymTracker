@@ -1,10 +1,10 @@
 import {
-    View, Button
+    View, Pressable, Text
 } from 'react-native'
 import 'react-native-gesture-handler'
 import React, { Dispatch } from 'react'
 import _default from 'babel-plugin-transform-typescript-metadata'
-import { styles } from '../constants/styles'
+import { bases, styles } from '../constants/styles'
 import { ButtonSetProps, DialogState } from '../types'
 import { ExerciseInformationText, CreateExerciseText, EditExerciseText, CreateScheduledItemText, ScheduledItemInformation, DuplicateScheduledItemText, EditScheduledItemText } from '../constants/strings'
 export function ButtonSet(props: any) {
@@ -33,48 +33,54 @@ export function ButtonSet(props: any) {
         case ExerciseInformationText:
             return (
                 <View style={styles.buttonsRow}>
-                    <Button title="delete" onPress={() => deleteExerciseConfirmation(aExercise)} />
-                    <Button title='Edit' onPress={() => { renderExerciseDialogForEdit() }} />
-                    <Button onPress={() => SetDialogState({ ...dialogState, isHistoryDialogVisible: true })} title="History and Pr" />
-                    <Button title='Cancel' onPress={() => cancelDialog()} />
+                    <Pressable style={styles.buttonSet} onPress={() => deleteExerciseConfirmation(aExercise)} ><Text style={styles.buttonFont} >DELETE</Text></Pressable>
+                    <Pressable style={styles.buttonSet} onPress={() => { renderExerciseDialogForEdit() }} ><Text style={styles.buttonFont}>EDIT</Text></Pressable>
+                    <Pressable style={styles.buttonSet} onPress={() => SetDialogState({ ...dialogState, isHistoryDialogVisible: true })} ><Text style={styles.buttonFont}>HISTORY AND PR</Text></Pressable>
+                    <Pressable style={styles.buttonSet} onPress={() => cancelDialog()} ><Text style={styles.buttonFont}>CANCEL</Text></Pressable>
                 </View>
             )
         case CreateExerciseText:
             return (
                 <View style={styles.buttonsRow}>
-                    <Button title='Save' onPress={() => createExercise()}></Button>
-                    <Button title='Cancel' onPress={() => cancelDialog()} />
+                    <Pressable style={styles.buttonSet} onPress={() => createExercise()}><Text style={styles.buttonFont}>SAVE</Text></Pressable>
+                    <Pressable style={styles.buttonSet} onPress={() => cancelDialog()} >  <Text style={styles.buttonFont}>CANCEL</Text>  </Pressable>
                 </View>
             )
         case EditExerciseText:
             return (
                 <View style={styles.buttonsRow}>
-                    <Button title='Save' onPress={() => updateExercise()}></Button>
-                    <Button title='Back' onPress={() => renderExerciseDialogForViewing(aExercise)} />
-                    <Button title='Cancel' onPress={() => cancelDialog()} />
-                </View>
+                    <Pressable style={styles.buttonSet} onPress={() => updateExercise()}><Text style={styles.buttonFont}>SAVE</Text></Pressable>
+                    <Pressable style={styles.buttonSet} onPress={() => renderExerciseDialogForViewing(aExercise)} >
+                        <Text style={styles.buttonFont}>BACK</Text> </Pressable >
+                    <Pressable style={styles.buttonSet} onPress={() => cancelDialog()} >
+                        <Text style={styles.buttonFont}>CANCEL</Text></Pressable >
+                </View >
             )
         case CreateScheduledItemText:
             return (
                 <View style={styles.buttonsRow}>
-                    <Button title='Save' onPress={() =>createScheduledItemWithStateUpdate()}></Button>
-                    <Button title='Cancel' onPress={() => cancelDialog()} />
-                </View>
+                    <Pressable style={styles.buttonSet} onPress={() => createScheduledItemWithStateUpdate()}><Text style={styles.buttonFont}>SAVE</Text></Pressable>
+                    <Pressable style={styles.buttonSet} onPress={() => cancelDialog()} ><Text style={styles.buttonFont}>CANCEL</Text></Pressable >
+                </View >
             )
         case ScheduledItemInformation:
             return (
                 <View style={styles.buttonsRow}>
-                    <Button title="delete" onPress={() => deleteScheduledItemConfirmation(aScheduledItem)} />
-                    <Button title='Edit' onPress={() => { renderScheduledItemDialogForEdit() }} />
-                    <Button title="duplicate" onPress={() => { renderScheduledItemDialogForDuplication() }} />
-                    <Button title='Cancel' onPress={() => cancelDialog()} />
-                </View>
+                    <Pressable style={styles.buttonSet} onPress={() => deleteScheduledItemConfirmation(aScheduledItem)} >
+                        <Text style={styles.buttonFont}>DELETE</Text></Pressable>
+                    <Pressable style={styles.buttonSet} onPress={() => { renderScheduledItemDialogForEdit() }} >
+                        <Text style={styles.buttonFont}>EDIT</Text></Pressable >
+                    <Pressable style={styles.buttonSet} onPress={() => { renderScheduledItemDialogForDuplication() }} >
+                        <Text style={styles.buttonFont}>DUPLICATE</Text></Pressable >
+                    <Pressable style={styles.buttonSet} onPress={() => cancelDialog()} >
+                        <Text style={styles.buttonFont}>CANCEL</Text></Pressable >
+                </View >
             )
         case DuplicateScheduledItemText:
         case EditScheduledItemText:
             return (
                 <View style={styles.buttonsRow}>
-                    <Button title='Save' onPress={() => {
+                    <Pressable style={styles.buttonSet} onPress={() => {
                         switch (dialogText) {
                             case EditScheduledItemText:
                                 updateScheduledItemWithStateUpdate()
@@ -83,10 +89,13 @@ export function ButtonSet(props: any) {
                                 createScheduledItemWithStateUpdate()
                                 break
                         }
-                    }}/>
-                    <Button title='Back' onPress={() => renderScheduledItemDialogForViewing(aScheduledItem)} />
-                    <Button title='Cancel' onPress={() => cancelDialog()} />
-                </View>
+                    }}>
+                        <Text style={styles.buttonFont}>SAVE</Text></Pressable>
+                    <Pressable style={styles.buttonSet} onPress={() => renderScheduledItemDialogForViewing(aScheduledItem)} >
+                        <Text style={styles.buttonFont}>BACK</Text></Pressable>
+                    <Pressable style={styles.buttonSet} onPress={() => cancelDialog()} >
+                        <Text style={styles.buttonFont}>CANCEL</Text></Pressable>
+                </View >
             )
         default: return (<View></View>)
     }

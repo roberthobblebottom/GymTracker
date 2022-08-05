@@ -43,16 +43,19 @@ function ExercisesScreen() {
         onChange={text => handleFilterExercises(text.nativeEvent.text)}
         value={filteredKeyword}
       />
+      <View style={{bottom:20,end:20,position:'absolute'}}>
+
       <TouchableOpacity
         style={{
           ...styles.planScreenPressable,
           backgroundColor: Colors.light.tint,
-          bottom: "5%",
+        
         }}
         onPress={() => handleShowCreate()}
       >
         <Ionicons style={{bottom:"-5%",right:"-10%"}} name="add-outline" size={Layout.defaultMargin+40} color="white"/>
       </TouchableOpacity>
+      </View>
     </View>
   );
 }

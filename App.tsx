@@ -130,7 +130,7 @@ export default function App() {
               })
             })
         setExerciseState({
-          ...exerciseState,exercises: tempExercises, filteredExercises: tempExercises
+          ...exerciseState, exercises: tempExercises, filteredExercises: tempExercises
         })
       })
     if (majorMuscles[0] == initialMajorMuscles[0])
@@ -149,15 +149,13 @@ export default function App() {
   }, [scheduledItemState, exerciseState, majorMuscles, emm])
   init()
 
-  let textInputStyle, numberInputStyle, buttonStyle;
+  let textInputStyle, numberInputStyle 
   if (dialogState.isEditable) {
     textInputStyle = styles.textInputEditable
     numberInputStyle = styles.numberInputEditable
-    buttonStyle = styles.changeButtonEnabled
   } else {
     textInputStyle = styles.textInputViewOnly
     numberInputStyle = styles.numberInputViewOnly
-    buttonStyle = styles.changeButtonDisabled
   }
 
   const handleResetDB = () => {
@@ -194,11 +192,9 @@ export default function App() {
     setDropDownPushPullSelected(exercise.push_or_pull)
     SetDialogState({
       ...dialogState,
-      isExDialogVisible: true,
-      openPushPullDropDown: false,
+      isExDialogVisible: true, openPushPullDropDown: false,
       dialogText: ExerciseInformationText,
-      isEditable: false,
-      isDropDownOpen: false,
+      isEditable: false, isDropDownOpen: false,
     });
   }
 
@@ -213,11 +209,8 @@ export default function App() {
     textInputStyle = styles.textInputEditable;
     SetDialogState({
       ...dialogState,
-      isExDialogVisible: true,
-      openPushPullDropDown: false,
-      dialogText: CreateExerciseText,
-      isEditable: true,
-      isDropDownOpen: false
+      isExDialogVisible: true, openPushPullDropDown: false,
+      dialogText: CreateExerciseText, isEditable: true, isDropDownOpen: false
     });
     setDropDownPushPullSelected(PushPullEnum.Push)
   }
@@ -272,7 +265,7 @@ export default function App() {
     toBeDeleted.forEach(x => deleteExerciseMajorMuscleRelationship(aExercise.name, x.name))
     aExercise.push_or_pull = pushPullDropDownValue
     updateExercise(aExercise, oldExerciseName,
-      (_, result) => {
+      () => {
         const exerciseToBeUpdated: Exercise = {
           name: aExercise.name, description: aExercise.description, imagesJson: aExercise.imagesJson,
           major_muscles: selected, push_or_pull: dropDownPushPullSelected
@@ -331,45 +324,35 @@ export default function App() {
   //Scheduled Item Functions: 
   //renders:
   function renderScheduledItemDialogForViewing(scheduledItem: ScheduledItem) {
-    buttonStyle = styles.changeButtonDisabled;
     textInputStyle = styles.textInputViewOnly;
     numberInputStyle = styles.numberInputViewOnly;
     setScheduledItemState({ ...scheduledItemState, aScheduledItem: scheduledItem })
     SetDialogState({
       ...dialogState,
-      isEditable: false,
-      dialogText: ScheduledItemInformation,
-      isExDialogVisible: false,
-      openPushPullDropDown: false,
-      isPlanDialogVisible: true
+      isEditable: false, dialogText: ScheduledItemInformation,
+      isExDialogVisible: false, openPushPullDropDown: false, isPlanDialogVisible: true
     })
     setDropDownExNameSelected(scheduledItem.exercise.name)
   }
 
   function commonLogicForScheduledItemEditAndDuplication(dialogText: string) {
-    buttonStyle = styles.changeButtonEnabled;
     textInputStyle = styles.textInputEditable;
     setScheduledItemState({ ...scheduledItemState, })
     SetDialogState({
-      ...dialogState,
-      isEditable: true,
-      isDropDownOpen: false,
-      dialogText: dialogText
+      ...dialogState, isEditable: true,
+      isDropDownOpen: false, dialogText: dialogText
     });
     setDropDownExNameSelected(scheduledItemState.aScheduledItem.exercise.name)
   }
 
   function renderScheduledItemDialogForCreate() {
-    buttonStyle = styles.changeButtonEnabled;
     textInputStyle = styles.textInputEditable;
     numberInputStyle = styles.numberInputEditable;
     setScheduledItemState({ ...scheduledItemState, aScheduledItem: initialScheduledItem[0] })
     SetDialogState({
       ...dialogState,
-      isEditable: true,
-      dialogText: CreateScheduledItemText,
-      isPlanDialogVisible: true,
-      isDropDownOpen: false,
+      isEditable: true, dialogText: CreateScheduledItemText,
+      isPlanDialogVisible: true, isDropDownOpen: false,
     })
     setDropDownExNameSelected(exerciseState.exercises[0].name)
     const parts: string[] = dialogState.planHeader.split(" ")[1].split("-")
