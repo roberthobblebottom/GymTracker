@@ -56,9 +56,10 @@ export function PlanScreen() {
     setScheduledItemState({ ...scheduledItemState, selectedScheduledItems: ssi })
   }
   return (
+    <View style={{elevation:0,flex:1}}>
     <View style={{
-      flexDirection: "column", flex: 1,
-      justifyContent: 'space-evenly', display: "flex",
+      width:'100%',
+      height:'100%' 
     }}>
       <Agenda items={a}
         showOnlySelectedDayItems={true}
@@ -103,7 +104,7 @@ export function PlanScreen() {
           let dateParts: string[] = dateString.split(" ");
           let dateLabelToShow = dateParts[1] + " " + dateParts[2]
           let bgc;
-          if (selectedScheduledItems.indexOf(set) > -1) bgc = { backgroundColor: Colors.light.tint }
+          if (selectedScheduledItems.indexOf(set) > -1) bgc = { backgroundColor: "gray" }
           else bgc = {}
           return (
             <View style={{ ...styles.listStyle, ...bgc }}>
@@ -162,123 +163,119 @@ export function PlanScreen() {
           );
         }}
       />
-
-      <Pressable
-        style={{
-          ...styles.planScreenPressable,
-          backgroundColor: "blue",
-          bottom: '65%',
-          display: selectedScheduledItems.length > 0 ? "flex" : "none"
-        }}
-        onPress={() => {
-          let parts: string[] = dialogState.planHeader.split(" ")[1].split("-")
-          let monthNumber: number = Number(parts[1])
-          let month: string = monthNumber < 10 ? "0" + monthNumber.toString() : monthNumber.toString()
-          let day: string = Number(parts[0]) < 10 ? "0" + parts[0] : parts[0];
-          let date: DateData = {
-            year: Number(parts[2]), month: monthNumber, day: Number(parts[0]), timestamp: 0,
-            dateString: parts[2] + "-" + month + "-" + day
-          }
-          let selectedDateScheduledItems = scheduledItems.filter(si => si.date.dateString == date.dateString)
-          selectedDateScheduledItems.forEach(si => {
-            if (!selectedScheduledItems.includes(si))
-              selectedScheduledItems.push(si)
-          })
-          setScheduledItemState({ ...scheduledItemState, selectedScheduledItems: [...selectedScheduledItems] })//not tested
-          setScheduledItemState({ ...scheduledItemState, })
-        }}>
-        <MaterialIcons style={{ bottom: "-14%", right: "-17%" }} name="select-all" size={Layout.defaultMargin + 30} color="white" />
-      </Pressable>
-
-      <Pressable
-        style={{
-          ...styles.planScreenPressable,
-          bottom: '55%',
-          display: selectedScheduledItems.length > 0 ? "flex" : "none"
-        }}
-        onPress={() => {
-          setDialogState({ ...dialogState, isCalendarDialogVisible: true })
-          setScheduledItemState({ ...scheduledItemState, isMovingScheduledItems: true })
-        }}>
-        <MaterialCommunityIcons style={{ bottom: "-14%", right: "-17%" }} 
-        name="file-move-outline" size={Layout.defaultMargin + 30} color="white" />
-      </Pressable>
-
-      <Pressable
-        style={{
-          ...styles.planScreenPressable,
-          backgroundColor: "green",
-          bottom: '45%',
-          display: selectedScheduledItems.length > 0 ? "flex" : "none"
-        }}
-        onPress={() => {
-          setDialogState({ ...dialogState, isCalendarDialogVisible: true });
-        }}
-      >
-        <Ionicons style={{ bottom: "-14%", right: "-17%" }}
-         name="duplicate-outline" size={Layout.defaultMargin + 30} color="white" />
-      </Pressable>
-
-      <Pressable
-        style={{
-          ...styles.planScreenPressable,
-          backgroundColor: "red",
-          bottom: '35%',
-          display: selectedScheduledItems.length > 0 ? "flex" : "none"
-        }}
-        onPress={() => {
-          Alert.alert("confirmation", "Are you sure you like to delete all selected?", [{
-            text: "Yes", onPress: () => {
-              selectedScheduledItems.forEach(si => {
-                deleteScheduledItem(si.id)
-                const i = scheduledItems.indexOf(si)
-                scheduledItems.splice(i, 1)
-              })
-              setScheduledItemState({ ...scheduledItemState, selectedScheduledItems: [] })
-              commonScheduledItemCRUD(scheduledItems)
-            }
-          }, { text: "No", onPress: () => { } }], { cancelable: true })
-        }}
-      >
-        <MaterialCommunityIcons style={{ bottom: "-14%", right: "-17%" }} 
-        name="delete" size={Layout.defaultMargin + 30} color="white" />
-      </Pressable>
-
-      <Pressable
-        style={{
-          ...styles.planScreenPressable,
-          backgroundColor: "orange",
-          bottom: '25%',
-          display: selectedScheduledItems.length > 0 ? "flex" : "none"
-        }}
-        onPress={() => { setScheduledItemState({ ...scheduledItemState, selectedScheduledItems: [] }) }}
-      >
-        <MaterialCommunityIcons
-          style={{ bottom: "-14%", right: "-17%" }}
-          name="selection-remove"
-          size={Layout.defaultMargin + 30}
-          color="white" />
-      </Pressable>
-
-      <Pressable
-        style={{
-          ...styles.planScreenPressable,
-          backgroundColor: Colors.light.tint,
-          bottom: '15%',
-        }}
-        onPress={() => { handleCreate() }}
-      >
-        <Ionicons style={{ bottom: "-5%", right: "-10%" }} name="add-outline" size={Layout.defaultMargin + 40} color="white" />
-      </Pressable>
-
-      < TextInput
+         < TextInput
         style={styles.filterScheduledItemTextInput}
         placeholder="Type here to filter items per day..."
         onChange={text => fitlerScheduledItem(text.nativeEvent.text)}
         value={majorSetKeyword}
       />
+      </View>
+      <View style={{position:'absolute',end:20,bottom:20}}>
+        <Pressable
+          style={{
+            ...styles.planScreenPressable,
+            backgroundColor: "blue",
+            display: selectedScheduledItems.length > 0 ? "flex" : "none"
+          }}
+          onPress={() => {
+            let parts: string[] = dialogState.planHeader.split(" ")[1].split("-")
+            let monthNumber: number = Number(parts[1])
+            let month: string = monthNumber < 10 ? "0" + monthNumber.toString() : monthNumber.toString()
+            let day: string = Number(parts[0]) < 10 ? "0" + parts[0] : parts[0];
+            let date: DateData = {
+              year: Number(parts[2]), month: monthNumber, day: Number(parts[0]), timestamp: 0,
+              dateString: parts[2] + "-" + month + "-" + day
+            }
+            let selectedDateScheduledItems = scheduledItems.filter(si => si.date.dateString == date.dateString)
+            selectedDateScheduledItems.forEach(si => {
+              if (!selectedScheduledItems.includes(si))
+                selectedScheduledItems.push(si)
+            })
+            setScheduledItemState({ ...scheduledItemState, selectedScheduledItems: [...selectedScheduledItems] })//not tested
+            setScheduledItemState({ ...scheduledItemState, })
+          }}>
+          <MaterialIcons style={{ bottom: "-14%", right: "-17%" }} name="select-all" size={Layout.defaultMargin + 30} color="white" />
+        </Pressable>
 
-    </View>
+        <Pressable
+          style={{
+            ...styles.planScreenPressable,
+            backgroundColor: "grey",
+            display: selectedScheduledItems.length > 0 ? "flex" : "none"
+          }}
+          onPress={() => {
+            setDialogState({ ...dialogState, isCalendarDialogVisible: true })
+            setScheduledItemState({ ...scheduledItemState, isMovingScheduledItems: true })
+          }}>
+          <MaterialCommunityIcons style={{ bottom: "-14%", right: "-17%" }}
+            name="file-move-outline" size={Layout.defaultMargin + 30} color="white" />
+        </Pressable>
+
+        <Pressable
+          style={{
+            ...styles.planScreenPressable,
+            backgroundColor: "green",
+            display: selectedScheduledItems.length > 0 ? "flex" : "none"
+          }}
+          onPress={() => {
+            setDialogState({ ...dialogState, isCalendarDialogVisible: true });
+          }}
+        >
+          <Ionicons style={{ bottom: "-14%", right: "-17%" }}
+            name="duplicate-outline" size={Layout.defaultMargin + 30} color="white" />
+        </Pressable>
+
+        <Pressable
+          style={{
+            ...styles.planScreenPressable,
+            backgroundColor: "red",
+            display: selectedScheduledItems.length > 0 ? "flex" : "none"
+          }}
+          onPress={() => {
+            Alert.alert("confirmation", "Are you sure you like to delete all selected?", [{
+              text: "Yes", onPress: () => {
+                selectedScheduledItems.forEach(si => {
+                  deleteScheduledItem(si.id)
+                  const i = scheduledItems.indexOf(si)
+                  scheduledItems.splice(i, 1)
+                })
+                setScheduledItemState({ ...scheduledItemState, selectedScheduledItems: [] })
+                commonScheduledItemCRUD(scheduledItems)
+              }
+            }, { text: "No", onPress: () => { } }], { cancelable: true })
+          }}
+        >
+          <MaterialCommunityIcons style={{ bottom: "-14%", right: "-17%" }}
+            name="delete" size={Layout.defaultMargin + 30} color="white" />
+        </Pressable>
+
+        <Pressable
+          style={{
+            ...styles.planScreenPressable,
+            backgroundColor: "orange",
+            display: selectedScheduledItems.length > 0 ? "flex" : "none"
+          }}
+          onPress={() => { setScheduledItemState({ ...scheduledItemState, selectedScheduledItems: [] }) }}
+        >
+          <MaterialCommunityIcons
+            style={{ bottom: "-14%", right: "-17%" }}
+            name="selection-remove"
+            size={Layout.defaultMargin + 30}
+            color="white" />
+        </Pressable>
+
+        <Pressable
+          style={{
+            ...styles.planScreenPressable,
+            backgroundColor: Colors.light.tint,
+          }}
+          onPress={() => { handleCreate() }}
+        >
+          <Ionicons style={{ bottom: "-5%", right: "-10%" }} name="add-outline" size={Layout.defaultMargin + 40} color="white" />
+        </Pressable>
+      </View>
+   </View>
+
   );
 
 }

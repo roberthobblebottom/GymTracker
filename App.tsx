@@ -30,7 +30,7 @@ import { ExerciseInformationText, EditExerciseText, CreateExerciseText, Schedule
 LogBox.ignoreLogs(['Require cycle:'])
 const Tab = createBottomTabNavigator()
 
-let d: Date = new Date()
+const d: Date = new Date()
 
 //initial constant values
 export const initialDate = { year: 0, month: 0, day: 0, timestamp: 0, dateString: "" };
@@ -103,7 +103,7 @@ export default function App() {
   const [dialogState, SetDialogState] = useState<DialogState>(initialDialogState)
 
   function handlePlanHeader(date: DateData) {
-    let s: string = ("Plan " + date.day + "-" + date.month + "-" + date.year)
+    const s: string = ("Plan " + date.day + "-" + date.month + "-" + date.year)
     SetDialogState({ ...dialogState, planHeader: s });
   }
   useEffect(() => {
@@ -116,8 +116,8 @@ export default function App() {
           scheduledItemState.scheduledItems == undefined)
           retrieveScheduledItems(
             (_, results) => {
-              let tempScheduledItems: ScheduledItem[] = results.rows._array;
-              let a = results.rows._array.slice()
+              const tempScheduledItems: ScheduledItem[] = results.rows._array;
+              const a = results.rows._array.slice()
               tempScheduledItems.forEach((ms, index) => {
                 ms.date = JSON.parse(ms.date.toString())
                 const t = tempExercises.find(ex => ex.name == a[index].exercise)
@@ -139,8 +139,8 @@ export default function App() {
       retrieveExerciseMajorMuscleRelationships((_, results) => setEmm(results.rows._array))
     if (majorMuscles.length > 1 && exerciseState.exercises.length > 1 && emm.length > 1) {
       emm.forEach(x => {
-        let ex = exerciseState.exercises.find(e => e.name == x.exercise_name)
-        let mm2 = majorMuscles.find(mm => mm.name == x.major_muscle_name)
+        const ex = exerciseState.exercises.find(e => e.name == x.exercise_name)
+        const mm2 = majorMuscles.find(mm => mm.name == x.major_muscle_name)
         if (ex == undefined) return;
         if (ex.major_muscles == initialMajorMuscles) ex.major_muscles = [mm2!]
         else if (!ex.major_muscles.find(x => x.name == mm2?.name)) ex.major_muscles.push(mm2!)
@@ -188,7 +188,7 @@ export default function App() {
   const renderExerciseDialogForViewing = (exercise: Exercise) => {
     textInputStyle = styles.textInputViewOnly;
     setExerciseState({ ...exerciseState, aExercise: exercise, oldExerciseName: exercise.name })
-    let names: string[] = [];
+    const names: string[] = [];
     exercise.major_muscles.forEach(mm => names.push(mm.name))
     setMajorMuscleValues(names)
     setDropDownPushPullSelected(exercise.push_or_pull)
@@ -228,7 +228,7 @@ export default function App() {
     cancelDialog()
   }
 
-  let deleteExerciseConfirmation = (exercise: Exercise) => {
+  const deleteExerciseConfirmation = (exercise: Exercise) => {
     Alert.alert(
       "Confirmation",
       "Are you sure you want to delete this exercise?",
@@ -238,12 +238,12 @@ export default function App() {
     )
   };
 
-  let deleteExerciseWithStateUpdate = (exercise: Exercise) => {
-    let selected: MajorMuscle[] = majorMuscles.filter(x => dropDownMajorMuscleNameSelected.includes(x.name))
+  const deleteExerciseWithStateUpdate = (exercise: Exercise) => {
+    const selected: MajorMuscle[] = majorMuscles.filter(x => dropDownMajorMuscleNameSelected.includes(x.name))
     selected.forEach(x => deleteExerciseMajorMuscleRelationship(exercise.name, x.name))
     deleteExercise(exercise.name, () => {
-      let deletedName = exercise.name;
-      let es: Exercise[] = exerciseState.exercises.slice()
+      const deletedName = exercise.name;
+      const es: Exercise[] = exerciseState.exercises.slice()
       es.forEach((currentExercise, i) => {
         if (currentExercise.name == deletedName) {
           es.splice(i, 1)
@@ -265,19 +265,19 @@ export default function App() {
     }
     const oldExerciseName = exerciseState.oldExerciseName
     const pushPullDropDownValue = dropDownPushPullSelected
-    let selected: MajorMuscle[] = majorMuscles.filter(x => dropDownMajorMuscleNameSelected.includes(x.name))
-    let toBeCreated: MajorMuscle[] = selected.filter(x => !aExercise.major_muscles.find(t => t.name == x.name))
-    let toBeDeleted: MajorMuscle[] = aExercise.major_muscles.filter(x => !selected.find(t => t.name == x.name))
+    const selected: MajorMuscle[] = majorMuscles.filter(x => dropDownMajorMuscleNameSelected.includes(x.name))
+    const toBeCreated: MajorMuscle[] = selected.filter(x => !aExercise.major_muscles.find(t => t.name == x.name))
+    const toBeDeleted: MajorMuscle[] = aExercise.major_muscles.filter(x => !selected.find(t => t.name == x.name))
     toBeCreated.forEach(x => createExerciseMajorMuscleRelationship(aExercise.name, x.name))
     toBeDeleted.forEach(x => deleteExerciseMajorMuscleRelationship(aExercise.name, x.name))
     aExercise.push_or_pull = pushPullDropDownValue
     updateExercise(aExercise, oldExerciseName,
       (_, result) => {
-        let exerciseToBeUpdated: Exercise = {
+        const exerciseToBeUpdated: Exercise = {
           name: aExercise.name, description: aExercise.description, imagesJson: aExercise.imagesJson,
           major_muscles: selected, push_or_pull: dropDownPushPullSelected
         }
-        let es: Exercise[] = exerciseState.exercises.slice()
+        const es: Exercise[] = exerciseState.exercises.slice()
         es.forEach((currentExercise, i) => {
           if (currentExercise.name == oldExerciseName) {
             es.splice(i, 1, exerciseToBeUpdated)
@@ -295,7 +295,7 @@ export default function App() {
       Toast.show("name cannot be empty")
       return
     }
-    let selected: MajorMuscle[] = majorMuscles.filter(x => dropDownMajorMuscleNameSelected.includes(x.name))
+    const selected: MajorMuscle[] = majorMuscles.filter(x => dropDownMajorMuscleNameSelected.includes(x.name))
     selected.forEach(x => createExerciseMajorMuscleRelationship(aExercise.name, x.name))
 
     aExercise.push_or_pull = dropDownPushPullSelected
@@ -396,7 +396,7 @@ export default function App() {
     cancelDialog()
   }
 
-  let deleteScheduledItemConfirmation = (ms: ScheduledItem) => {
+  const deleteScheduledItemConfirmation = (ms: ScheduledItem) => {
     Alert.alert(
       "Confirmation",
       "Are you sure you want to delete this scheduled item?",
@@ -406,9 +406,9 @@ export default function App() {
     )
   };
 
-  let deleteScheduledItemWithStateUpdate = (id: number) => {
+  const deleteScheduledItemWithStateUpdate = (id: number) => {
     deleteScheduledItem(id, () => {
-      let si = scheduledItemState.scheduledItems.slice()
+      const si = scheduledItemState.scheduledItems.slice()
       si.forEach((ms1, i) => {
         if (ms1.id == id) {
           si.splice(i, 1)
@@ -426,18 +426,18 @@ export default function App() {
       Toast.show("exercise must be selected")
       return;
     }
-    let theexercise = exerciseState.exercises.filter((e, i, a) => {
+    const theexercise = exerciseState.exercises.filter((e, i, a) => {
       if (e.name == dropDownExNameSelected) return e;
     })[0];
     updateScheduledItem(aScheduledItem,
       (_, result) => {
-        let toBeUpdated: ScheduledItem = {
+        const toBeUpdated: ScheduledItem = {
           id: aScheduledItem.id, exercise: theexercise, reps: aScheduledItem.reps,
           percent_complete: aScheduledItem.percent_complete, sets: aScheduledItem.sets,
           duration_in_seconds: aScheduledItem.duration_in_seconds,
           weight: aScheduledItem.weight, notes: aScheduledItem.notes, date: aScheduledItem.date
         }
-        let ms: ScheduledItem[] = scheduledItemState.scheduledItems.slice()
+        const ms: ScheduledItem[] = scheduledItemState.scheduledItems.slice()
         ms.forEach((currentScheduledItem, i) => {
           if (currentScheduledItem.id == aScheduledItem.id) {
             ms.splice(i, 1, toBeUpdated)
@@ -460,11 +460,11 @@ export default function App() {
     })
     createScheduledItem(aScheduledItem,
       (_, r) => {
-        let tempScheduledItem = Object.assign({}, aScheduledItem)
+        const tempScheduledItem = Object.assign({}, aScheduledItem)
         tempScheduledItem.id = r.insertId!
         tempScheduledItem.date = aScheduledItem.date
         tempScheduledItem.duration_in_seconds = aScheduledItem.duration_in_seconds
-        let m = scheduledItemState.scheduledItems.slice()
+        const m = scheduledItemState.scheduledItems.slice()
         m.push(tempScheduledItem)
         commonScheduledItemCRUD(m)
         Toast.show("Scheduled item created.")
@@ -473,9 +473,9 @@ export default function App() {
 
   function handleFilterScheduledItem(keyword: string) {
     console.log("here")
-    let filtered = scheduledItemState.scheduledItems.filter(si => {
-      let sec = si.duration_in_seconds % 60;
-      let min = Math.floor(si.duration_in_seconds / 60)
+    const filtered = scheduledItemState.scheduledItems.filter(si => {
+      const sec = si.duration_in_seconds % 60;
+      const min = Math.floor(si.duration_in_seconds / 60)
       return ((si.percent_complete.toString() + "%").includes(keyword)
         || si.id.toString().includes(keyword)
         || (si.weight.toString() + "kg").includes(keyword)
