@@ -149,7 +149,7 @@ export default function App() {
   }, [scheduledItemState, exerciseState, majorMuscles, emm])
   init()
 
-  let textInputStyle, numberInputStyle 
+  let textInputStyle, numberInputStyle
   if (dialogState.isEditable) {
     textInputStyle = styles.textInputEditable
     numberInputStyle = styles.numberInputEditable
@@ -183,7 +183,7 @@ export default function App() {
 
   // Exercises Functions:
   //renders
-  const renderExerciseDialogForViewing = (exercise: Exercise) => {
+  const renderExerciseDialogForViewing = (exercise:Exercise) => {
     textInputStyle = styles.textInputViewOnly;
     setExerciseState({ ...exerciseState, aExercise: exercise, oldExerciseName: exercise.name })
     const names: string[] = [];
@@ -200,7 +200,13 @@ export default function App() {
 
   const renderExerciseDialogForEdit = () => {
     textInputStyle = styles.textInputEditable;
-    SetDialogState({ ...dialogState, isEditable: true, dialogText: EditExerciseText, isDropDownOpen: false, openPushPullDropDown: false });
+    SetDialogState({
+      ...dialogState, 
+      isEditable: true,
+      dialogText: EditExerciseText,
+      isDropDownOpen: false,
+      openPushPullDropDown: false
+    });
   }
 
   const renderExerciseDialogForCreate = () => {

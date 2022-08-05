@@ -33,10 +33,14 @@ export function ButtonSet(props: any) {
         case ExerciseInformationText:
             return (
                 <View style={styles.buttonsRow}>
-                    <Pressable style={styles.buttonSet} onPress={() => deleteExerciseConfirmation(aExercise)} ><Text style={styles.buttonFont} >DELETE</Text></Pressable>
-                    <Pressable style={styles.buttonSet} onPress={() => { renderExerciseDialogForEdit() }} ><Text style={styles.buttonFont}>EDIT</Text></Pressable>
-                    <Pressable style={styles.buttonSet} onPress={() => SetDialogState({ ...dialogState, isHistoryDialogVisible: true })} ><Text style={styles.buttonFont}>HISTORY AND PR</Text></Pressable>
-                    <Pressable style={styles.buttonSet} onPress={() => cancelDialog()} ><Text style={styles.buttonFont}>CANCEL</Text></Pressable>
+                    <Pressable style={styles.buttonSet} onPress={() => deleteExerciseConfirmation(aExercise)} >
+                        <Text style={styles.buttonFont} >DELETE</Text></Pressable>
+                    <Pressable style={styles.buttonSet} onPress={() => { renderExerciseDialogForEdit() }} >
+                        <Text style={styles.buttonFont}>EDIT</Text></Pressable>
+                    <Pressable style={styles.buttonSet} onPress={() => SetDialogState({ ...dialogState, isHistoryDialogVisible: true })} >
+                        <Text style={styles.buttonFont}>HISTORY AND PR</Text></Pressable>
+                    <Pressable style={styles.buttonSet} onPress={() => cancelDialog()} >
+                        <Text style={styles.buttonFont}>CANCEL</Text></Pressable>
                 </View>
             )
         case CreateExerciseText:
@@ -47,11 +51,14 @@ export function ButtonSet(props: any) {
                 </View>
             )
         case EditExerciseText:
+            
             return (
                 <View style={styles.buttonsRow}>
-                    <Pressable style={styles.buttonSet} onPress={() => updateExercise()}><Text style={styles.buttonFont}>SAVE</Text></Pressable>
+                    <Pressable style={styles.buttonSet} onPress={() => updateExercise()}>
+                        <Text style={styles.buttonFont}>SAVE</Text></Pressable>
                     <Pressable style={styles.buttonSet} onPress={() => renderExerciseDialogForViewing(aExercise)} >
-                        <Text style={styles.buttonFont}>BACK</Text> </Pressable >
+                        <Text style={styles.buttonFont}>BACK</Text> 
+                        </Pressable>
                     <Pressable style={styles.buttonSet} onPress={() => cancelDialog()} >
                         <Text style={styles.buttonFont}>CANCEL</Text></Pressable >
                 </View >
