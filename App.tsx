@@ -108,12 +108,13 @@ export default function App() {
   }
   useEffect(() => {
     let tempExercises: Exercise[];
+    if(exerciseState.exercises[0]!=undefined)
     if (exerciseState.exercises[0].name == "" || exerciseState.exercises.length <= 0)
       retrieveExercises((_, r) => {
         tempExercises = r.rows._array;
         tempExercises.forEach(ex => ex.major_muscles = initialMajorMuscles)
-        if (scheduledItemState.scheduledItems[0].exercise == initialExerciseState.aExercise ||
-          scheduledItemState.scheduledItems == undefined)
+          if(scheduledItemState.scheduledItems[0] != undefined)
+        if (scheduledItemState.scheduledItems[0].exercise == initialExerciseState.aExercise )
           retrieveScheduledItems(
             (_, results) => {
               const tempScheduledItems: ScheduledItem[] = results.rows._array;
