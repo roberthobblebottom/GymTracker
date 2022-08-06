@@ -31,7 +31,7 @@ export function ExerciseDialog(props: any) {
     const buttonsSetProps = props.buttonsSetProps
     const aExercise = exerciseState.aExercise;
     let filteredScheduledItems: ScheduledItem[]
-    if (scheduledItemState.scheduledItems === initialScheduledItem)
+    if (scheduledItemState.scheduledItems !== initialScheduledItem)
         filteredScheduledItems = dialogState.isExerciseHistory
             ? scheduledItemState
                 .scheduledItems
@@ -48,6 +48,7 @@ export function ExerciseDialog(props: any) {
                 .filter(si => si.exercise.name == aExercise.name)
                 .sort((a, b) => a.weight * a.reps * a.sets - b.weight * b.reps * b.sets)
     else filteredScheduledItems = []
+    console.log(dialogState.isExerciseHistory)
     const header = dialogState.isExerciseHistory
         ? "History"
         : "Personal Records"

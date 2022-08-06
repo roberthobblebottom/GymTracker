@@ -49,7 +49,6 @@ function ExercisesScreen() {
         style={{
           ...styles.planScreenPressable,
           backgroundColor: Colors.light.tint,
-        
         }}
         onPress={() => handleShowCreate()}
       >
