@@ -10,7 +10,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import {
   init, db, resetTables, createScheduledItem, deleteScheduledItem, updateScheduledItem,
-  createExerciseMajorMuscleRelationship, createExercise, deleteExerciseMajorMuscleRelationship, deleteExercise, updateExercise, retrieveExerciseMajorMuscleRelationships, retrieveMajorMuscles, retrieveScheduledItems, retrieveExercises
+  createExerciseMajorMuscleRelationship, createExercise, deleteExerciseMajorMuscleRelationship, deleteExercise, updateExercise, retrieveExerciseMajorMuscleRelationships, retrieveMajorMuscles, retrieveScheduledItems, retrieveExercises, deleteFromExerciseAndScheduledItem
 }
   from './dbhandler';
 import { ButtonSetProps, ContextProps, DialogState, Emm, Exercise, ExerciseState, MajorMuscle, PushPullEnum, ScheduledItemState } from './types';
@@ -117,7 +117,6 @@ export default function App() {
   async function handleExport() {
     const exportData = {
       exercises: exerciseState.exercises,
-      majorMuscles: majorMuscles,
       scheduledItems: scheduledItemState.scheduledItems
     }
     const permissions = await StorageAccessFramework.requestDirectoryPermissionsAsync()
@@ -130,8 +129,26 @@ export default function App() {
     const permissions = await StorageAccessFramework.requestDirectoryPermissionsAsync()
     if (!permissions.granted) return
     const directory = await StorageAccessFramework.readDirectoryAsync(permissions.directoryUri)
-    const data = await StorageAccessFramework.readAsStringAsync(directory[0])
-    console.log(data)
+    const fileName = directory.find((v) => v.includes('backup.json'))
+    if (fileName == undefined) {
+      Toast.show("Cannot find the file name with \'backup.json\'")
+      return
+    }
+    deleteFromExerciseAndScheduledItem()
+    const data = JSON.parse(await StorageAccessFramework.readAsStringAsync(fileName))
+    console.log(data.exercises)
+    setExerciseState({
+      ...exerciseState,
+      exercises: data.exercises,
+      filteredExercises: data.exercises
+    })
+    setScheduledItemState({
+      ...scheduledItemState,
+      scheduledItems: data.scheduledItems,
+      filteredScheduledItems: data.scheduledItems
+    })
+    exerciseState.exercises.forEach(ex=> createExercise(ex))
+    // scheduledItemState.scheduledItems.forEach(si=>createScheduledItem(si))
   }
 
   function cancelDialog() {

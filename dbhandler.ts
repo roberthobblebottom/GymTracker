@@ -23,6 +23,10 @@ function createData(showResetAlert: boolean) {
     )))
     if (showResetAlert) Toast.show("Database had been reset.");
 }
+function deleteFromExerciseAndScheduledItem() {
+    db.transaction(t => t.executeSql('DELETE FROM exercise'))
+    db.transaction(t => t.executeSql('DELETE FROM scheduled_item'))
+}
 function resetTables() {
     console.log("resetting tables");
     db.transaction(t => t.executeSql("DROP TABLE if exists exercise"));
@@ -136,7 +140,7 @@ export const retrieveMajorMuscles = (dbCallback: SQLStatementCallback) => {
         dbCallback, (_, err) => { console.log(err); return true; }))
 }
 
-export { resetTables, init, db }
+export { resetTables, init, db ,deleteFromExerciseAndScheduledItem}
 const commands = `
 CREATE TABLE IF NOT EXISTS "scheduled_item" (
 	"id"	INTEGER PRIMARY KEY AUTOINCREMENT,
