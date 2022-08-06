@@ -27,80 +27,25 @@ import { SelectDateDialog } from './screens/SelectDateDialog';
 import * as Filesystem from 'expo-file-system';
 import { StorageAccessFramework } from 'expo-file-system'
 import { ExerciseInformationText, EditExerciseText, CreateExerciseText, ScheduledItemInformation, EditScheduledItemText, DuplicateScheduledItemText, CreateScheduledItemText } from './constants/strings';
+import { initalContextProps, initialExerciseState, initialScheduledItemState, initialMajorMuscles, initialEmm, initialDialogState, initialScheduledItem } from './constants/initialValues';
 LogBox.ignoreLogs(['Require cycle:'])
 const Tab = createBottomTabNavigator()
 
-const d: Date = new Date()
-
-//initial constant values
-export const initialDate = { year: 0, month: 0, day: 0, timestamp: 0, dateString: "" };
-export const initialExerciseState: ExerciseState = {
-  exercises: [{ name: "", description: "", imagesJson: "", major_muscles: [], push_or_pull: PushPullEnum.Push }]
-  , aExercise: { name: "", description: "", imagesJson: "", major_muscles: [], push_or_pull: PushPullEnum.Push }
-  , filteredExercises: [{ name: "", description: "", imagesJson: "", major_muscles: [], push_or_pull: PushPullEnum.Push }]
-  , filteredExerciseKeyword: ""
-  , oldExerciseName: ""
-};
-export const initialScheduledItem: ScheduledItem[] = [{
-  id: 0, exercise: initialExerciseState.aExercise,
-  reps: 1, percent_complete: 0, sets: 1,
-  duration_in_seconds: 0, weight: 1, notes: "", date: initialDate
-}];
-export const initialScheduledItemState: ScheduledItemState = {
-  scheduledItems: initialScheduledItem,
-  aScheduledItem: initialScheduledItem[0],
-  filteredScheduledItems: initialScheduledItem,
-  filteredScheduledItemKeyword: "",
-  selectedScheduledItems: [],
-  isMovingScheduledItems: false
-}
-const initialMajorMuscles: MajorMuscle[] = [{ name: "", notes: "", imageJson: "" }];
-const initialEmm: Emm[] = [{ id: 9999, exercise_name: "", major_muscle_name: "" }];
-const initialDialogState = {
-  isExDialogVisible: false,
-  openPushPullDropDown: false,
-  dialogText: "",
-  isEditable: false,
-  isCalendarDialogVisible: false,
-  isDropDownOpen: false,
-  isPlanDialogVisible: false,
-  isHistoryDialogVisible: false,
-  planHeader: "Plan " + d.getDate() + "-" + (d.getMonth() + 1) + "-" + d.getFullYear(),
-  isExerciseHistory: true,
-}
-const initalContextProps: ContextProps = {
-  renderScheduledItemDialogForViewing: Function,
-  renderScheduledItemDialogForCreate: Function,
-  handleFilterScheduledItem: Function,
-  handlePlanHeader: Function,
-  scheduledItemState: initialScheduledItemState,
-  setScheduledItemState: () => { },
-  exerciseState: initialExerciseState,
-  setExerciseState: () => { },
-  renderExerciseDialogForCreate: Function,
-  renderExerciseDialogForViewing: Function,
-  handleFilterExercises: Function,
-  commonScheduledItemCRUD: Function,
-  setDialogState: () => { },
-  dialogState: initialDialogState,
-}
-
 //contexts
-export const SettingsScreenContext = React.createContext({ handleResetDB: () => { }, handleExport: () => { } })
+export const SettingsScreenContext = React.createContext({ handleResetDB: () => { }, handleExport: () => { }, handleImport: () => { } })
 export const ExerciseScreenContext = React.createContext({ contextProps: initalContextProps })
 export const ScheduledItemContext = React.createContext({ contextProps: initalContextProps })
 
 export default function App() {
   const [exerciseState, setExerciseState] = useState<ExerciseState>(initialExerciseState)
   const [scheduledItemState, setScheduledItemState] = useState<ScheduledItemState>(initialScheduledItemState)
+  const [dialogState, SetDialogState] = useState<DialogState>(initialDialogState)
   const [majorMuscles, setMajorMuscles] = useState(initialMajorMuscles)
   const [emm, setEmm] = useState(initialEmm)
 
-  //Various Drop downs
   const [dropDownMajorMuscleNameSelected, setMajorMuscleValues] = useState([""])
   const [dropDownExNameSelected, setDropDownExNameSelected] = useState("")
   const [dropDownPushPullSelected, setDropDownPushPullSelected] = useState(PushPullEnum.Push)
-  const [dialogState, SetDialogState] = useState<DialogState>(initialDialogState)
 
   function handlePlanHeader(date: DateData) {
     const s: string = ("Plan " + date.day + "-" + date.month + "-" + date.year)
@@ -108,32 +53,32 @@ export default function App() {
   }
   useEffect(() => {
     let tempExercises: Exercise[];
-    if(exerciseState.exercises[0]!=undefined)
-    if (exerciseState.exercises[0].name == "" || exerciseState.exercises.length <= 0)
-      retrieveExercises((_, r) => {
-        tempExercises = r.rows._array;
-        tempExercises.forEach(ex => ex.major_muscles = initialMajorMuscles)
-          if(scheduledItemState.scheduledItems[0] != undefined)
-        if (scheduledItemState.scheduledItems[0].exercise == initialExerciseState.aExercise )
-          retrieveScheduledItems(
-            (_, results) => {
-              const tempScheduledItems: ScheduledItem[] = results.rows._array;
-              const a = results.rows._array.slice()
-              tempScheduledItems.forEach((ms, index) => {
-                ms.date = JSON.parse(ms.date.toString())
-                const t = tempExercises.find(ex => ex.name == a[index].exercise)
-                tempScheduledItems[index].exercise = t!;
-              })
-              setScheduledItemState({
-                ...scheduledItemState,
-                scheduledItems: tempScheduledItems,
-                filteredScheduledItems: tempScheduledItems
-              })
-            })
-        setExerciseState({
-          ...exerciseState, exercises: tempExercises, filteredExercises: tempExercises
+    if (exerciseState.exercises[0] != undefined)
+      if (exerciseState.exercises[0].name == "" || exerciseState.exercises.length <= 0)
+        retrieveExercises((_, r) => {
+          tempExercises = r.rows._array;
+          tempExercises.forEach(ex => ex.major_muscles = initialMajorMuscles)
+          if (scheduledItemState.scheduledItems[0] != undefined)
+            if (scheduledItemState.scheduledItems[0].exercise == initialExerciseState.aExercise)
+              retrieveScheduledItems(
+                (_, results) => {
+                  const tempScheduledItems: ScheduledItem[] = results.rows._array;
+                  const a = results.rows._array.slice()
+                  tempScheduledItems.forEach((ms, index) => {
+                    ms.date = JSON.parse(ms.date.toString())
+                    const t = tempExercises.find(ex => ex.name == a[index].exercise)
+                    tempScheduledItems[index].exercise = t!;
+                  })
+                  setScheduledItemState({
+                    ...scheduledItemState,
+                    scheduledItems: tempScheduledItems,
+                    filteredScheduledItems: tempScheduledItems
+                  })
+                })
+          setExerciseState({
+            ...exerciseState, exercises: tempExercises, filteredExercises: tempExercises
+          })
         })
-      })
     if (majorMuscles[0] == initialMajorMuscles[0])
       retrieveMajorMuscles((_, results) => setMajorMuscles(results.rows._array))
     if (emm[0] == initialEmm[0])
@@ -168,23 +113,34 @@ export default function App() {
     setEmm(initialEmm)
   }
 
+  //Android only exprt and import
   async function handleExport() {
     const exportData = {
       exercises: exerciseState.exercises,
       majorMuscles: majorMuscles,
       scheduledItems: scheduledItemState.scheduledItems
     }
-    //     const permissions = await StorageAccessFramework.requestDirectoryPermissionsAsync()
-    //     if(!permissions.granted)
-    // return
+    const permissions = await StorageAccessFramework.requestDirectoryPermissionsAsync()
+    if (!permissions.granted) return
+    let uri = await StorageAccessFramework.createFileAsync(permissions.directoryUri, "GymTracker backup", "application/json")
+    await StorageAccessFramework.writeAsStringAsync(uri, JSON.stringify(exportData))
+    Toast.show("Backup is created in " + uri)
   }
+  async function handleImport() {
+    const permissions = await StorageAccessFramework.requestDirectoryPermissionsAsync()
+    if (!permissions.granted) return
+    const directory = await StorageAccessFramework.readDirectoryAsync(permissions.directoryUri)
+    const data = await StorageAccessFramework.readAsStringAsync(directory[0])
+    console.log(data)
+  }
+
   function cancelDialog() {
     SetDialogState({ ...dialogState, isExDialogVisible: false, isCalendarDialogVisible: false, isPlanDialogVisible: false });
   }
 
   // Exercises Functions:
   //renders
-  const renderExerciseDialogForViewing = (exercise:Exercise) => {
+  const renderExerciseDialogForViewing = (exercise: Exercise) => {
     textInputStyle = styles.textInputViewOnly;
     setExerciseState({ ...exerciseState, aExercise: exercise, oldExerciseName: exercise.name })
     const names: string[] = [];
@@ -202,7 +158,7 @@ export default function App() {
   const renderExerciseDialogForEdit = () => {
     textInputStyle = styles.textInputEditable;
     SetDialogState({
-      ...dialogState, 
+      ...dialogState,
       isEditable: true,
       dialogText: EditExerciseText,
       isDropDownOpen: false,
@@ -558,7 +514,7 @@ export default function App() {
 
           commonScheduledItemCRUD={commonScheduledItemCRUD}
         />
-        <SettingsScreenContext.Provider value={{ handleResetDB: handleResetDB, handleExport: handleExport }}>
+        <SettingsScreenContext.Provider value={{ handleResetDB: handleResetDB, handleExport: handleExport, handleImport: handleImport }}>
           <ExerciseScreenContext.Provider value={{ contextProps: contextProps }}>
             <ScheduledItemContext.Provider value={{ contextProps: contextProps }}>
               <Tab.Navigator

@@ -48,15 +48,12 @@ export function ExerciseDialog(props: any) {
                 .filter(si => si.exercise.name == aExercise.name)
                 .sort((a, b) => a.weight * a.reps * a.sets - b.weight * b.reps * b.sets)
     else filteredScheduledItems = []
-    console.log(dialogState.isExerciseHistory)
     const header = dialogState.isExerciseHistory
         ? "History"
         : "Personal Records"
-
     const buttonTitle = dialogState.isExerciseHistory
         ? "change to Personal Records"
         : "change to history"
-
     let textInputStyle, numberInputStyle, buttonStyle
     if (dialogState.isEditable) {
         textInputStyle = styles.textInputEditable
@@ -67,7 +64,6 @@ export function ExerciseDialog(props: any) {
         numberInputStyle = styles.numberInputViewOnly
         buttonStyle = styles.changeButtonDisabled
     }
-
     return (
         <Modal visible={dialogState.isExDialogVisible} animationType="fade" transparent={true}>
             <TouchableOpacity style={styles.overallDialog} onPressIn={() => SetDialogState({ ...dialogState, isExDialogVisible: false })}>

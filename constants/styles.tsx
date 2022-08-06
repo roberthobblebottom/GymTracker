@@ -106,9 +106,9 @@ export const styles = StyleSheet.create({
     ...bases.changeButtonBase
   }
   ,
-  buttonFont:{
-    color:'white',
-   // Material design blue from https://material.google.com/style/color.html#color-color-palette
+  buttonFont: {
+    color: 'white',
+    // Material design blue from https://material.google.com/style/color.html#color-color-palette
     ...Platform.select({
       ios: {
         // iOS blue from https://developer.apple.com/ios/human-interface-guidelines/visual-design/color/
@@ -176,5 +176,8 @@ export const styles = StyleSheet.create({
     fontSize: Layout.defaultFontSize,
     borderTopWidth: 2,
     borderTopColor: "white"
+  },
+  settingsButtonText: {
+    color: "white", textAlign: 'center', fontWeight: '600'
   }
 })

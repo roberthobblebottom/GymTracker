@@ -1,8 +1,13 @@
 
-import { View, Button, Alert } from 'react-native';
+import {
+    View, Button, Alert, Pressable, Text,
+    Platform, StyleProp, ViewStyle
+} from 'react-native';
 import React, { useContext } from 'react';
 import { SettingsScreenContext } from '../App';
 import { styles } from '../constants/styles';
+import Toast from 'react-native-simple-toast';
+
 function confirmation(handleFunc: Function) {
     return Alert.alert(
         "Comfirmation",
@@ -11,13 +16,21 @@ function confirmation(handleFunc: Function) {
     )
 }
 
+const androidStyle = () => {
+    if (Platform.OS == 'ios') return (
+        { ...styles.buttonSet, display: 'none' } as StyleProp<ViewStyle>)
+    else return { ...styles.buttonSet, display: 'flex' } as StyleProp<ViewStyle>
+}
+
 export function SettingsScreen() {
     const context = useContext(SettingsScreenContext);
     return (
         <View style={styles.settingsScreen}>
             <Button title='Reset Database' onPress={() => confirmation(context.handleResetDB)} />
-            {/* <Button title='export to directory of the app' onPress={()=>context.handleExport()} /> */}
-            {/* <Button title='import' onPress={()=>{}} /> */}
+            <Pressable style={() => androidStyle()} onPress={() => context.handleExport()}>
+                <Text style={styles.settingsButtonText}>EXPORT</Text></Pressable>
+            <Pressable style={() => androidStyle()} onPress={()=>context.handleImport()}>
+                <Text style={styles.settingsButtonText}>IMPORT </Text></Pressable>
         </View>
     );
 }
