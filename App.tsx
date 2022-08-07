@@ -129,7 +129,7 @@ export default function App() {
     const permissions = await StorageAccessFramework.requestDirectoryPermissionsAsync()
     if (!permissions.granted) return
     const directory = await StorageAccessFramework.readDirectoryAsync(permissions.directoryUri)
-    const fileName = directory.find((v) => v.includes('backup.json'))
+    const fileName = directory.find((v) => v.includes('backup')&& v.includes('GymTracker')&&v.includes('.json'))
     if (fileName == undefined) {
       Toast.show("Cannot find the file name with the suffix \'backup.json\'")
       return
