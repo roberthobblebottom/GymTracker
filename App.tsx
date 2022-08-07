@@ -113,7 +113,7 @@ export default function App() {
     setEmm(initialEmm)
   }
 
-  //Android only exprt and import
+  //Android only export and import
   async function handleExport() {
     const exportData = {
       exercises: exerciseState.exercises,
@@ -123,20 +123,19 @@ export default function App() {
     if (!permissions.granted) return
     let uri = await StorageAccessFramework.createFileAsync(permissions.directoryUri, "GymTracker backup", "application/json")
     await StorageAccessFramework.writeAsStringAsync(uri, JSON.stringify(exportData))
-    Toast.show("Backup is created in " + uri)
   }
+
   async function handleImport() {
     const permissions = await StorageAccessFramework.requestDirectoryPermissionsAsync()
     if (!permissions.granted) return
     const directory = await StorageAccessFramework.readDirectoryAsync(permissions.directoryUri)
     const fileName = directory.find((v) => v.includes('backup.json'))
     if (fileName == undefined) {
-      Toast.show("Cannot find the file name with \'backup.json\'")
+      Toast.show("Cannot find the file name with the suffix \'backup.json\'")
       return
     }
     deleteFromExerciseAndScheduledItem()
     const data = JSON.parse(await StorageAccessFramework.readAsStringAsync(fileName))
-    console.log(data.exercises)
     setExerciseState({
       ...exerciseState,
       exercises: data.exercises,
@@ -147,8 +146,9 @@ export default function App() {
       scheduledItems: data.scheduledItems,
       filteredScheduledItems: data.scheduledItems
     })
-    exerciseState.exercises.forEach(ex=> createExercise(ex))
-    // scheduledItemState.scheduledItems.forEach(si=>createScheduledItem(si))
+    data.exercises.forEach((ex: Exercise)=> createExercise(ex))
+    console.log(scheduledItemState.scheduledItems)
+    data.scheduledItems.forEach((si:ScheduledItem)=>createScheduledItem(si))
   }
 
   function cancelDialog() {

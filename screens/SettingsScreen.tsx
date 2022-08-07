@@ -29,8 +29,9 @@ export function SettingsScreen() {
             <Button title='Reset Database' onPress={() => confirmation(context.handleResetDB)} />
             <Pressable style={() => androidStyle()} onPress={() => context.handleExport()}>
                 <Text style={styles.settingsButtonText}>EXPORT</Text></Pressable>
-            <Pressable style={() => androidStyle()} onPress={()=>context.handleImport()}>
+            <Pressable style={() => androidStyle()} onPress={() => context.handleImport()}>
                 <Text style={styles.settingsButtonText}>IMPORT </Text></Pressable>
+            <Text>Make sure that the folder you choose have only one file with the prefix "backup.json". However if there are multiple, the very first one will be choosen</Text>
         </View>
     );
 }
