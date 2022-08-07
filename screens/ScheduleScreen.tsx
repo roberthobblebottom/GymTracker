@@ -1,8 +1,8 @@
-import { Text, TouchableOpacity, View, StyleSheet, TextInput, Modal, Pressable, Alert } from 'react-native';
+import { Text, TouchableOpacity, View, TextInput, Pressable, Alert } from 'react-native';
 import React, { Dispatch, useContext } from 'react';
 import Colors from '../constants/Colors';
 import { Agenda, AgendaEntry, DateData } from 'react-native-calendars';
-import {  initialDate, initialScheduledItem } from '../constants/initialValues';
+import {  initialDate } from '../constants/initialValues';
 import { ScheduledItemContext } from '../App';
 import { DialogState, ScheduledItem, ScheduledItemState } from '../types';
 import Toast from 'react-native-simple-toast';

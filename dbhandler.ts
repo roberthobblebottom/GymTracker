@@ -189,15 +189,15 @@ INSERT INTO "major_muscle" VALUES ('Hips','',NULL);
 INSERT INTO "major_muscle" VALUES ('Gluts','Also called Buttocks.',NULL);
 INSERT INTO "major_muscle" VALUES ('Quadriceps','Front of thighs.',NULL);
 INSERT INTO "major_muscle" VALUES ('Hamstring','Back of thighs.',NULL);
-INSERT INTO "major_muscle" VALUES ('Adductors','Inside of thighs.',NULL);
+INSERT INTO "major_muscle" VALUES ('Abdominals','Inside of thighs.',NULL);
 INSERT INTO "major_muscle" VALUES ('Calves','Between foot and knee.',NULL);
-INSERT INTO "exercise" VALUES ('Conventional Deadlift',"Pull",'TESTING DESCRIPTION',"{}");
-INSERT INTO "exercise" VALUES ('Romanian Deadlift',"Pull",'TESTING DESCRIPTION',"{}");
-INSERT INTO "exercise" VALUES ('Straight-legged Deadlift',"Pull",'TESTING DESCRIPTION',"{}");
-INSERT INTO "exercise" VALUES ('Sumo Deadlift',"Pull",'TESTING DESCRIPTION',"{}");
-INSERT INTO "exercise" VALUES ('Trap Bar Deadlift',"Pull",'TESTING DESCRIPTION',"{}");
-INSERT INTO "exercise" VALUES ('Back Squat',"Pull",'TESTING DESCRIPTION',"{}");
-INSERT INTO "exercise" VALUES ('Front Squat',"Push",'TESTING DESCRIPTION',"{}");
+INSERT INTO "exercise" VALUES ('Conventional Deadlift',"Pull",'The deadlift is a weight training exercise in which a loaded barbell or bar is lifted off the ground to the level of the hips, torso perpendicular to the floor, before being placed back on the ground.',"{}");
+INSERT INTO "exercise" VALUES ('Romanian Deadlift',"Pull",'From the standing position, the bar is lowered to about knee-height where the hamstrings are at maximal stretch without rounding the back, developing a natural bend in the legs without squatting, then come to a full lockout position.',"{}");
+INSERT INTO "exercise" VALUES ('Straight-legged Deadlift',"Pull",'The grounded-bar start and end positions are modified to make the legs as straight as possible without rounding the back.',"{}");
+INSERT INTO "exercise" VALUES ('Sumo Deadlift',"Pull",'The Sumo deadlift is a variation where one will approach the bar with the feet wider than shoulder-width apart and grip the bar with a close grip inside of one's legs and proceed with correct form. ',"{}");
+INSERT INTO "exercise" VALUES ('Trap Bar Deadlift',"Pull",'The trap bar deadlift is a variation of the deadlift using a special hexagonal bar (a trap bar). This allows more clearance for the knees to pass "through" the bar. To perform the trapbar deadlift, one should load the bar, step inside the hollow portion of the bar, bend down, grasp the handles, stand erect, then lower the bar to the ground in the exact opposite path.During the descent of a squat, the hip and knee joints flex while the ankle joint dorsiflexes; conversely the hip and knee joints extend and the ankle joint plantarflexes when standing up. ',"{}");
+INSERT INTO "exercise" VALUES ('Back Squat',"Pull",' the bar is held on the back of the body upon the upper trapezius muscle, near to the base of the neck. Alternatively, it may be held lower across the upper back and rear deltoids. ',"{}");
+INSERT INTO "exercise" VALUES ('Front Squat',"Push",'the barbell is held in front of the body across the clavicles and deltoids in either a clean grip, as is used in weightlifting, or with the arms crossed and hands placed on top of the barbell.',"{}");
 INSERT INTO "exercise" VALUES ('Box Squat',"Push",'TESTING DESCRIPTION',"{}");
 INSERT INTO "exercise" VALUES ('Sumo Squat',"Push",'TESTING DESCRIPTION',"{}");
 INSERT INTO "exercise" VALUES ('Overhead Squat',"Push",'TESTING DESCRIPTION',"{}");
@@ -205,12 +205,12 @@ INSERT INTO "exercise" VALUES ('Split Squat',"Push",'TESTING DESCRIPTION',"{}");
 INSERT INTO "exercise" VALUES ('Smoth Squat',"Push",'TESTING DESCRIPTION',"{}");
 INSERT INTO "exercise" VALUES ('Bodyweight Squat',"Push",'TESTING DESCRIPTION',"{}");
 INSERT INTO "exercise" VALUES ('Jump Squat',"Push",'TESTING DESCRIPTION',"{}");
-INSERT INTO "exercise" VALUES ('Flat Barbell Bench Press',"Push",'TESTING DESCRIPTION',"{}");
-INSERT INTO "exercise" VALUES ('Incline Barbell Bench Press',"Push",'TESTING DESCRIPTION',"{}");
-INSERT INTO "exercise" VALUES ('Decline Barbell Bench Press',"Push",'TESTING DESCRIPTION',"{}");
-INSERT INTO "exercise" VALUES ('Flat Dumbbell Bench Press',"Push",'TESTING DESCRIPTION',"{}");
-INSERT INTO "exercise" VALUES ('Incline Dumbbell Bench Press',"Push",'TESTING DESCRIPTION',"{}");
-INSERT INTO "exercise" VALUES ('Decline Dumbbell Bench Press',"Push",'TESTING DESCRIPTION',"{}");
+INSERT INTO "exercise" VALUES ('Flat Barbell Bench Press',"Push",'A weight training exercise in which the trainee presses a (loaded) barbell upwards while lying on a weight training bench.',"{}");
+INSERT INTO "exercise" VALUES ('Incline Barbell Bench Press',"Push",'An incline is just like the flat barbell bench press but it elevates the shoulders and lowers the pelvis as if reclining in a chair.',"{}");
+INSERT INTO "exercise" VALUES ('Decline Barbell Bench Press',"Push",'A decline bench press elevates the pelvis and lowers the head, and emphasizes the lower portion of the pectoralis major whilst incorporating shoulders and triceps.',"{}");
+INSERT INTO "exercise" VALUES ('Flat Dumbbell Bench Press',"Push",'A weight training exercise in which the trainee presses (loaded) dumbbells ono each hands upwards while lying on a weight training bench.',"{}");
+INSERT INTO "exercise" VALUES ('Incline Dumbbell Bench Press',"Push",'An incline is just like the flat barbell bench press but it elevates the shoulders and lowers the pelvis as if reclining in a chair.',"{}");
+INSERT INTO "exercise" VALUES ('Decline Dumbbell Bench Press',"Push",'A decline dumbell bench press elevates the pelvis and lowers the head, and emphasizes the lower portion of the pectoralis major whilst incorporating shoulders and triceps.',"{}");
 INSERT INTO "exercise" VALUES ('Chest Fly',"Push",'TESTING DESCRIPTION',"{}");
 INSERT INTO "exercise" VALUES ('Dips',"Push",'TESTING DESCRIPTION',"{}");
 INSERT INTO "exercise" VALUES ('Pull-up',"Pull",'TESTING DESCRIPTION',"{}");
@@ -235,75 +235,117 @@ INSERT INTO "exercise" VALUES ('Sit-Up',"Pull",'TESTING DESCRIPTION',"{}");
 INSERT INTO "exercise" VALUES ('Plank',"Push",'TESTING DESCRIPTION',"{}");
 INSERT INTO "exercise" VALUES ('Good-morning',"Pull",'TESTING DESCRIPTION',"{}");
 INSERT INTO "exercise" VALUES ('Hyperextension',"Pull",'TESTING DESCRIPTION',"{}");
-INSERT INTO "exercise" VALUES ('Leg Press',"Push",'TESTING DESCRIPTION',"{}");
+INSERT INTO "exercise" VALUES ('Leg Press',"Push",'Raise legs while lying down. There are other variants too.',"{}");
 INSERT INTO "exercise" VALUES ('Lunge',"Push",'TESTING DESCRIPTION',"{}");
-INSERT INTO "exercise" VALUES ('Calf Raise',"Push",'TESTING DESCRIPTION',"{}");
+INSERT INTO "exercise" VALUES ('Calf Raise',"Push",'',"{}");
 INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Conventional Deadlift','Hamstring');
+INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Conventional Deadlift','Quadriceps');
+INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Conventional Deadlift','Gluts');
+INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Conventional Deadlift','Lower Back');
+
+
 INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Romanian Deadlift','Hamstring');
-INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Straight-legged Deadlift','Hamstring');
+INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Romanian Deadlift','Quadriceps');
+INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Romanian Deadlift','Gluts');
+INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Romanian Deadlift','Lower Back');
+
 INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Sumo Deadlift','Hamstring');
-INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Trap Bar Deadlift','Calves');
-INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Back Squat','Hamstring');
-INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Front Squat','Hamstring');
+INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Sumo Deadlift','Quadriceps');
+INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Sumo Deadlift','Gluts');
+INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Sumo Deadlift','Lower Back');
+
+INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Straight-legged Deadlift','Hamstring');
+INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Straight-legged Deadlift','Quadriceps');
+INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Straight-legged Deadlift','Gluts');
+INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Straight-legged Deadlift','Lower Back');
+
+INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Trap Bar Deadlift','Hamstring');
+INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Trap Bar Deadlift','Quadriceps');
+INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Trap Bar Deadlift','Gluts');
+INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Trap Bar Deadlift','Lower Back');
+INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Back Squad','Quadriceps');
+INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Back Squad','Gluts');
+INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Back Squad','Abdominals');
+INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Front Squad','Quadriceps');
+INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Front Squad','Gluts');
+INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Front Squad','Abdominals');
+INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Sumo Squad','Quadriceps');
+INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Sumo Squad','Gluts');
+INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Sumo Squad','Abdominals');
+
+INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Bodyweight Squad','Quadriceps');
+INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Bodyweight Squad','Gluts');
+INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Bodyweight Squad','Abdominals');
+
+
+
 INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Box Squat','Hamstring');
-INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Sumo Squat','Hamstring');
 INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Overhead Squat','Hamstring');
 INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Split Squat','Hamstring');
-INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Smoth Squat','Hamstring');
-INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Bodyweight Squat','Hamstring');
 INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Jump Squat','Hamstring');
+
 INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Flat Barbell Bench Press','Chest');
 INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Incline Barbell Bench Press','Chest');
 INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Decline Barbell Bench Press','Chest');
 INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Flat Dumbbell Bench Press','Chest');
 INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Incline Dumbbell Bench Press','Chest');
 INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Decline Dumbbell Bench Press','Chest');
+
+INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Flat Barbell Bench Press','Triceps');
+INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Incline Barbell Bench Press','Triceps');
+INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Decline Barbell Bench Press','Triceps');
+INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Flat Dumbbell Bench Press','Triceps');
+INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Incline Dumbbell Bench Press','Triceps');
+INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Decline Dumbbell Bench Press','Triceps');
+
+
+
 INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Chest Fly','Chest');
-INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Dips','Calves');
-INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Pull-up','Calves');
-INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Pull-down','Calves');
-INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Chin-up','Calves');
-INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Muscle-up','Calves');
-INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Seated Row','Calves');
+INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Dips','Triceps');
+INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Pull-up','Lats');
+INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Pull-up','Biceps');
+INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Pull-down','Lats');
+INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Pull-down','Biceps');
+INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Chin-up','Lats');
+INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Chin-up','Biceps');
+INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Muscle-up','Lats');
+INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Muscle-up','Biceps');
+INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Muscle-up','Triceps');
+INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Seated Row','Lats');
+INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Seated Row','Trapezius');
 INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Face Pull','Calves');
-INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Shoulder Shrug','Calves');
-INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Upright Row','Calves');
-INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Bent-over Row','Calves');
+INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Shoulder Shrug','Trapezius');
+INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Shoulder Shrug','Deltoids');
+
+INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Upright Row','Trapezius');
+INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Upright Row','Deltoids');
+
+INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Bent-over Row','Lats');
 INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Bridge','Calves');
 INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Front raise','Calves');
 INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('lateral Raise','Calves');
 INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Military Press','Calves');
 INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Overhead Press','Calves');
-INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Biceps Curl','Calves');
-INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Wirst Curl','Calves');
-INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Crunch','Calves');
+INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Biceps Curl','Biceps');
+INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Wirst Curl','Forearms');
+INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Crunch','Abdominals');
 INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Leg Raise','Calves');
-INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Sit-Up','Calves');
-INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Plank','Calves');
-INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Good-morning','Calves');
-INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Hyperextension','Calves');
+INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Sit-Up','Abdominals');
+INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Plank','Abdominals');
+
+INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Good-morning','Lower Back');
+INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Hyperextension','Lower Back');
+
 INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Leg Press','Calves');
-INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Lunge','Calves');
-INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Calf Raise','Calves');
-INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Shoulder Shrug','Hamstring');
-INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Upright Row','Hamstring');
-INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Bent-over Row','Hamstring');
-INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Bridge','Hamstring');
-INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Front raise','Hamstring');
-INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('lateral Raise','Hamstring');
-INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Military Press','Hamstring');
-INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Overhead Press','Hamstring');
-INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Biceps Curl','Hamstring');
-INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Wirst Curl','Hamstring');
-INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Crunch','Hamstring');
-INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Leg Raise','Hamstring');
-INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Sit-Up','Hamstring');
-INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Plank','Hamstring');
-INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Good-morning','Hamstring');
-INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Hyperextension','Hamstring');
 INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Leg Press','Hamstring');
+INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Leg Press','Quadriceps');
+INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Leg Press','Abdominals');
 INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Lunge','Hamstring');
-INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Calf Raise','Hamstring');
+INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Lunge','Quadriceps');
+INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Lunge','Gluts');
+
+INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Calf Raise','Calves');
+
 
 
 `;
