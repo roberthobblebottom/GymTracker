@@ -5,15 +5,15 @@ import { ExercisesScreen } from './screens/ExercisesScreen';
 import { SettingsScreen } from './screens/SettingsScreen';
 import { PlanScreen } from './screens/ScheduleScreen';
 import 'react-native-gesture-handler';
-import React, { useState, useEffect, Dispatch } from 'react';
+import React, { useState, useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import {
-  init, db, resetTables, createScheduledItem, deleteScheduledItem, updateScheduledItem,
+  init, resetTables, createScheduledItem, deleteScheduledItem, updateScheduledItem,
   createExerciseMajorMuscleRelationship, createExercise, deleteExerciseMajorMuscleRelationship, deleteExercise, updateExercise, retrieveExerciseMajorMuscleRelationships, retrieveMajorMuscles, retrieveScheduledItems, retrieveExercises, deleteFromExerciseAndScheduledItem
 }
   from './dbhandler';
-import { ButtonSetProps, ContextProps, DialogState, Emm, Exercise, ExerciseState, MajorMuscle, PushPullEnum, ScheduledItemState } from './types';
+import { ButtonSetProps, ContextProps, DialogState, Exercise, ExerciseState, MajorMuscle, PushPullEnum, ScheduledItemState } from './types';
 import { ScheduledItem } from './types';
 import Toast from 'react-native-simple-toast';
 import Colors from './constants/Colors';
@@ -24,7 +24,6 @@ import { ScheduleDialog } from './screens/ScheduleDialog';
 import { ExerciseDialog } from './screens/ExerciseDialog';
 import { styles } from './constants/styles';
 import { SelectDateDialog } from './screens/SelectDateDialog';
-import * as Filesystem from 'expo-file-system';
 import { StorageAccessFramework } from 'expo-file-system'
 import { ExerciseInformationText, EditExerciseText, CreateExerciseText, ScheduledItemInformation, EditScheduledItemText, DuplicateScheduledItemText, CreateScheduledItemText } from './constants/strings';
 import { initalContextProps, initialExerciseState, initialScheduledItemState, initialMajorMuscles, initialEmm, initialDialogState, initialScheduledItem } from './constants/initialValues';
@@ -40,7 +39,6 @@ export default function App() {
   const [exerciseState, setExerciseState] = useState<ExerciseState>(initialExerciseState)
   const [scheduledItemState, setScheduledItemState] = useState<ScheduledItemState>(initialScheduledItemState)
   const [dialogState, SetDialogState] = useState<DialogState>(initialDialogState)
-  const [majorMuscles, setMajorMuscles] = useState(initialMajorMuscles)
   const [emm, setEmm] = useState(initialEmm)
 
   const [dropDownMajorMuscleNameSelected, setMajorMuscleValues] = useState([""])
@@ -79,20 +77,20 @@ export default function App() {
             ...exerciseState, exercises: tempExercises, filteredExercises: tempExercises
           })
         })
-    if (majorMuscles[0] == initialMajorMuscles[0])
-      retrieveMajorMuscles((_, results) => setMajorMuscles(results.rows._array))
+    if (exerciseState.majorMuscles[0] == initialMajorMuscles[0])
+      retrieveMajorMuscles((_, results) => setExerciseState({...exerciseState,majorMuscles:results.rows._array}))
     if (emm[0] == initialEmm[0])
       retrieveExerciseMajorMuscleRelationships((_, results) => setEmm(results.rows._array))
-    if (majorMuscles.length > 1 && exerciseState.exercises.length > 1 && emm.length > 1) {
+    if (exerciseState.majorMuscles.length > 1 && exerciseState.exercises.length > 1 && emm.length > 1) {
       emm.forEach(x => {
         const ex = exerciseState.exercises.find(e => e.name == x.exercise_name)
-        const mm2 = majorMuscles.find(mm => mm.name == x.major_muscle_name)
+        const mm2 = exerciseState.majorMuscles.find(mm => mm.name == x.major_muscle_name)
         if (ex == undefined) return;
         if (ex.major_muscles == initialMajorMuscles) ex.major_muscles = [mm2!]
         else if (!ex.major_muscles.find(x => x.name == mm2?.name)) ex.major_muscles.push(mm2!)
       })
     }
-  }, [scheduledItemState, exerciseState, majorMuscles, emm])
+  }, [scheduledItemState, exerciseState,  emm])
   init()
 
   let textInputStyle, numberInputStyle
@@ -109,7 +107,6 @@ export default function App() {
     setExerciseState(initialExerciseState)
     setScheduledItemState(initialScheduledItemState)
     SetDialogState(initialDialogState)
-    setMajorMuscles(initialMajorMuscles)
     setEmm(initialEmm)
   }
 
@@ -220,7 +217,7 @@ export default function App() {
   };
 
   const deleteExerciseWithStateUpdate = (exercise: Exercise) => {
-    const selected: MajorMuscle[] = majorMuscles.filter(x => dropDownMajorMuscleNameSelected.includes(x.name))
+    const selected: MajorMuscle[] = exerciseState.majorMuscles.filter(x => dropDownMajorMuscleNameSelected.includes(x.name))
     selected.forEach(x => deleteExerciseMajorMuscleRelationship(exercise.name, x.name))
     deleteExercise(exercise.name, () => {
       const deletedName = exercise.name;
@@ -246,7 +243,7 @@ export default function App() {
     }
     const oldExerciseName = exerciseState.oldExerciseName
     const pushPullDropDownValue = dropDownPushPullSelected
-    const selected: MajorMuscle[] = majorMuscles.filter(x => dropDownMajorMuscleNameSelected.includes(x.name))
+    const selected: MajorMuscle[] = exerciseState.majorMuscles.filter(x => dropDownMajorMuscleNameSelected.includes(x.name))
     const toBeCreated: MajorMuscle[] = selected.filter(x => !aExercise.major_muscles.find(t => t.name == x.name))
     const toBeDeleted: MajorMuscle[] = aExercise.major_muscles.filter(x => !selected.find(t => t.name == x.name))
     toBeCreated.forEach(x => createExerciseMajorMuscleRelationship(aExercise.name, x.name))
@@ -276,7 +273,7 @@ export default function App() {
       Toast.show("name cannot be empty")
       return
     }
-    const selected: MajorMuscle[] = majorMuscles.filter(x => dropDownMajorMuscleNameSelected.includes(x.name))
+    const selected: MajorMuscle[] = exerciseState.majorMuscles.filter(x => dropDownMajorMuscleNameSelected.includes(x.name))
     selected.forEach(x => createExerciseMajorMuscleRelationship(aExercise.name, x.name))
 
     aExercise.push_or_pull = dropDownPushPullSelected
@@ -519,7 +516,7 @@ export default function App() {
           exerciseState={exerciseState}
           dialogState={dialogState}
           scheduledItemState={scheduledItemState}
-          majorMuscles={majorMuscles}
+          majorMuscles={exerciseState.majorMuscles}
           dropDownPushPullSelected={dropDownPushPullSelected}
           dropDownMajorMuscleNameSelected={dropDownMajorMuscleNameSelected}
 

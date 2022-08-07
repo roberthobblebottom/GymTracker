@@ -4,11 +4,12 @@ const d: Date = new Date()
 //initial constant values
 export const initialDate = { year: 0, month: 0, day: 0, timestamp: 0, dateString: "" };
 export const initialExerciseState: ExerciseState = {
-  exercises: [{ name: "", description: "", imagesJson: "", major_muscles: [], push_or_pull: PushPullEnum.Push }]
-  , aExercise: { name: "", description: "", imagesJson: "", major_muscles: [], push_or_pull: PushPullEnum.Push }
-  , filteredExercises: [{ name: "", description: "", imagesJson: "", major_muscles: [], push_or_pull: PushPullEnum.Push }]
-  , filteredExerciseKeyword: ""
-  , oldExerciseName: ""
+  exercises: [{ name: "", description: "", imagesJson: "", major_muscles: [], push_or_pull: PushPullEnum.Push }],
+  aExercise: { name: "", description: "", imagesJson: "", major_muscles: [], push_or_pull: PushPullEnum.Push },
+  filteredExercises: [{ name: "", description: "", imagesJson: "", major_muscles: [], push_or_pull: PushPullEnum.Push }],
+  filteredExerciseKeyword: "",
+  oldExerciseName: "",
+  majorMuscles: []
 };
 export const initialScheduledItem: ScheduledItem[] = [{
   id: 0, exercise: initialExerciseState.aExercise,

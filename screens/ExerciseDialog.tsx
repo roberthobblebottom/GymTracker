@@ -1,3 +1,5 @@
+// @ts-nocheck
+// remove this line above if there are suspicions of other errors other than the set open for the drop downs.
 import {
     Modal, View, Text, TouchableOpacity, TextInput, Pressable, Button, FlatList
 } from 'react-native'
@@ -11,7 +13,7 @@ import { bases, styles } from '../constants/styles'
 import { DialogState, Exercise, PushPullEnum, ScheduledItem, ScheduledItemState } from '../types'
 import { ButtonSet } from './ButtonSet'
 import Toast from 'react-native-simple-toast'
-import { initialScheduledItem } from '../App'
+import { initialScheduledItem } from '../constants/initialValues'
 export function ExerciseDialog(props: any) {
     const exerciseState = props.exerciseState;
     const majorMuscles = props.majorMuscles

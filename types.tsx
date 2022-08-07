@@ -75,7 +75,8 @@ export type ExerciseState = {
   aExercise: Exercise,
   filteredExercises: Exercise[],
   filteredExerciseKeyword: string,
-  oldExerciseName: string
+  oldExerciseName: string,
+  majorMuscles:MajorMuscle[]
 }
 
 export type ScheduledItemState = {
