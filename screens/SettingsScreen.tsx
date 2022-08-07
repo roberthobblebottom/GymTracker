@@ -1,6 +1,6 @@
 
 import {
-    View, Button, Alert, Pressable, Text,
+    View, Pressable, Alert, Text,
     Platform, StyleProp, ViewStyle
 } from 'react-native';
 import React, { useContext } from 'react';
@@ -18,20 +18,34 @@ function confirmation(handleFunc: Function) {
 
 const androidStyle = () => {
     if (Platform.OS == 'ios') return (
-        { ...styles.buttonSet, display: 'none' } as StyleProp<ViewStyle>)
-    else return { ...styles.buttonSet, display: 'flex' } as StyleProp<ViewStyle>
+        { ...styles.settingButtonSet, display: 'none' } as StyleProp<ViewStyle>)
+    else return { ...styles.settingButtonSet, display: 'flex' } as StyleProp<ViewStyle>
 }
-
+const androidTextStyle = () => {
+    if (Platform.OS == 'ios') return ({ display: 'none' } as StyleProp<ViewStyle>)
+    else return ({ display: 'flex' } as StyleProp<ViewStyle>)
+}
+function textStyle() {
+    if (Platform.OS == 'ios')
+        return <Text></Text>
+    else return <Text >
+        Make sure that the folder you choose have only one file with the prefix "backup.json". However if there are multiple, the very first one will be choosen
+    </Text>
+}
 export function SettingsScreen() {
     const context = useContext(SettingsScreenContext);
     return (
         <View style={styles.settingsScreen}>
-            <Button title='Reset Database' onPress={() => confirmation(context.handleResetDB)} />
+            <Pressable style={styles.settingButtonSet} onPress={() => confirmation(context.handleResetDB)}>
+                <Text style={styles.settingsButtonText}>
+                    RESET DATA
+                </Text></Pressable>
             <Pressable style={() => androidStyle()} onPress={() => context.handleExport()}>
                 <Text style={styles.settingsButtonText}>EXPORT</Text></Pressable>
             <Pressable style={() => androidStyle()} onPress={() => context.handleImport()}>
                 <Text style={styles.settingsButtonText}>IMPORT </Text></Pressable>
-            <Text>Make sure that the folder you choose have only one file with the prefix "backup.json". However if there are multiple, the very first one will be choosen</Text>
+            {textStyle()}
+
         </View>
     );
 }

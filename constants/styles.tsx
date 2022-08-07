@@ -90,6 +90,16 @@ export const styles = StyleSheet.create({
     backgroundColor: '#2196F3',
     ...bases.changeButtonBase
   },
+settingButtonSet: {
+    backgroundColor: '#2196F3',
+    // marginLeft: Layout.defaultMargin,
+    paddingHorizontal: Layout.defaultMargin,
+    paddingTop: 6,
+    height: 30,
+    marginBottom: 7,
+    elevation: 4,
+    borderRadius: 2,
+  },
   buttonSet: {
     backgroundColor: '#2196F3',
     marginLeft: Layout.defaultMargin,

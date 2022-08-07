@@ -134,8 +134,16 @@ export default function App() {
       Toast.show("Cannot find the file name with the suffix \'backup.json\'")
       return
     }
-    deleteFromExerciseAndScheduledItem()
     const data = JSON.parse(await StorageAccessFramework.readAsStringAsync(fileName))
+    if (!('exercises' in data) || !('scheduledItems' in data)) {
+      Toast.show("The data does not have the correct format")
+      return
+    }
+    if (Array.isArray(data.exercises) || Array.isArray(data.scheduledItems !== Array)) {
+      Toast.show("The data does not have the correct format")
+      return
+    }
+    deleteFromExerciseAndScheduledItem()
     setExerciseState({
       ...exerciseState,
       exercises: data.exercises,
@@ -146,9 +154,9 @@ export default function App() {
       scheduledItems: data.scheduledItems,
       filteredScheduledItems: data.scheduledItems
     })
-    data.exercises.forEach((ex: Exercise)=> createExercise(ex))
+    data.exercises.forEach((ex: Exercise) => createExercise(ex))
     console.log(scheduledItemState.scheduledItems)
-    data.scheduledItems.forEach((si:ScheduledItem)=>createScheduledItem(si))
+    data.scheduledItems.forEach((si: ScheduledItem) => createScheduledItem(si))
   }
 
   function cancelDialog() {
