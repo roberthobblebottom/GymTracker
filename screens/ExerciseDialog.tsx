@@ -3,7 +3,6 @@
 import {
     Modal, View, Text, TouchableOpacity, TextInput, Pressable, Button, FlatList
 } from 'react-native'
-import 'react-native-gesture-handler'
 import React, { Dispatch } from 'react'
 import Colors from '../constants/Colors'
 import Layout from '../constants/Layout'

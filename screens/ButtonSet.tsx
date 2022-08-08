@@ -1,7 +1,6 @@
 import {
     View, Pressable, Text
 } from 'react-native'
-import 'react-native-gesture-handler'
 import React, { Dispatch } from 'react'
 import _default from 'babel-plugin-transform-typescript-metadata'
 import { bases, styles } from '../constants/styles'

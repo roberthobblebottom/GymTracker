@@ -20,10 +20,7 @@ const androidStyle = () => {
         { ...styles.settingButtonSet, display: 'none' } as StyleProp<ViewStyle>)
     else return { ...styles.settingButtonSet, display: 'flex' } as StyleProp<ViewStyle>
 }
-const androidTextStyle = () => {
-    if (Platform.OS == 'ios') return ({ display: 'none' } as StyleProp<ViewStyle>)
-    else return ({ display: 'flex' } as StyleProp<ViewStyle>)
-}
+
 function textStyle() {
     if (Platform.OS == 'ios')
         return <Text></Text>
@@ -43,10 +40,10 @@ export function SettingsScreen() {
                 <Text style={styles.settingsButtonText}>EXPORT</Text></Pressable>
             <Pressable style={() => androidStyle()} onPress={() => context.handleImport()}>
                 <Text style={styles.settingsButtonText}>IMPORT </Text></Pressable>
-            {textStyle()}
+            {/* {textStyle()} */}
             <Pressable style={styles.settingButtonSet} onPress={() => Alert.alert("Credits", "Credits to various Wikipedia articles where the exercises information is retrieved", [{
                 text: "Cancel",
-                onPress: () => console.log("Cancel Pressed"),
+                onPress: () => {},
                 style: "cancel"
             },], { cancelable: true })}>
                 <Text style={styles.settingsButtonText}>CREDITS </Text></Pressable>

@@ -2,7 +2,6 @@ import {
   Modal, View, Text, Button,
   TouchableOpacity, TextInput, Pressable
 } from 'react-native'
-import 'react-native-gesture-handler'
 import React, { } from 'react'
 import Toast from 'react-native-simple-toast'
 import Colors from '../constants/Colors'

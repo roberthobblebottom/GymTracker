@@ -4,7 +4,6 @@ import {
 import { ExercisesScreen } from './screens/ExercisesScreen';
 import { SettingsScreen } from './screens/SettingsScreen';
 import { PlanScreen } from './screens/ScheduleScreen';
-import 'react-native-gesture-handler';
 import React, { useState, useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -34,6 +33,7 @@ import {
   initalContextProps, initialExerciseState, initialScheduledItemState, initialMajorMuscles,
   initialEmm, initialDialogState, initialScheduledItem
 } from './constants/initialValues';
+import * as DocumentPicker from 'expo-document-picker';
 LogBox.ignoreLogs(['Require cycle:'])
 const Tab = createBottomTabNavigator()
 
@@ -129,26 +129,39 @@ export default function App() {
     if (!permissions.granted) return
     let uri = await StorageAccessFramework.createFileAsync(permissions.directoryUri, "GymTracker backup", "application/json")
     await StorageAccessFramework.writeAsStringAsync(uri, JSON.stringify(exportData))
+    Alert.alert("", `The backup data is now saved in the approved folder as "+'GymTracker backup.json'+" 
+    \nNote: if there is multiple backups, it will be numbered.`,
+      [{
+        text: "Cancel",
+        onPress: () => { },
+        style: "cancel"
+      }],
+      { cancelable: true }
+    )
+
   }
 
   async function handleImport() {
+    Toast.show("Please grant folder permissions.")
     const permissions = await StorageAccessFramework.requestDirectoryPermissionsAsync()
     if (!permissions.granted) return
-    const directory = await StorageAccessFramework.readDirectoryAsync(permissions.directoryUri)
-    const fileName = directory.find((v) => v.includes('backup') && v.includes('GymTracker') && v.includes('.json'))
-    if (fileName == undefined) {
-      Toast.show("Cannot find the file name with the suffix \'backup.json\'")
+    // const directory = await StorageAccessFramework.readDirectoryAsync(permissions.directoryUri)
+    // const fileName = directory.find((v) => v.includes('backup') && v.includes('GymTracker') && v.includes('.json'))
+    Toast.show("Please choose the correct json file")
+    let documentResult: DocumentPicker.DocumentResult = await DocumentPicker.getDocumentAsync({ type: 'application/json' });
+    if (documentResult.type == 'cancel') {
       return
     }
-    const data = JSON.parse(await StorageAccessFramework.readAsStringAsync(fileName))
+    const data = JSON.parse(await StorageAccessFramework.readAsStringAsync(documentResult.uri))
+    console.log(data)
     if (!('exercises' in data) || !('scheduledItems' in data)) {
       Toast.show("The data does not have the correct format")
       return
     }
-    if (Array.isArray(data.exercises) || Array.isArray(data.scheduledItems !== Array)) {
+    if (!Array.isArray(data.exercises) || !Array.isArray(data.scheduledItems)) {
       Toast.show("The data does not have the correct format")
       return
-    }
+    }//error is here
     deleteFromExerciseAndScheduledItem()
     setExerciseState({
       ...exerciseState,
