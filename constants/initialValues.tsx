@@ -3,13 +3,15 @@ import { ExerciseState, PushPullEnum, ScheduledItem, ScheduledItemState, MajorMu
 const d: Date = new Date()
 //initial constant values
 export const initialDate = { year: 0, month: 0, day: 0, timestamp: 0, dateString: "" };
+export const initialMajorMuscles: MajorMuscle[] = [{ name: "", notes: "", imageJson: "" }];
 export const initialExerciseState: ExerciseState = {
   exercises: [{ name: "", description: "", imagesJson: "", major_muscles: [], push_or_pull: PushPullEnum.Push }],
   aExercise: { name: "", description: "", imagesJson: "", major_muscles: [], push_or_pull: PushPullEnum.Push },
   filteredExercises: [{ name: "", description: "", imagesJson: "", major_muscles: [], push_or_pull: PushPullEnum.Push }],
   filteredExerciseKeyword: "",
   oldExerciseName: "",
-  majorMuscles: []
+  majorMuscles: initialMajorMuscles
+
 };
 export const initialScheduledItem: ScheduledItem[] = [{
   id: 0, exercise: initialExerciseState.aExercise,
@@ -24,7 +26,6 @@ export const initialScheduledItemState: ScheduledItemState = {
   selectedScheduledItems: [],
   isMovingScheduledItems: false
 }
-export const initialMajorMuscles: MajorMuscle[] = [{ name: "", notes: "", imageJson: "" }];
 export const initialEmm: Emm[] = [{ id: 9999, exercise_name: "", major_muscle_name: "" }];
 export const initialDialogState = {
   isExDialogVisible: false,

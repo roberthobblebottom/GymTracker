@@ -10,7 +10,8 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import {
   init, resetTables, createScheduledItem, deleteScheduledItem, updateScheduledItem,
-  createExerciseMajorMuscleRelationship, createExercise, deleteExerciseMajorMuscleRelationship, deleteExercise, updateExercise, retrieveExerciseMajorMuscleRelationships, retrieveMajorMuscles, retrieveScheduledItems, retrieveExercises, deleteFromExerciseAndScheduledItem
+  createExerciseMajorMuscleRelationship, createExercise, deleteExerciseMajorMuscleRelationship, deleteExercise, updateExercise,
+  retrieveExerciseMajorMuscleRelationships, retrieveMajorMuscles, retrieveScheduledItems, retrieveExercises, deleteFromExerciseAndScheduledItem
 }
   from './dbhandler';
 import { ButtonSetProps, ContextProps, DialogState, Exercise, ExerciseState, MajorMuscle, PushPullEnum, ScheduledItemState } from './types';
@@ -25,8 +26,14 @@ import { ExerciseDialog } from './screens/ExerciseDialog';
 import { styles } from './constants/styles';
 import { SelectDateDialog } from './screens/SelectDateDialog';
 import { StorageAccessFramework } from 'expo-file-system'
-import { ExerciseInformationText, EditExerciseText, CreateExerciseText, ScheduledItemInformation, EditScheduledItemText, DuplicateScheduledItemText, CreateScheduledItemText } from './constants/strings';
-import { initalContextProps, initialExerciseState, initialScheduledItemState, initialMajorMuscles, initialEmm, initialDialogState, initialScheduledItem } from './constants/initialValues';
+import {
+  ExerciseInformationText, EditExerciseText, CreateExerciseText, ScheduledItemInformation,
+  EditScheduledItemText, DuplicateScheduledItemText, CreateScheduledItemText
+} from './constants/strings';
+import {
+  initalContextProps, initialExerciseState, initialScheduledItemState, initialMajorMuscles,
+  initialEmm, initialDialogState, initialScheduledItem
+} from './constants/initialValues';
 LogBox.ignoreLogs(['Require cycle:'])
 const Tab = createBottomTabNavigator()
 
@@ -77,20 +84,22 @@ export default function App() {
             ...exerciseState, exercises: tempExercises, filteredExercises: tempExercises
           })
         })
-    if (exerciseState.majorMuscles[0] == initialMajorMuscles[0])
-      retrieveMajorMuscles((_, results) => setExerciseState({...exerciseState,majorMuscles:results.rows._array}))
+
+    if (exerciseState.majorMuscles[0] == initialMajorMuscles[0]) {
+      retrieveMajorMuscles((_, results) => setExerciseState({ ...exerciseState, majorMuscles: results.rows._array }))
+    }
     if (emm[0] == initialEmm[0])
       retrieveExerciseMajorMuscleRelationships((_, results) => setEmm(results.rows._array))
     if (exerciseState.majorMuscles.length > 1 && exerciseState.exercises.length > 1 && emm.length > 1) {
       emm.forEach(x => {
         const ex = exerciseState.exercises.find(e => e.name == x.exercise_name)
         const mm2 = exerciseState.majorMuscles.find(mm => mm.name == x.major_muscle_name)
-        if (ex == undefined) return;
+        if (ex == undefined || mm2 == undefined) return;
         if (ex.major_muscles == initialMajorMuscles) ex.major_muscles = [mm2!]
-        else if (!ex.major_muscles.find(x => x.name == mm2?.name)) ex.major_muscles.push(mm2!)
+        else if (!ex.major_muscles.find(x => x.name == mm2.name)) ex.major_muscles.push(mm2!)
       })
     }
-  }, [scheduledItemState, exerciseState,  emm])
+  }, [scheduledItemState, exerciseState, emm])
   init()
 
   let textInputStyle, numberInputStyle
@@ -126,7 +135,7 @@ export default function App() {
     const permissions = await StorageAccessFramework.requestDirectoryPermissionsAsync()
     if (!permissions.granted) return
     const directory = await StorageAccessFramework.readDirectoryAsync(permissions.directoryUri)
-    const fileName = directory.find((v) => v.includes('backup')&& v.includes('GymTracker')&&v.includes('.json'))
+    const fileName = directory.find((v) => v.includes('backup') && v.includes('GymTracker') && v.includes('.json'))
     if (fileName == undefined) {
       Toast.show("Cannot find the file name with the suffix \'backup.json\'")
       return
@@ -236,7 +245,6 @@ export default function App() {
 
   const updateExerciseWithStateUpdate = () => {
     const aExercise = exerciseState.aExercise
-    console.log("111" + aExercise.name + "111")
     if (aExercise.name.trim() == "") {
       Toast.show("name cannot be empty")
       return
