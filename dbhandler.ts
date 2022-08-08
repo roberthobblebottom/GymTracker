@@ -213,30 +213,28 @@ INSERT INTO "exercise" VALUES ('Incline Dumbbell Bench Press',"Push",'An incline
 INSERT INTO "exercise" VALUES ('Decline Dumbbell Bench Press',"Push",'A decline dumbell bench press elevates the pelvis and lowers the head, and emphasizes the lower portion of the pectoralis major whilst incorporating shoulders and triceps.',"{}");
 INSERT INTO "exercise" VALUES ('Chest Fly',"Push",'The chest fly or pectoral fly (abbreviated to pec fly) primarily works the pectoralis major muscles to move the arms horizontally forward.',"{}");
 INSERT INTO "exercise" VALUES ('Dips',"Push",'To perform a dip, the exerciser supports themselves on a dip bar with their arms straight down and shoulders over their hands, then lowers their body until their arms are bent to a 90 degree angle at the elbows, and then lifts their body up, returning to the starting position. ',"{}");
-INSERT INTO "exercise" VALUES ('Pull-up',"Pull",'TESTING DESCRIPTION',"{}");
+INSERT INTO "exercise" VALUES ('Pull-up',"Pull",'The pull-up is a closed-chain movement where the body is suspended by the hands with forward grip and pulls up. As this happens, the elbows flex and the shoulders adduct and extend to bring the elbows to the torso.',"{}");
 INSERT INTO "exercise" VALUES ('Pull-down',"Pull",'',"{}");
-INSERT INTO "exercise" VALUES ('Chin-up',"Pull",'TESTING DESCRIPTION',"{}");
-INSERT INTO "exercise" VALUES ('Muscle-up',"Pull",'TESTING DESCRIPTION',"{}");
-INSERT INTO "exercise" VALUES ('Seated Row',"Pull",'TESTING DESCRIPTION',"{}");
-INSERT INTO "exercise" VALUES ('Face Pull',"Pull",'TESTING DESCRIPTION',"{}");
-INSERT INTO "exercise" VALUES ('Shoulder Shrug',"Pull",'TESTING DESCRIPTION',"{}");
-INSERT INTO "exercise" VALUES ('Upright Row',"Pull",'TESTING DESCRIPTION',"{}");
-INSERT INTO "exercise" VALUES ('Bent-over Row',"Pull",'TESTING DESCRIPTION',"{}");
-INSERT INTO "exercise" VALUES ('Bridge',"Pull",'TESTING DESCRIPTION',"{}");
-INSERT INTO "exercise" VALUES ('Front raise',"Pull",'TESTING DESCRIPTION',"{}");
-INSERT INTO "exercise" VALUES ('lateral Raise',"Pull",'TESTING DESCRIPTION',"{}");
-INSERT INTO "exercise" VALUES ('Military Press',"Push",'TESTING DESCRIPTION',"{}");
-INSERT INTO "exercise" VALUES ('Overhead Press',"Push",'TESTING DESCRIPTION',"{}");
-INSERT INTO "exercise" VALUES ('Biceps Curl',"Pull",'TESTING DESCRIPTION',"{}");
-INSERT INTO "exercise" VALUES ('Wirst Curl',"Pull",'TESTING DESCRIPTION',"{}");
-INSERT INTO "exercise" VALUES ('Crunch',"Push",'TESTING DESCRIPTION',"{}");
-INSERT INTO "exercise" VALUES ('Leg Raise',"Push",'TESTING DESCRIPTION',"{}");
-INSERT INTO "exercise" VALUES ('Sit-Up',"Pull",'TESTING DESCRIPTION',"{}");
-INSERT INTO "exercise" VALUES ('Plank',"Push",'TESTING DESCRIPTION',"{}");
-INSERT INTO "exercise" VALUES ('Good-morning',"Pull",'TESTING DESCRIPTION',"{}");
-INSERT INTO "exercise" VALUES ('Hyperextension',"Pull",'TESTING DESCRIPTION',"{}");
+INSERT INTO "exercise" VALUES ('Chin-up',"Pull",'The chin up is a closed-chain movement where the body is suspended by the hands with reverse grip and pulls up. As this happens, the elbows flex and the shoulders adduct and extend to bring the elbows to the torso.',"{}");
+INSERT INTO "exercise" VALUES ('Muscle-up',"Pull",'A pull-up with a maximal range of motion, transitioning to a dip. ',"{}");
+INSERT INTO "exercise" VALUES ('Seated Row',"Pull",'An exercise where the purpose is to strengthen the muscles that draw the rower''s arms toward the body (latissimus dorsi) as well as those that retract the scapulae (trapezius and rhomboids) and those that support the spine (erector spinae).',"{}");
+INSERT INTO "exercise" VALUES ('Face Pull',"Pull",'The face pull is often performed standing using a cable machine and rope attachment, with the subject rowing the rope attachment towards the face, with the elbows flared outwards',"{}");
+INSERT INTO "exercise" VALUES ('Shoulder Shrug',"Pull",'The lifter stands erect, hands about shoulder width apart, and slowly raises the shoulders as high as possible, and then slowly lowers them, while not bending the elbows, or moving the body at all.',"{}");
+INSERT INTO "exercise" VALUES ('Upright Row',"Pull",'The upright row is a weight training exercise performed by holding a weight with an overhand grip and lifting it straight up to the collarbone',"{}");
+INSERT INTO "exercise" VALUES ('Bent-over Row',"Pull",'',"{}");
+INSERT INTO "exercise" VALUES ('Front raise',"Pull",'To execute the exercise, the lifter stands with their feet shoulder width apart and weights or resistance handles held by their side with a pronated (overhand) grip. ',"{}");
+INSERT INTO "exercise" VALUES ('lateral Raise',"Pull",'The movement starts with the arms straight, and the hands holding weights at the sides or in front of the body. Body is in a slight forward-leaning position with hips and knees bent a little. Arms are kept straight or slightly bent, and raised through an arc of movement in the coronal plane that terminates when the hands are at approximately shoulder height',"{}");
+INSERT INTO "exercise" VALUES ('Overhead Press',"Push",'The lift is set up by taking either a barbell, a pair of dumbbells or kettlebells, and holding them at shoulder level. The weight is then pressed overhead. While the exercise can be performed standing or seated, standing recruits more muscles as more balancing is required in order to support the lift.',"{}");
+INSERT INTO "exercise" VALUES ('Biceps Curl',"Pull",'A biceps curl usually starts with the arm in a fully extended position, holding a weight with a supinated (palms facing up) grip. A full repetition consists of bending or "curling" the elbow until it is fully flexed, then slowly lowering the weight to the starting position. ',"{}");
+INSERT INTO "exercise" VALUES ('Wirst Curl',"Pull",'To perform a seated wrist curl, the lifter should be seated on a bench with knees bent and the forearm(s) resting on the thigh, or with forearms on a bench and hands hanging off the edge. The palm should be facing up and the hand should be free to move completely up and down. At the starting point, the wrist should be bent back so that the fingers are almost pointing down at the floor. In a steady motion, the lifter should raise the weight by using the forearm muscles to bring the hand up as far as possible. The forearm itself should remain resting on the thigh. Then the weight should be slowly lowered back down to the starting point. ',"{}");
+INSERT INTO "exercise" VALUES ('Crunch',"Push",'',"{}");
+INSERT INTO "exercise" VALUES ('Leg Raise',"Push",'The lying leg raise is done by lying on the floor on the back. It is done without apparatus except possibly cushions or weights for added resistance.  There are other variants',"{}");
+INSERT INTO "exercise" VALUES ('Sit-Up',"Pull",'It begins with lying with the back on the floor, typically with the arms across the chest or hands behind the head and the knees and toes bent in an attempt to reduce stress on the back muscles and spine, and then elevating both the upper and lower vertebrae from the floor until everything superior to the buttocks is not touching the ground. ',"{}");
+INSERT INTO "exercise" VALUES ('Plank',"Push",'An isometric core strength exercise that involves maintaining a position similar to a push-up for the maximum possible time. ',"{}");
+INSERT INTO "exercise" VALUES ('Good-morning',"Pull",'One starts with a barbell held on one''s shoulders, behind the head. Similar to a back squat, there is some variation with the height on the back at which the bar is held. Holding the bar lower on the back decreases the distance to the pelvis and decreases the strain on the hip and spine extensors: a low bar position allows one to lift heavier weights while a high position allows one to stress the muscles harder with a lighter weight. ',"{}");
+INSERT INTO "exercise" VALUES ('Hyperextension',"Pull",'',"{}");
 INSERT INTO "exercise" VALUES ('Leg Press',"Push",'Raise legs while lying down. There are other variants too.',"{}");
-INSERT INTO "exercise" VALUES ('Lunge',"Push",'TESTING DESCRIPTION',"{}");
+INSERT INTO "exercise" VALUES ('Lunge',"Push",'A lunge can refer to any position of the human body where one leg is positioned forward with knee bent and foot flat on the ground while the other leg is positioned behind.',"{}");
 INSERT INTO "exercise" VALUES ('Calf Raise',"Push",'',"{}");
 INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Conventional Deadlift','Hamstring');
 INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Conventional Deadlift','Quadriceps');
@@ -273,9 +271,9 @@ INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_n
 INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Sumo Squad','Gluts');
 INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Sumo Squad','Abdominals');
 
-INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Bodyweight Squad','Quadriceps');
-INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Bodyweight Squad','Gluts');
-INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Bodyweight Squad','Abdominals');
+INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Bodyweight Squat','Quadriceps');
+INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Bodyweight Squat','Gluts');
+INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Bodyweight Squat','Abdominals');
 
 
 
@@ -321,11 +319,17 @@ INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_n
 INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Upright Row','Deltoids');
 
 INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Bent-over Row','Lats');
-INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Bridge','Calves');
-INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Front raise','Calves');
-INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('lateral Raise','Calves');
-INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Military Press','Calves');
-INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Overhead Press','Calves');
+
+
+
+
+INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Front raise','Deltoids');
+INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('lateral Raise','Deltoids');
+INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Overhead Press','Deltoids');
+
+
+
+
 INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Biceps Curl','Biceps');
 INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Wirst Curl','Forearms');
 INSERT INTO "exercise_major_muscle_one_to_many" ('exercise_name','major_muscle_name') VALUES ('Crunch','Abdominals');
