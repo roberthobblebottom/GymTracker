@@ -15,7 +15,7 @@ import { DialogState, Exercise, ScheduledItem, ScheduledItemState } from '../typ
 export function ScheduleDialog(props: any) {
   //variables
   const exerciseState = props.exerciseState
-  const dialogState: DialogState = props.dialogState;
+  const dialogState: DialogState = props.dialogState
   const dropDownExNameSelected = props.dropDownExNameSelected
   const scheduledItemState: ScheduledItemState = props.scheduledItemState
 
@@ -201,7 +201,7 @@ export function ScheduleDialog(props: any) {
                 if (dialogState.isEditable && minutes >= 1) return styles.changeButtonEnabled
                 else styles.changeButtonDisabled
               }} disabled={!dialogState.isEditable || minutes <= 0} onPress={() => {
-                const a = aScheduledItem.duration_in_seconds - 60;
+                const a = aScheduledItem.duration_in_seconds - 60
                 setScheduledItemState({ ...scheduledItemState, aScheduledItem: { ...aScheduledItem, duration_in_seconds: a } })
               }
               } >
@@ -272,7 +272,7 @@ export function ScheduleDialog(props: any) {
                     })
                     return
                   }
-                  const totalSec = minutes + seconds;
+                  const totalSec = minutes + seconds
                   const item = Object.assign({}, aScheduledItem)
                   item.duration_in_seconds = totalSec
                   setScheduledItemState({

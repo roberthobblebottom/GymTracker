@@ -1,44 +1,46 @@
 import {
   Alert, LogBox
-} from 'react-native';
-import { ExercisesScreen } from './screens/ExercisesScreen';
-import { SettingsScreen } from './screens/SettingsScreen';
-import { PlanScreen } from './screens/ScheduleScreen';
-import React, { useState, useEffect } from 'react';
-import { NavigationContainer } from '@react-navigation/native';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+} from 'react-native'
+import { ExercisesScreen } from './screens/ExercisesScreen'
+import { SettingsScreen } from './screens/SettingsScreen'
+import { PlanScreen } from './screens/ScheduleScreen'
+import React, { useState, useEffect } from 'react'
+import { NavigationContainer } from '@react-navigation/native'
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import {
   init, resetTables, createScheduledItem, deleteScheduledItem, updateScheduledItem,
   createExerciseMajorMuscleRelationship, createExercise, deleteExerciseMajorMuscleRelationship, deleteExercise, updateExercise,
   retrieveExerciseMajorMuscleRelationships, retrieveMajorMuscles, retrieveScheduledItems, retrieveExercises, deleteFromExerciseAndScheduledItem
-} from './dbhandler';
-import { ButtonSetProps, ContextProps, DialogState, Exercise, ExerciseState, MajorMuscle, PushPullEnum, ScheduledItemState } from './types';
-import { ScheduledItem } from './types';
-import Toast from 'react-native-simple-toast';
-import Colors from './constants/Colors';
-import { DateData } from 'react-native-calendars';
-import { Ionicons, MaterialCommunityIcons, } from '@expo/vector-icons';
-import _default from 'babel-plugin-transform-typescript-metadata';
-import { ScheduleDialog } from './screens/ScheduleDialog';
-import { ExerciseDialog } from './screens/ExerciseDialog';
-import { styles } from './constants/styles';
-import { SelectDateDialog } from './screens/SelectDateDialog';
+} from './dbhandler'
+import { ButtonSetProps, ContextProps, DialogState, Exercise, ExerciseState, MajorMuscle, PushPullEnum, ScheduledItemState } from './types'
+import { ScheduledItem } from './types'
+import Toast from 'react-native-simple-toast'
+import Colors from './constants/Colors'
+import { DateData } from 'react-native-calendars'
+import { Ionicons, MaterialCommunityIcons, } from '@expo/vector-icons'
+import _default from 'babel-plugin-transform-typescript-metadata'
+import { ScheduleDialog } from './screens/ScheduleDialog'
+import { ExerciseDialog } from './screens/ExerciseDialog'
+import { styles } from './constants/styles'
+import { SelectDateDialog } from './screens/SelectDateDialog'
 import { StorageAccessFramework } from 'expo-file-system'
 import {
   ExerciseInformationText, EditExerciseText, CreateExerciseText, ScheduledItemInformation,
   EditScheduledItemText, DuplicateScheduledItemText, CreateScheduledItemText
-} from './constants/strings';
+} from './constants/strings'
 import {
   initialExerciseState, initialScheduledItemState, initialMajorMuscles,
-  initialEmm, initialDialogState, initialScheduledItem, ExerciseScreenContext, ScheduledItemContext, SettingsScreenContext
-} from './constants/initialValues';
-import * as DocumentPicker from 'expo-document-picker';
+  initialEmm, initialDialogState, initialScheduledItem, ExerciseScreenContext, 
+  ScheduledItemContext, SettingsScreenContext
+} from './constants/initialValues'
+import * as DocumentPicker from 'expo-document-picker'
 LogBox.ignoreLogs(['Require cycle:'])
 const Tab = createBottomTabNavigator()
 
 export default function App() {
   const [exerciseState, setExerciseState] = useState<ExerciseState>(initialExerciseState)
-  const [scheduledItemState, setScheduledItemState] = useState<ScheduledItemState>(initialScheduledItemState)
+  const [scheduledItemState, setScheduledItemState] = 
+  useState<ScheduledItemState>(initialScheduledItemState)
   const [dialogState, SetDialogState] = useState<DialogState>(initialDialogState)
   const [emm, setEmm] = useState(initialEmm)
 
@@ -48,25 +50,25 @@ export default function App() {
 
   function handlePlanHeader(date: DateData) {
     const s: string = ("Plan " + date.day + "-" + date.month + "-" + date.year)
-    SetDialogState({ ...dialogState, planHeader: s });
+    SetDialogState({ ...dialogState, planHeader: s })
   }
   useEffect(() => {
-    let tempExercises: Exercise[];
+    let tempExercises: Exercise[]
     if (exerciseState.exercises[0] != undefined)
       if (exerciseState.exercises[0].name == "" || exerciseState.exercises.length <= 0)
         retrieveExercises((_, r) => {
-          tempExercises = r.rows._array;
+          tempExercises = r.rows._array
           tempExercises.forEach(ex => ex.major_muscles = initialMajorMuscles)
           if (scheduledItemState.scheduledItems[0] != undefined)
             if (scheduledItemState.scheduledItems[0].exercise == initialExerciseState.aExercise)
               retrieveScheduledItems(
                 (_, results) => {
-                  const tempScheduledItems: ScheduledItem[] = results.rows._array;
+                  const tempScheduledItems: ScheduledItem[] = results.rows._array
                   const a = results.rows._array.slice()
                   tempScheduledItems.forEach((ms, index) => {
                     ms.date = JSON.parse(ms.date.toString())
                     const t = tempExercises.find(ex => ex.name == a[index].exercise)
-                    tempScheduledItems[index].exercise = t!;
+                    tempScheduledItems[index].exercise = t!
                   })
                   setScheduledItemState({
                     ...scheduledItemState,
@@ -88,7 +90,7 @@ export default function App() {
       emm.forEach(x => {
         const ex = exerciseState.exercises.find(e => e.name == x.exercise_name)
         const mm2 = exerciseState.majorMuscles.find(mm => mm.name == x.major_muscle_name)
-        if (ex == undefined || mm2 == undefined) return;
+        if (ex == undefined || mm2 == undefined) return
         if (ex.major_muscles == initialMajorMuscles) ex.major_muscles = [mm2!]
         else if (!ex.major_muscles.find(x => x.name == mm2.name)) ex.major_muscles.push(mm2!)
       })
@@ -139,13 +141,10 @@ export default function App() {
     Toast.show("Please grant folder permissions.")
     const permissions = await StorageAccessFramework.requestDirectoryPermissionsAsync()
     if (!permissions.granted) return
-    // const directory = await StorageAccessFramework.readDirectoryAsync(permissions.directoryUri)
-    // const fileName = directory.find((v) => v.includes('backup') && v.includes('GymTracker') && v.includes('.json'))
     Toast.show("Please choose the correct json file")
-    let documentResult: DocumentPicker.DocumentResult = await DocumentPicker.getDocumentAsync({ type: 'application/json' });
-    if (documentResult.type == 'cancel') {
-      return
-    }
+    let documentResult: DocumentPicker.DocumentResult = await DocumentPicker.getDocumentAsync({ type: 'application/json' })
+    if (documentResult.type == 'cancel') return
+
     const data = JSON.parse(await StorageAccessFramework.readAsStringAsync(documentResult.uri))
     console.log(data)
     if (!('exercises' in data) || !('scheduledItems' in data)) {
@@ -155,7 +154,7 @@ export default function App() {
     if (!Array.isArray(data.exercises) || !Array.isArray(data.scheduledItems)) {
       Toast.show("The data does not have the correct format")
       return
-    }//error is here
+    }
     deleteFromExerciseAndScheduledItem()
     setExerciseState({
       ...exerciseState,
@@ -173,15 +172,15 @@ export default function App() {
   }
 
   function cancelDialog() {
-    SetDialogState({ ...dialogState, isExDialogVisible: false, isCalendarDialogVisible: false, isPlanDialogVisible: false });
+    SetDialogState({ ...dialogState, isExDialogVisible: false, isCalendarDialogVisible: false, isPlanDialogVisible: false })
   }
 
   // Exercises Functions:
   //renders
   const renderExerciseDialogForViewing = (exercise: Exercise) => {
-    textInputStyle = styles.textInputViewOnly;
+    textInputStyle = styles.textInputViewOnly
     setExerciseState({ ...exerciseState, aExercise: exercise, oldExerciseName: exercise.name })
-    const names: string[] = [];
+    const names: string[] = []
     exercise.major_muscles.forEach(mm => names.push(mm.name))
     setDropDownMajorMuscleValues(names)
     setDropDownPushPullSelected(exercise.push_or_pull)
@@ -190,29 +189,29 @@ export default function App() {
       isExDialogVisible: true, openPushPullDropDown: false,
       dialogText: ExerciseInformationText,
       isEditable: false, isDropDownOpen: false,
-    });
+    })
   }
 
   const renderExerciseDialogForEdit = () => {
-    textInputStyle = styles.textInputEditable;
+    textInputStyle = styles.textInputEditable
     SetDialogState({
       ...dialogState,
       isEditable: true,
       dialogText: EditExerciseText,
       isDropDownOpen: false,
       openPushPullDropDown: false
-    });
+    })
   }
 
   const renderExerciseDialogForCreate = () => {
     setExerciseState({ ...exerciseState, aExercise: initialExerciseState.aExercise })
     setDropDownMajorMuscleValues([])
-    textInputStyle = styles.textInputEditable;
+    textInputStyle = styles.textInputEditable
     SetDialogState({
       ...dialogState,
       isExDialogVisible: true, openPushPullDropDown: false,
       dialogText: CreateExerciseText, isEditable: true, isDropDownOpen: false
-    });
+    })
     setDropDownPushPullSelected(PushPullEnum.Push)
   }
 
@@ -230,18 +229,18 @@ export default function App() {
       { text: "No", onPress: () => renderExerciseDialogForViewing(exercise) }],//warning, recursive-
       { cancelable: true }
     )
-  };
+  }
 
   const deleteExerciseWithStateUpdate = (exercise: Exercise) => {
     const selected: MajorMuscle[] = exerciseState.majorMuscles.filter(x => dropDownMajorMuscleNameSelected.includes(x.name))
     selected.forEach(x => deleteExerciseMajorMuscleRelationship(exercise.name, x.name))
     deleteExercise(exercise.name, () => {
-      const deletedName = exercise.name;
+      const deletedName = exercise.name
       const es: Exercise[] = exerciseState.exercises.slice()
       es.forEach((currentExercise, i) => {
         if (currentExercise.name == deletedName) {
           es.splice(i, 1)
-          return;
+          return
         }
       })
       //correct way of removing element from a array for me. Not using delete keyword which leaves a undefined space
@@ -274,7 +273,7 @@ export default function App() {
         es.forEach((currentExercise, i) => {
           if (currentExercise.name == oldExerciseName) {
             es.splice(i, 1, exerciseToBeUpdated)
-            return;
+            return
           }
         })
         commonExercisesCRUD(es)
@@ -283,7 +282,7 @@ export default function App() {
   }
 
   function createExerciseWithStateUpdate() {
-    const aExercise = exerciseState.aExercise;
+    const aExercise = exerciseState.aExercise
     if (aExercise.name == "") {
       Toast.show("name cannot be empty")
       return
@@ -314,6 +313,7 @@ export default function App() {
           || e.major_muscles.filter(
             mm => mm.name.includes(keyword)
           ).length > 0
+          || e.description.includes(keyword)
         )),
       filteredExerciseKeyword: keyword
     })
@@ -324,8 +324,8 @@ export default function App() {
   //Scheduled Item Functions: 
   //renders:
   function renderScheduledItemDialogForViewing(scheduledItem: ScheduledItem) {
-    textInputStyle = styles.textInputViewOnly;
-    numberInputStyle = styles.numberInputViewOnly;
+    textInputStyle = styles.textInputViewOnly
+    numberInputStyle = styles.numberInputViewOnly
     setScheduledItemState({ ...scheduledItemState, aScheduledItem: scheduledItem })
     SetDialogState({
       ...dialogState,
@@ -336,18 +336,18 @@ export default function App() {
   }
 
   function commonLogicForScheduledItemEditAndDuplication(dialogText: string) {
-    textInputStyle = styles.textInputEditable;
+    textInputStyle = styles.textInputEditable
     setScheduledItemState({ ...scheduledItemState, })
     SetDialogState({
       ...dialogState, isEditable: true,
       isDropDownOpen: false, dialogText: dialogText
-    });
+    })
     setDropDownExNameSelected(scheduledItemState.aScheduledItem.exercise.name)
   }
 
   function renderScheduledItemDialogForCreate() {
-    textInputStyle = styles.textInputEditable;
-    numberInputStyle = styles.numberInputEditable;
+    textInputStyle = styles.textInputEditable
+    numberInputStyle = styles.numberInputEditable
     setScheduledItemState({ ...scheduledItemState, aScheduledItem: initialScheduledItem[0] })
     SetDialogState({
       ...dialogState,
@@ -358,13 +358,13 @@ export default function App() {
     const parts: string[] = dialogState.planHeader.split(" ")[1].split("-")
     const monthNumber: number = Number(parts[1])
     const month: string = monthNumber < 10 ? "0" + monthNumber.toString() : monthNumber.toString()
-    const day: string = Number(parts[0]) < 10 ? "0" + parts[0] : parts[0];
+    const day: string = Number(parts[0]) < 10 ? "0" + parts[0] : parts[0]
     const date: DateData = {
       year: Number(parts[2]), month: monthNumber, day: Number(parts[0]), timestamp: 0,
       dateString: parts[2] + "-" + month + "-" + day
     }
     const aScheduledItem = initialScheduledItem[0]
-    aScheduledItem.date = date;
+    aScheduledItem.date = date
     setScheduledItemState({ ...scheduledItemState, aScheduledItem: { ...aScheduledItem } })
   }
 
@@ -387,7 +387,7 @@ export default function App() {
       { text: "No", onPress: () => renderScheduledItemDialogForViewing(ms) }],//warning, recursive
       { cancelable: true }
     )
-  };
+  }
 
   const deleteScheduledItemWithStateUpdate = (id: number) => {
     deleteScheduledItem(id, () => {
@@ -395,7 +395,7 @@ export default function App() {
       si.forEach((ms1, i) => {
         if (ms1.id == id) {
           si.splice(i, 1)
-          return;
+          return
         }
       }) //correct way of removing element from a array for me. Not using delete keyword which leaves a undefined space
       Toast.show("The scheduled item is deleted.")
@@ -407,11 +407,11 @@ export default function App() {
     const aScheduledItem = scheduledItemState.aScheduledItem
     if (dropDownExNameSelected == undefined || dropDownExNameSelected == "") {
       Toast.show("exercise must be selected")
-      return;
+      return
     }
     const theexercise = exerciseState.exercises.filter((e, i, a) => {
-      if (e.name == dropDownExNameSelected) return e;
-    })[0];
+      if (e.name == dropDownExNameSelected) return e
+    })[0]
     updateScheduledItem(aScheduledItem,
       (_, result) => {
         const toBeUpdated: ScheduledItem = {
@@ -424,7 +424,7 @@ export default function App() {
         ms.forEach((currentScheduledItem, i) => {
           if (currentScheduledItem.id == aScheduledItem.id) {
             ms.splice(i, 1, toBeUpdated)
-            return;
+            return
           }
         })
         commonScheduledItemCRUD(ms)
@@ -457,7 +457,7 @@ export default function App() {
   function handleFilterScheduledItem(keyword: string) {
     console.log("here")
     const filtered = scheduledItemState.scheduledItems.filter(si => {
-      const sec = si.duration_in_seconds % 60;
+      const sec = si.duration_in_seconds % 60
       const min = Math.floor(si.duration_in_seconds / 60)
       return ((si.percent_complete.toString() + "%").includes(keyword)
         || si.id.toString().includes(keyword)
@@ -487,7 +487,7 @@ export default function App() {
     renderScheduledItemDialogForEdit: () => commonLogicForScheduledItemEditAndDuplication(EditScheduledItemText),
     renderExerciseDialogForEdit: renderExerciseDialogForEdit,
     renderExerciseDialogForViewing: renderExerciseDialogForViewing,
-  };
+  }
 
   const contextProps: ContextProps = {
     renderScheduledItemDialogForViewing: renderScheduledItemDialogForViewing,
@@ -562,13 +562,13 @@ export default function App() {
                     switch (route.name) {
                       case 'Plan':
                         iconName = focused ? 'clipboard-list' : 'clipboard-list-outline'
-                        return <MaterialCommunityIcons name={iconName} size={size} color={color} />;
+                        return <MaterialCommunityIcons name={iconName} size={size} color={color} />
                       case 'Exercises':
                         iconName = focused ? 'arm-flex' : 'arm-flex-outline'
-                        return <MaterialCommunityIcons name={iconName} size={size} color={color} />;
+                        return <MaterialCommunityIcons name={iconName} size={size} color={color} />
                       case 'Settings':
                         iconName = focused ? 'settings' : 'settings-outline'
-                        return <Ionicons name={iconName} size={size} color={color} />;
+                        return <Ionicons name={iconName} size={size} color={color} />
                     }
                   },
                   tabBarActiveTintColor: Colors.light.tint
