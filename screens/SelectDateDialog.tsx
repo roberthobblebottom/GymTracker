@@ -26,7 +26,8 @@ export function SelectDateDialog(props: any) {
 
     return (
         <Modal visible={dialogState.isCalendarDialogVisible} animationType="fade" transparent={true} >
-            <TouchableOpacity style={styles.overallDialog} onPressIn={() => setDialogState({ ...dialogState, isCalendarDialogVisible: false })
+            <TouchableOpacity style={styles.overallDialog}
+             onPressIn={() => setDialogState({ ...dialogState, isCalendarDialogVisible: false })
             }>
                 <TouchableOpacity style={styles.innerTouchableOpacity}
                     onPress={() => { }}

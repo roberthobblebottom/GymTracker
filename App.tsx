@@ -87,11 +87,14 @@ export default function App() {
         })
 
     if (exerciseState.majorMuscles[0] == initialMajorMuscles[0]) {
-      retrieveMajorMuscles((_, results) => setExerciseState({ ...exerciseState, majorMuscles: results.rows._array }))
+      retrieveMajorMuscles(
+        (_, results) => setExerciseState({ ...exerciseState, majorMuscles: results.rows._array }))
     }
     if (emm[0] == initialEmm[0])
       retrieveExerciseMajorMuscleRelationships((_, results) => setEmm(results.rows._array))
-    if (exerciseState.majorMuscles.length > 1 && exerciseState.exercises.length > 1 && emm.length > 1) {
+    if (exerciseState.majorMuscles.length > 1
+      && exerciseState.exercises.length > 1
+      && emm.length > 1) {
       emm.forEach(x => {
         const ex = exerciseState.exercises.find(e => e.name == x.exercise_name)
         const mm2 = exerciseState.majorMuscles.find(mm => mm.name == x.major_muscle_name)
@@ -128,10 +131,13 @@ export default function App() {
     }
     const permissions = await StorageAccessFramework.requestDirectoryPermissionsAsync()
     if (!permissions.granted) return
-    let uri = await StorageAccessFramework.createFileAsync(permissions.directoryUri, "GymTracker backup", "application/json")
+    let uri = await StorageAccessFramework.createFileAsync(
+      permissions.directoryUri, "GymTracker backup", "application/json"
+    )
     await StorageAccessFramework.writeAsStringAsync(uri, JSON.stringify(exportData))
-    Alert.alert("", `The backup data is now saved in the approved folder as "+'GymTracker backup.json'+" 
-    \nNote: if there is multiple backups, it will be numbered.`,
+    Alert.alert("", `The backup data is now saved in the approved folder as `
+      + `GymTracker backup.json`
+      + `\nNote: if there is multiple backups, it will be numbered.`,
       [{
         text: "Cancel",
         onPress: () => { },
@@ -147,7 +153,8 @@ export default function App() {
     const permissions = await StorageAccessFramework.requestDirectoryPermissionsAsync()
     if (!permissions.granted) return
     Toast.show("Please choose the correct json file")
-    let documentResult: DocumentPicker.DocumentResult = await DocumentPicker.getDocumentAsync({ type: 'application/json' })
+    let documentResult: DocumentPicker.DocumentResult =
+      await DocumentPicker.getDocumentAsync({ type: 'application/json' })
     if (documentResult.type == 'cancel') return
 
     const data = JSON.parse(await StorageAccessFramework.readAsStringAsync(documentResult.uri))
@@ -177,7 +184,12 @@ export default function App() {
   }
 
   function cancelDialog() {
-    SetDialogState({ ...dialogState, isExDialogVisible: false, isCalendarDialogVisible: false, isPlanDialogVisible: false })
+    SetDialogState({
+      ...dialogState,
+      isExDialogVisible: false,
+      isCalendarDialogVisible: false,
+      isPlanDialogVisible: false
+    })
   }
 
   // Exercises Functions:
@@ -222,7 +234,11 @@ export default function App() {
 
   //db
   const commonExercisesCRUD = (es: Exercise[]) => {
-    setExerciseState({ ...exerciseState, exercises: [...es], filteredExercises: [...es], filteredExerciseKeyword: "" })
+    setExerciseState({
+      ...exerciseState, exercises: [...es],
+      filteredExercises: [...es],
+      filteredExerciseKeyword: ""
+    })
     cancelDialog()
   }
 
@@ -237,7 +253,8 @@ export default function App() {
   }
 
   const deleteExerciseWithStateUpdate = (exercise: Exercise) => {
-    const selected: MajorMuscle[] = exerciseState.majorMuscles.filter(x => dropDownMajorMuscleNameSelected.includes(x.name))
+    const selected: MajorMuscle[] = exerciseState.majorMuscles.filter(
+      x => dropDownMajorMuscleNameSelected.includes(x.name))
     selected.forEach(x => deleteExerciseMajorMuscleRelationship(exercise.name, x.name))
     deleteExercise(exercise.name, () => {
       const deletedName = exercise.name
@@ -262,16 +279,22 @@ export default function App() {
     }
     const oldExerciseName = exerciseState.oldExerciseName
     const pushPullDropDownValue = dropDownPushPullSelected
-    const selected: MajorMuscle[] = exerciseState.majorMuscles.filter(x => dropDownMajorMuscleNameSelected.includes(x.name))
-    const toBeCreated: MajorMuscle[] = selected.filter(x => !aExercise.major_muscles.find(t => t.name == x.name))
-    const toBeDeleted: MajorMuscle[] = aExercise.major_muscles.filter(x => !selected.find(t => t.name == x.name))
-    toBeCreated.forEach(x => createExerciseMajorMuscleRelationship(aExercise.name, x.name))
-    toBeDeleted.forEach(x => deleteExerciseMajorMuscleRelationship(aExercise.name, x.name))
+    const selected: MajorMuscle[] = exerciseState.majorMuscles.filter(
+      x => dropDownMajorMuscleNameSelected.includes(x.name))
+    const toBeCreated: MajorMuscle[] = selected.filter(
+      x => !aExercise.major_muscles.find(t => t.name == x.name))
+    const toBeDeleted: MajorMuscle[] = aExercise.major_muscles.filter(
+      x => !selected.find(t => t.name == x.name))
+    toBeCreated.forEach(
+      x => createExerciseMajorMuscleRelationship(aExercise.name, x.name))
+    toBeDeleted.forEach(
+      x => deleteExerciseMajorMuscleRelationship(aExercise.name, x.name))
     aExercise.push_or_pull = pushPullDropDownValue
     updateExercise(aExercise, oldExerciseName,
       () => {
         const exerciseToBeUpdated: Exercise = {
-          name: aExercise.name, description: aExercise.description, imagesJson: aExercise.imagesJson,
+          name: aExercise.name, description: aExercise.description,
+          imagesJson: aExercise.imagesJson,
           major_muscles: selected, push_or_pull: dropDownPushPullSelected
         }
         const es: Exercise[] = exerciseState.exercises.slice()
@@ -292,15 +315,18 @@ export default function App() {
       Toast.show("name cannot be empty")
       return
     }
-    const selected: MajorMuscle[] = exerciseState.majorMuscles.filter(x => dropDownMajorMuscleNameSelected.includes(x.name))
-    selected.forEach(x => createExerciseMajorMuscleRelationship(aExercise.name, x.name))
+    const selected: MajorMuscle[] = exerciseState.majorMuscles.filter(
+      x => dropDownMajorMuscleNameSelected.includes(x.name))
+    selected.forEach(
+      x => createExerciseMajorMuscleRelationship(aExercise.name, x.name))
 
     aExercise.push_or_pull = dropDownPushPullSelected
     console.log(aExercise.push_or_pull)
     createExercise(aExercise, (_, result) => {
       const es: Exercise[] = exerciseState.exercises.slice()
       es.push({
-        name: aExercise.name, description: aExercise.description, imagesJson: aExercise.imagesJson, major_muscles: selected,
+        name: aExercise.name, description: aExercise.description,
+        imagesJson: aExercise.imagesJson, major_muscles: selected,
         push_or_pull: dropDownPushPullSelected
       })
       commonExercisesCRUD(es)
@@ -335,7 +361,8 @@ export default function App() {
     SetDialogState({
       ...dialogState,
       isEditable: false, dialogText: ScheduledItemInformation,
-      isExDialogVisible: false, openPushPullDropDown: false, isPlanDialogVisible: true
+      isExDialogVisible: false, openPushPullDropDown: false,
+      isPlanDialogVisible: true
     })
     setDropDownExNameSelected(scheduledItem.exercise.name)
   }
@@ -448,7 +475,7 @@ export default function App() {
     })
     createScheduledItem(aScheduledItem,
       (_, r) => {
-        const tempScheduledItem = {...aScheduledItem}
+        const tempScheduledItem = { ...aScheduledItem }
         tempScheduledItem.id = r.insertId!
         tempScheduledItem.date = aScheduledItem.date
         tempScheduledItem.duration_in_seconds = aScheduledItem.duration_in_seconds
@@ -477,7 +504,11 @@ export default function App() {
       )
     }
     )
-    setScheduledItemState({ ...scheduledItemState, filteredScheduledItems: filtered, filteredScheduledItemKeyword: keyword })
+    setScheduledItemState({
+      ...scheduledItemState,
+      filteredScheduledItems: filtered,
+      filteredScheduledItemKeyword: keyword
+    })
   }
   const buttonsSetProps: ButtonSetProps = {
     cancelDialog: cancelDialog,
@@ -488,8 +519,10 @@ export default function App() {
     createScheduledItemWithStateUpdate: createScheduledItemWithStateUpdate,
     updateScheduledItemWithStateUpdate: updateScheduledItemWithStateUpdate,
     renderScheduledItemDialogForViewing: renderScheduledItemDialogForViewing,
-    renderScheduledItemDialogForDuplication: () => commonLogicForScheduledItemEditAndDuplication(DuplicateScheduledItemText),
-    renderScheduledItemDialogForEdit: () => commonLogicForScheduledItemEditAndDuplication(EditScheduledItemText),
+    renderScheduledItemDialogForDuplication:
+      () => commonLogicForScheduledItemEditAndDuplication(DuplicateScheduledItemText),
+    renderScheduledItemDialogForEdit:
+      () => commonLogicForScheduledItemEditAndDuplication(EditScheduledItemText),
     renderExerciseDialogForEdit: renderExerciseDialogForEdit,
     renderExerciseDialogForViewing: renderExerciseDialogForViewing,
   }

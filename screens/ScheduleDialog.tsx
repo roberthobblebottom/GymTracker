@@ -45,9 +45,13 @@ export function ScheduleDialog(props: any) {
 
   return (
     <Modal visible={dialogState.isPlanDialogVisible} animationType="fade" transparent={true}>
-      <TouchableOpacity style={{ flex: 1, display: 'flex', justifyContent: 'flex-end' }} onPressIn={() => setDialogState({ ...dialogState, isPlanDialogVisible: false })}>
-        <TouchableOpacity style={{ ...styles.innerTouchableOpacity }} activeOpacity={1} onPress={() => setDialogState({ ...dialogState, isDropDownOpen: false })}>
-          <Text style={{ fontSize: Layout.defaultFontSize, fontWeight: "bold" }}>{dialogState.dialogText}</Text>
+      <TouchableOpacity style={{ flex: 1, display: 'flex', justifyContent: 'flex-end' }}
+        onPressIn={() => setDialogState({ ...dialogState, isPlanDialogVisible: false })}>
+        <TouchableOpacity style={{ ...styles.innerTouchableOpacity }} activeOpacity={1}
+          onPress={() => setDialogState({ ...dialogState, isDropDownOpen: false })}>
+          <Text style={{ fontSize: Layout.defaultFontSize, fontWeight: "bold" }}>
+            {dialogState.dialogText}
+          </Text>
           <View style={{ marginLeft: "1%", ...bases.numberCRUD }}>
             <Text style={{ fontSize: Layout.defaultFontSize, marginRight: "1%" }}>Exercise:</Text>
             <DropDownPicker
@@ -90,12 +94,12 @@ export function ScheduleDialog(props: any) {
                 if (dialogState.isEditable && aScheduledItem.sets > 1)
                   return styles.changeButtonEnabled
                 else return styles.changeButtonDisabled
-              }} disabled={!dialogState.isEditable || aScheduledItem.sets <= 1} onPress={() => {
-                aScheduledItem.sets--
-
-                setScheduledItemState({ ...scheduledItemState, aScheduledItem: { ...aScheduledItem } })
-              }
-              } >
+              }} disabled={!dialogState.isEditable || aScheduledItem.sets <= 1}
+                onPress={() => {
+                  aScheduledItem.sets--
+                  setScheduledItemState({ ...scheduledItemState, aScheduledItem: { ...aScheduledItem } })
+                }
+                } >
                 <Text style={bases.incrementButton}>-</Text>
               </Pressable>
               <TextInput placeholder='sets'
@@ -113,10 +117,11 @@ export function ScheduleDialog(props: any) {
                 }}
                 editable={dialogState.isEditable}
                 keyboardType="numeric" />
-              <Pressable style={{ ...buttonStyle, marginLeft: 0 }} disabled={!dialogState.isEditable} onPress={() => {
-                aScheduledItem.sets++
-                setScheduledItemState({ ...scheduledItemState, aScheduledItem: { ...aScheduledItem } })
-              }}>
+              <Pressable style={{ ...buttonStyle, marginLeft: 0 }} disabled={!dialogState.isEditable}
+                onPress={() => {
+                  aScheduledItem.sets++
+                  setScheduledItemState({ ...scheduledItemState, aScheduledItem: { ...aScheduledItem } })
+                }}>
                 <Text style={bases.incrementButton}>+</Text>
               </Pressable>
             </View>
@@ -125,7 +130,8 @@ export function ScheduleDialog(props: any) {
             <Text style={{ fontSize: Layout.defaultFontSize }} > Reps: </Text>
             <View style={styles.numberElementsOnTheLeftOfScheduleItemDialog}>
               <Pressable style={() => {
-                if (dialogState.isEditable && aScheduledItem.reps > 1) return styles.changeButtonEnabled
+                if (dialogState.isEditable && aScheduledItem.reps > 1)
+                  return styles.changeButtonEnabled
                 else return styles.changeButtonDisabled
               }} disabled={!dialogState.isEditable || aScheduledItem.reps <= 1}
                 onPress={() => {
@@ -162,7 +168,8 @@ export function ScheduleDialog(props: any) {
             <Text style={{ fontSize: Layout.defaultFontSize }}> complete(%): </Text>
             <View style={styles.numberElementsOnTheLeftOfScheduleItemDialog}>
               <Pressable style={() => {
-                if (dialogState.isEditable && aScheduledItem.percent_complete > 0) return styles.changeButtonEnabled
+                if (dialogState.isEditable && aScheduledItem.percent_complete > 0)
+                  return styles.changeButtonEnabled
                 else return styles.changeButtonDisabled
               }}
                 disabled={!dialogState.isEditable || aScheduledItem.percent_complete <= 0}
@@ -190,7 +197,8 @@ export function ScheduleDialog(props: any) {
                   if (dialogState.isEditable && aScheduledItem.percent_complete < 100)
                     return styles.changeButtonEnabled
                   else return styles.changeButtonDisabled
-                }} disabled={!dialogState.isEditable || aScheduledItem.percent_complete >= 100} onPress={() => {
+                }} disabled={!dialogState.isEditable || aScheduledItem.percent_complete >= 100}
+                onPress={() => {
                   aScheduledItem.percent_complete++
                   setScheduledItemState({ ...scheduledItemState, aScheduledItem: { ...aScheduledItem } })
                 }}>
@@ -235,7 +243,8 @@ export function ScheduleDialog(props: any) {
                 onPress={() => {
                   setScheduledItemState({
                     ...scheduledItemState, aScheduledItem: {
-                      ...aScheduledItem, duration_in_seconds: (aScheduledItem.duration_in_seconds + 60)
+                      ...aScheduledItem,
+                      duration_in_seconds: (aScheduledItem.duration_in_seconds + 60)
                     }
                   })
 
@@ -312,7 +321,8 @@ export function ScheduleDialog(props: any) {
             <Text style={{ fontSize: Layout.defaultFontSize }}> Weight (kg): </Text>
             <View style={styles.numberElementsOnTheLeftOfScheduleItemDialog}>
               <Pressable style={() => {
-                if (dialogState.isEditable && aScheduledItem.weight > 0) return styles.changeButtonEnabled
+                if (dialogState.isEditable && aScheduledItem.weight > 0)
+                  return styles.changeButtonEnabled
                 else return styles.changeButtonDisabled
               }} disabled={!dialogState.isEditable || aScheduledItem.weight <= 0}
                 onPress={() => {
