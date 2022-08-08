@@ -67,7 +67,7 @@ export function SelectDateDialog(props: any) {
                                     commonScheduledItemCRUD(si)
                                 }
                             } else {
-                                const s = Object.assign({}, aScheduledItem)
+                                const s = {...aScheduledItem}
                                 s.date = day
                                 setScheduledItemState({ ...scheduledItemState, aScheduledItem: s })
                             }

@@ -448,7 +448,7 @@ export default function App() {
     })
     createScheduledItem(aScheduledItem,
       (_, r) => {
-        const tempScheduledItem = Object.assign({}, aScheduledItem)
+        const tempScheduledItem = {...aScheduledItem}
         tempScheduledItem.id = r.insertId!
         tempScheduledItem.date = aScheduledItem.date
         tempScheduledItem.duration_in_seconds = aScheduledItem.duration_in_seconds
