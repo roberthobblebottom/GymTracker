@@ -6,7 +6,6 @@ import {
 import React, { useContext } from 'react';
 import { SettingsScreenContext } from '../App';
 import { styles } from '../constants/styles';
-import Toast from 'react-native-simple-toast';
 
 function confirmation(handleFunc: Function) {
     return Alert.alert(
@@ -45,6 +44,13 @@ export function SettingsScreen() {
             <Pressable style={() => androidStyle()} onPress={() => context.handleImport()}>
                 <Text style={styles.settingsButtonText}>IMPORT </Text></Pressable>
             {textStyle()}
+            <Pressable style={styles.settingButtonSet} onPress={() => Alert.alert("Credits", "Credits to various Wikipedia articles where the exercises information is retrieved", [{
+                text: "Cancel",
+                onPress: () => console.log("Cancel Pressed"),
+                style: "cancel"
+            },], { cancelable: true })}>
+                <Text style={styles.settingsButtonText}>CREDITS </Text></Pressable>
+
 
         </View>
     );
