@@ -9,10 +9,15 @@ import { NavigationContainer } from '@react-navigation/native'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import {
   init, resetTables, createScheduledItem, deleteScheduledItem, updateScheduledItem,
-  createExerciseMajorMuscleRelationship, createExercise, deleteExerciseMajorMuscleRelationship, deleteExercise, updateExercise,
-  retrieveExerciseMajorMuscleRelationships, retrieveMajorMuscles, retrieveScheduledItems, retrieveExercises, deleteFromExerciseAndScheduledItem
+  createExerciseMajorMuscleRelationship, createExercise,
+  deleteExerciseMajorMuscleRelationship, deleteExercise, updateExercise,
+  retrieveExerciseMajorMuscleRelationships, retrieveMajorMuscles,
+  retrieveScheduledItems, retrieveExercises, deleteFromExerciseAndScheduledItem
 } from './dbhandler'
-import { ButtonSetProps, ContextProps, DialogState, Exercise, ExerciseState, MajorMuscle, PushPullEnum, ScheduledItemState } from './types'
+import {
+  ButtonSetProps, ContextProps, DialogState, Exercise, ExerciseState,
+  MajorMuscle, PushPullEnum, ScheduledItemState
+} from './types'
 import { ScheduledItem } from './types'
 import Toast from 'react-native-simple-toast'
 import Colors from './constants/Colors'
@@ -30,7 +35,7 @@ import {
 } from './constants/strings'
 import {
   initialExerciseState, initialScheduledItemState, initialMajorMuscles,
-  initialEmm, initialDialogState, initialScheduledItem, ExerciseScreenContext, 
+  initialEmm, initialDialogState, initialScheduledItem, ExerciseScreenContext,
   ScheduledItemContext, SettingsScreenContext
 } from './constants/initialValues'
 import * as DocumentPicker from 'expo-document-picker'
@@ -39,8 +44,8 @@ const Tab = createBottomTabNavigator()
 
 export default function App() {
   const [exerciseState, setExerciseState] = useState<ExerciseState>(initialExerciseState)
-  const [scheduledItemState, setScheduledItemState] = 
-  useState<ScheduledItemState>(initialScheduledItemState)
+  const [scheduledItemState, setScheduledItemState] =
+    useState<ScheduledItemState>(initialScheduledItemState)
   const [dialogState, SetDialogState] = useState<DialogState>(initialDialogState)
   const [emm, setEmm] = useState(initialEmm)
 

@@ -257,7 +257,7 @@ export function ScheduleDialog(props: any) {
                 value={seconds.toString()}
                 onChangeText={text => {
                   const seconds = Number(text)
-                  if (isNaN(seconds) || seconds<=0) {
+                  if (isNaN(seconds) || seconds <= 0) {
                     setScheduledItemState({
                       ...scheduledItemState, aScheduledItem: {
                         ...aScheduledItem, duration_in_seconds: 0
@@ -281,10 +281,10 @@ export function ScheduleDialog(props: any) {
                 }}
                 editable={dialogState.isEditable}
                 keyboardType="numeric" />
-              <Pressable style={()=>{
-                if(dialogState.isEditable&&seconds<59) return styles.changeButtonEnabled
+              <Pressable style={() => {
+                if (dialogState.isEditable && seconds < 59) return styles.changeButtonEnabled
                 else return styles.changeButtonDisabled
-              }} disabled={!dialogState.isEditable||seconds>=59} onPress={() => {
+              }} disabled={!dialogState.isEditable || seconds >= 59} onPress={() => {
                 setScheduledItemState({
                   ...scheduledItemState, aScheduledItem: {
                     ...aScheduledItem, duration_in_seconds: aScheduledItem.duration_in_seconds + 1
@@ -299,10 +299,10 @@ export function ScheduleDialog(props: any) {
           <View style={bases.numberCRUD}>
             <Text style={{ fontSize: Layout.defaultFontSize }}> Weight (kg): </Text>
             <View style={styles.numberElementsOnTheLeftOfScheduleItemDialog}>
-              <Pressable style={()=>{
-                if(dialogState.isEditable&&aScheduledItem.weight>0) return styles.changeButtonEnabled
+              <Pressable style={() => {
+                if (dialogState.isEditable && aScheduledItem.weight > 0) return styles.changeButtonEnabled
                 else return styles.changeButtonDisabled
-              }} disabled={!dialogState.isEditable||aScheduledItem.weight<=0} onPress={() => {
+              }} disabled={!dialogState.isEditable || aScheduledItem.weight <= 0} onPress={() => {
                 let s = Object.assign({}, aScheduledItem)
                 s.weight--
                 setScheduledItemState({ ...scheduledItemState, aScheduledItem: s })
@@ -325,10 +325,12 @@ export function ScheduleDialog(props: any) {
                 }}
                 editable={dialogState.isEditable}
                 keyboardType="numeric" />
-              <Pressable style={{ ...buttonStyle, marginLeft: 0 }} disabled={!dialogState.isEditable} onPress={() => {
-                aScheduledItem.weight++
-                setScheduledItemState({ ...scheduledItemState, aScheduledItem: Object.assign({}, aScheduledItem) })
-              }}>
+              <Pressable style={{ ...buttonStyle, marginLeft: 0 }}
+                disabled={!dialogState.isEditable}
+                onPress={() => {
+                  aScheduledItem.weight++
+                  setScheduledItemState({ ...scheduledItemState, aScheduledItem: Object.assign({}, aScheduledItem) })
+                }}>
                 <Text style={bases.incrementButton}>+</Text>
               </Pressable>
             </View>
@@ -347,7 +349,9 @@ export function ScheduleDialog(props: any) {
 
           </View>
           <View style={bases.numberCRUD}>
-            <Text style={{ fontSize: Layout.defaultFontSize }}> date: {currentDate.day + "-" + currentDate.month + "-" + currentDate.year}</Text>
+            <Text style={{ fontSize: Layout.defaultFontSize }}>
+              date: {currentDate.day + "-" + currentDate.month + "-" + currentDate.year}
+            </Text>
             <Pressable
               style={{
                 ...buttonStyle,
