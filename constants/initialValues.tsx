@@ -1,3 +1,4 @@
+import React from "react";
 import { ExerciseState, PushPullEnum, ScheduledItem, ScheduledItemState, MajorMuscle, Emm, ContextProps } from "../types";
 
 const d: Date = new Date()
@@ -55,3 +56,7 @@ export const initalContextProps: ContextProps = {
   setDialogState: () => { },
   dialogState: initialDialogState,
 }
+//contexts
+export const SettingsScreenContext = React.createContext({ handleResetDB: () => { }, handleExport: () => { }, handleImport: () => { } })
+export const ExerciseScreenContext = React.createContext({ contextProps: initalContextProps })
+export const ScheduledItemContext = React.createContext({ contextProps: initalContextProps })

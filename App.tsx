@@ -11,8 +11,7 @@ import {
   init, resetTables, createScheduledItem, deleteScheduledItem, updateScheduledItem,
   createExerciseMajorMuscleRelationship, createExercise, deleteExerciseMajorMuscleRelationship, deleteExercise, updateExercise,
   retrieveExerciseMajorMuscleRelationships, retrieveMajorMuscles, retrieveScheduledItems, retrieveExercises, deleteFromExerciseAndScheduledItem
-}
-  from './dbhandler';
+} from './dbhandler';
 import { ButtonSetProps, ContextProps, DialogState, Exercise, ExerciseState, MajorMuscle, PushPullEnum, ScheduledItemState } from './types';
 import { ScheduledItem } from './types';
 import Toast from 'react-native-simple-toast';
@@ -30,17 +29,12 @@ import {
   EditScheduledItemText, DuplicateScheduledItemText, CreateScheduledItemText
 } from './constants/strings';
 import {
-  initalContextProps, initialExerciseState, initialScheduledItemState, initialMajorMuscles,
-  initialEmm, initialDialogState, initialScheduledItem
+  initialExerciseState, initialScheduledItemState, initialMajorMuscles,
+  initialEmm, initialDialogState, initialScheduledItem, ExerciseScreenContext, ScheduledItemContext, SettingsScreenContext
 } from './constants/initialValues';
 import * as DocumentPicker from 'expo-document-picker';
 LogBox.ignoreLogs(['Require cycle:'])
 const Tab = createBottomTabNavigator()
-
-//contexts
-export const SettingsScreenContext = React.createContext({ handleResetDB: () => { }, handleExport: () => { }, handleImport: () => { } })
-export const ExerciseScreenContext = React.createContext({ contextProps: initalContextProps })
-export const ScheduledItemContext = React.createContext({ contextProps: initalContextProps })
 
 export default function App() {
   const [exerciseState, setExerciseState] = useState<ExerciseState>(initialExerciseState)
@@ -48,7 +42,7 @@ export default function App() {
   const [dialogState, SetDialogState] = useState<DialogState>(initialDialogState)
   const [emm, setEmm] = useState(initialEmm)
 
-  const [dropDownMajorMuscleNameSelected, setMajorMuscleValues] = useState([""])
+  const [dropDownMajorMuscleNameSelected, setDropDownMajorMuscleValues] = useState([""])
   const [dropDownExNameSelected, setDropDownExNameSelected] = useState("")
   const [dropDownPushPullSelected, setDropDownPushPullSelected] = useState(PushPullEnum.Push)
 
@@ -189,7 +183,7 @@ export default function App() {
     setExerciseState({ ...exerciseState, aExercise: exercise, oldExerciseName: exercise.name })
     const names: string[] = [];
     exercise.major_muscles.forEach(mm => names.push(mm.name))
-    setMajorMuscleValues(names)
+    setDropDownMajorMuscleValues(names)
     setDropDownPushPullSelected(exercise.push_or_pull)
     SetDialogState({
       ...dialogState,
@@ -212,7 +206,7 @@ export default function App() {
 
   const renderExerciseDialogForCreate = () => {
     setExerciseState({ ...exerciseState, aExercise: initialExerciseState.aExercise })
-    setMajorMuscleValues([])
+    setDropDownMajorMuscleValues([])
     textInputStyle = styles.textInputEditable;
     SetDialogState({
       ...dialogState,
@@ -544,7 +538,7 @@ export default function App() {
           setDropDownPushPullSelected={setDropDownPushPullSelected}
           setDialogState={SetDialogState}
           setExerciseState={setExerciseState}
-          setMajorMuscleValues={setMajorMuscleValues}
+          setMajorMuscleValues={setDropDownMajorMuscleValues}
 
           buttonsSetProps={buttonsSetProps}
         />

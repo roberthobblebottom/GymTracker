@@ -4,7 +4,7 @@ import {
     Platform, StyleProp, ViewStyle
 } from 'react-native';
 import React, { useContext } from 'react';
-import { SettingsScreenContext } from '../App';
+import { SettingsScreenContext } from '../constants/initialValues';
 import { styles } from '../constants/styles';
 
 function confirmation(handleFunc: Function) {

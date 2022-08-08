@@ -3,7 +3,7 @@ import React, { Dispatch, useContext } from 'react';
 import Colors from '../constants/Colors';
 import { Agenda, AgendaEntry, DateData } from 'react-native-calendars';
 import {  initialDate } from '../constants/initialValues';
-import { ScheduledItemContext } from '../App';
+import { ScheduledItemContext } from '../constants/initialValues';
 import { DialogState, ScheduledItem, ScheduledItemState } from '../types';
 import Toast from 'react-native-simple-toast';
 import Layout from '../constants/Layout';

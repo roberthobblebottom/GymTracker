@@ -1,6 +1,6 @@
 import React from "react";
 import { FlatList, Text, View, TouchableOpacity } from 'react-native';
-import { ExerciseScreenContext } from '../App';
+import { ExerciseScreenContext } from '../constants/initialValues';
 import { useContext } from 'react';
 import layoutConstants from '../constants/Layout';
 import { Exercise } from "../types";
