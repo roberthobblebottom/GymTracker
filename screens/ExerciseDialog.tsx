@@ -30,8 +30,7 @@ export function ExerciseDialog(props: any) {
     const setExerciseState: Dispatch<any> = props.setExerciseState
     const setMajorMuscleValues: Dispatch<any> = props.setMajorMuscleValues
     const SetDialogState: Dispatch<DialogState> = props.setDialogState
-    const setAExercise = (e: Exercise) =>
-        setExerciseState({ ...exerciseState, aExercise: e })
+    const setAExercise = (e: Exercise) => setExerciseState({ ...exerciseState, aExercise: e })
 
     const buttonsSetProps = props.buttonsSetProps
     const aExercise = exerciseState.aExercise

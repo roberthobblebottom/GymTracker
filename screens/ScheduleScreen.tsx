@@ -112,7 +112,8 @@ export function PlanScreen() {
             let dateParts: string[] = dateString.split(" ")
             let dateLabelToShow = dateParts[1] + " " + dateParts[2]
             let bgc
-            if (selectedScheduledItems.indexOf(set) > -1) bgc = { backgroundColor: "gray" }
+            if (selectedScheduledItems.indexOf(set) > -1)
+              bgc = { backgroundColor: "gray" }
             else bgc = {}
             return (
               <View style={{ ...styles.listStyle, ...bgc }}>
@@ -261,21 +262,21 @@ export function PlanScreen() {
             display: selectedScheduledItems.length > 0 ? "flex" : "none"
           }}
           onPress={() => {
-            Alert.alert("confirmation", 
-            "Are you sure you like to delete all selected?", [{
-              text: "Yes", onPress: () => {
-                selectedScheduledItems.forEach(si => {
-                  deleteScheduledItem(si.id)
-                  const i = scheduledItems.indexOf(si)
-                  scheduledItems.splice(i, 1)
-                })
-                setScheduledItemState({
-                  ...scheduledItemState,
-                  selectedScheduledItems: []
-                })
-                commonScheduledItemCRUD(scheduledItems)
-              }
-            }, { text: "No", onPress: () => { } }], { cancelable: true })
+            Alert.alert("confirmation",
+              "Are you sure you like to delete all selected?", [{
+                text: "Yes", onPress: () => {
+                  selectedScheduledItems.forEach(si => {
+                    deleteScheduledItem(si.id)
+                    const i = scheduledItems.indexOf(si)
+                    scheduledItems.splice(i, 1)
+                  })
+                  setScheduledItemState({
+                    ...scheduledItemState,
+                    selectedScheduledItems: []
+                  })
+                  commonScheduledItemCRUD(scheduledItems)
+                }
+              }, { text: "No", onPress: () => { } }], { cancelable: true })
           }}
         >
           <MaterialCommunityIcons style={{ bottom: "-14%", right: "-17%" }}

@@ -31,10 +31,14 @@ export function SettingsScreen() {
                 <Text style={styles.settingsButtonText}>
                     RESET DATA
                 </Text></Pressable>
-            <Pressable style={() => androidStyle()} onPress={() => context.handleExport()}>
-                <Text style={styles.settingsButtonText}>EXPORT</Text></Pressable>
-            <Pressable style={() => androidStyle()} onPress={() => context.handleImport()}>
-                <Text style={styles.settingsButtonText}>IMPORT </Text></Pressable>
+            <Pressable style={() => androidStyle()}
+                onPress={() => context.handleExport()}>
+                <Text style={styles.settingsButtonText}>EXPORT</Text>
+            </Pressable>
+            <Pressable style={() => androidStyle()}
+                onPress={() => context.handleImport()}>
+                <Text style={styles.settingsButtonText}>IMPORT </Text>
+            </Pressable>
             {/* {textStyle()} */}
             <Pressable style={styles.settingButtonSet} onPress={
                 () => Alert.alert("Credits",
@@ -43,7 +47,8 @@ export function SettingsScreen() {
                         onPress: () => { },
                         style: "cancel"
                     },], { cancelable: true })}>
-                <Text style={styles.settingsButtonText}>CREDITS </Text></Pressable>
+                <Text style={styles.settingsButtonText}>CREDITS </Text>
+                </Pressable>
 
 
         </View>

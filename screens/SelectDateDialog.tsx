@@ -25,10 +25,13 @@ export function SelectDateDialog(props: any) {
         : "Select a date"
 
     return (
-        <Modal visible={dialogState.isCalendarDialogVisible} animationType="fade" transparent={true} >
+        <Modal visible={dialogState.isCalendarDialogVisible}
+            animationType="fade" transparent={true} >
             <TouchableOpacity style={styles.overallDialog}
-             onPressIn={() => setDialogState({ ...dialogState, isCalendarDialogVisible: false })
-            }>
+                onPressIn={() => setDialogState({
+                    ...dialogState,
+                    isCalendarDialogVisible: false
+                })}>
                 <TouchableOpacity style={styles.innerTouchableOpacity}
                     onPress={() => { }}
                     activeOpacity={1}
@@ -68,7 +71,7 @@ export function SelectDateDialog(props: any) {
                                     commonScheduledItemCRUD(si)
                                 }
                             } else {
-                                const s = {...aScheduledItem}
+                                const s = { ...aScheduledItem }
                                 s.date = day
                                 setScheduledItemState({ ...scheduledItemState, aScheduledItem: s })
                             }
