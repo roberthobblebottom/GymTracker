@@ -1,22 +1,23 @@
 import { Modal, TouchableOpacity, Button, Text } from "react-native"
-import React from "react";
-import { styles } from "../constants/styles";
-import Layout from "../constants/Layout";
-import { Calendar } from "react-native-calendars";
-import { DialogState, ScheduledItem, ScheduledItemState } from "../types";
-import {createScheduledItem, updateScheduledItem} from '../dbhandler';
+import React from "react"
+import { styles } from "../constants/styles"
+import Layout from "../constants/Layout"
+import { Calendar } from "react-native-calendars"
+import { DialogState, ScheduledItem, ScheduledItemState } from "../types"
+import { createScheduledItem, updateScheduledItem } from '../dbhandler'
+import Toast from 'react-native-simple-toast'
 export function SelectDateDialog(props: any) {
     const dialogState: DialogState = props.dialogState
     const scheduledItemState: ScheduledItemState = props.scheduledItemState
 
     const setDialogState = props.setDialogState
-    const setScheduledItemState = props.setScheduledItemState;
+    const setScheduledItemState = props.setScheduledItemState
 
     const aScheduledItem = scheduledItemState.aScheduledItem
     const isMovingScheduledItems = scheduledItemState.isMovingScheduledItems
     const scheduledItems = scheduledItemState.scheduledItems
 
-    const selectedScheduledItems: ScheduledItem[] = scheduledItemState.selectedScheduledItems;
+    const selectedScheduledItems: ScheduledItem[] = scheduledItemState.selectedScheduledItems
     const commonScheduledItemCRUD: Function = props.commonScheduledItemCRUD
     const text = selectedScheduledItems.length > 0 ?
         isMovingScheduledItems
@@ -25,9 +26,13 @@ export function SelectDateDialog(props: any) {
         : "Select a date"
 
     return (
-        <Modal visible={dialogState.isCalendarDialogVisible} animationType="fade" transparent={true} >
-            <TouchableOpacity style={styles.overallDialog} onPressIn={() => setDialogState({ ...dialogState, isCalendarDialogVisible: false })
-            }>
+        <Modal visible={dialogState.isCalendarDialogVisible}
+            animationType="fade" transparent={true} >
+            <TouchableOpacity style={styles.overallDialog}
+                onPressIn={() => setDialogState({
+                    ...dialogState,
+                    isCalendarDialogVisible: false
+                })}>
                 <TouchableOpacity style={styles.innerTouchableOpacity}
                     onPress={() => { }}
                     activeOpacity={1}
@@ -45,32 +50,39 @@ export function SelectDateDialog(props: any) {
                                         si.forEach((currentScheduledItem, i) => {
                                             if (currentScheduledItem.id == s.id) {
                                                 si.splice(i, 1, s)
-                                                return;
+                                                return
                                             }
                                         })
                                         updateScheduledItem(s)
                                     })
                                     commonScheduledItemCRUD(si)
+                                    Toast.show("Selected scheduled items are moved over to "+day.dateString)
                                 }
                                 else {
                                     let arr: ScheduledItem[] = []
                                     selectedScheduledItems.forEach(e => {
                                         let t = { ...e }
-                                        t.id = Math.floor(Math.random() * (1000000000 - 10000) + 10000)//WARNING: May cause issues of clashes of scheduled item of the same number
+                                        t.id = Math.floor(
+                                            Math.random() * (1000000000 - 10000) + 10000
+                                        )//WARNING: May cause issues of clashes of scheduled item of the same number
                                         t.date = day
                                         createScheduledItem(t)
                                         arr.push(t)
                                     })
                                     let si = arr.concat(scheduledItems)
                                     commonScheduledItemCRUD(si)
+                                    Toast.show("Selected scheduled items are copied over to "+day.dateString)
                                 }
                             } else {
-                                const s = Object.assign({}, aScheduledItem)
+                                const s = { ...aScheduledItem }
                                 s.date = day
                                 setScheduledItemState({ ...scheduledItemState, aScheduledItem: s })
                             }
                         }} />
-                    < Button title='Cancel' onPress={() => setDialogState({ ...dialogState, isCalendarDialogVisible: false })} />
+                    < Button title='Cancel' onPress={() => setDialogState({
+                        ...dialogState,
+                        isCalendarDialogVisible: false
+                    })} />
                 </TouchableOpacity>
             </TouchableOpacity>
         </Modal>

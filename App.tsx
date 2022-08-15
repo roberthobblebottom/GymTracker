@@ -1,73 +1,82 @@
 import {
   Alert, LogBox
-} from 'react-native';
-import { ExercisesScreen } from './screens/ExercisesScreen';
-import { SettingsScreen } from './screens/SettingsScreen';
-import { PlanScreen } from './screens/ScheduleScreen';
-import 'react-native-gesture-handler';
-import React, { useState, useEffect, Dispatch } from 'react';
-import { NavigationContainer } from '@react-navigation/native';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+} from 'react-native'
+import { ExercisesScreen } from './screens/ExercisesScreen'
+import { SettingsScreen } from './screens/SettingsScreen'
+import { PlanScreen } from './screens/ScheduleScreen'
+import React, { useState, useEffect } from 'react'
+import { NavigationContainer } from '@react-navigation/native'
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import {
-  init, db, resetTables, createScheduledItem, deleteScheduledItem, updateScheduledItem,
-  createExerciseMajorMuscleRelationship, createExercise, deleteExerciseMajorMuscleRelationship, deleteExercise, updateExercise, retrieveExerciseMajorMuscleRelationships, retrieveMajorMuscles, retrieveScheduledItems, retrieveExercises, deleteFromExerciseAndScheduledItem
-}
-  from './dbhandler';
-import { ButtonSetProps, ContextProps, DialogState, Emm, Exercise, ExerciseState, MajorMuscle, PushPullEnum, ScheduledItemState } from './types';
-import { ScheduledItem } from './types';
-import Toast from 'react-native-simple-toast';
-import Colors from './constants/Colors';
-import { DateData } from 'react-native-calendars';
-import { Ionicons, MaterialCommunityIcons, } from '@expo/vector-icons';
-import _default from 'babel-plugin-transform-typescript-metadata';
-import { ScheduleDialog } from './screens/ScheduleDialog';
-import { ExerciseDialog } from './screens/ExerciseDialog';
-import { styles } from './constants/styles';
-import { SelectDateDialog } from './screens/SelectDateDialog';
-import * as Filesystem from 'expo-file-system';
+  init, resetTables, createScheduledItem, deleteScheduledItem, updateScheduledItem,
+  createExerciseMajorMuscleRelationship, createExercise,
+  deleteExerciseMajorMuscleRelationship, deleteExercise, updateExercise,
+  retrieveExerciseMajorMuscleRelationships, retrieveMajorMuscles,
+  retrieveScheduledItems, retrieveExercises, deleteFromExerciseAndScheduledItem
+} from './dbhandler'
+import {
+  ButtonSetProps, ContextProps, DialogState, Exercise, ExerciseState,
+  MajorMuscle, PushPullEnum, ScheduledItemState
+} from './types'
+import { ScheduledItem } from './types'
+import Toast from 'react-native-simple-toast'
+import Colors from './constants/Colors'
+import { DateData } from 'react-native-calendars'
+import { Ionicons, MaterialCommunityIcons, } from '@expo/vector-icons'
+import _default from 'babel-plugin-transform-typescript-metadata'
+import { ScheduleDialog } from './screens/ScheduleDialog'
+import { ExerciseDialog } from './screens/ExerciseDialog'
+import { styles } from './constants/styles'
+import { SelectDateDialog } from './screens/SelectDateDialog'
 import { StorageAccessFramework } from 'expo-file-system'
-import { ExerciseInformationText, EditExerciseText, CreateExerciseText, ScheduledItemInformation, EditScheduledItemText, DuplicateScheduledItemText, CreateScheduledItemText } from './constants/strings';
-import { initalContextProps, initialExerciseState, initialScheduledItemState, initialMajorMuscles, initialEmm, initialDialogState, initialScheduledItem } from './constants/initialValues';
+import {
+  ExerciseInformationText, EditExerciseText,
+  CreateExerciseText, ScheduledItemInformation,
+  EditScheduledItemText, DuplicateScheduledItemText, CreateScheduledItemText
+} from './constants/strings'
+import {
+  initialExerciseState, initialScheduledItemState, initialMajorMuscles,
+  initialEmm, initialDialogState, initialScheduledItem, ExerciseScreenContext,
+  ScheduledItemContext, SettingsScreenContext
+} from './constants/initialValues'
+import * as DocumentPicker from 'expo-document-picker'
 LogBox.ignoreLogs(['Require cycle:'])
 const Tab = createBottomTabNavigator()
 
-//contexts
-export const SettingsScreenContext = React.createContext({ handleResetDB: () => { }, handleExport: () => { }, handleImport: () => { } })
-export const ExerciseScreenContext = React.createContext({ contextProps: initalContextProps })
-export const ScheduledItemContext = React.createContext({ contextProps: initalContextProps })
-
 export default function App() {
   const [exerciseState, setExerciseState] = useState<ExerciseState>(initialExerciseState)
-  const [scheduledItemState, setScheduledItemState] = useState<ScheduledItemState>(initialScheduledItemState)
+  const [scheduledItemState, setScheduledItemState] =
+    useState<ScheduledItemState>(initialScheduledItemState)
   const [dialogState, SetDialogState] = useState<DialogState>(initialDialogState)
-  const [majorMuscles, setMajorMuscles] = useState(initialMajorMuscles)
   const [emm, setEmm] = useState(initialEmm)
 
-  const [dropDownMajorMuscleNameSelected, setMajorMuscleValues] = useState([""])
+  const [dropDownMajorMuscleNameSelected, setDropDownMajorMuscleValues] = useState([""])
   const [dropDownExNameSelected, setDropDownExNameSelected] = useState("")
   const [dropDownPushPullSelected, setDropDownPushPullSelected] = useState(PushPullEnum.Push)
 
   function handlePlanHeader(date: DateData) {
     const s: string = ("Plan " + date.day + "-" + date.month + "-" + date.year)
-    SetDialogState({ ...dialogState, planHeader: s });
+    SetDialogState({ ...dialogState, planHeader: s })
   }
   useEffect(() => {
-    let tempExercises: Exercise[];
+    let tempExercises: Exercise[]
     if (exerciseState.exercises[0] != undefined)
-      if (exerciseState.exercises[0].name == "" || exerciseState.exercises.length <= 0)
+      if (exerciseState.exercises[0].name == ""
+        || exerciseState.exercises.length <= 0)
         retrieveExercises((_, r) => {
-          tempExercises = r.rows._array;
+          tempExercises = r.rows._array
           tempExercises.forEach(ex => ex.major_muscles = initialMajorMuscles)
           if (scheduledItemState.scheduledItems[0] != undefined)
-            if (scheduledItemState.scheduledItems[0].exercise == initialExerciseState.aExercise)
+            if (scheduledItemState.scheduledItems[0].exercise
+              == initialExerciseState.aExercise)
               retrieveScheduledItems(
                 (_, results) => {
-                  const tempScheduledItems: ScheduledItem[] = results.rows._array;
+                  const tempScheduledItems: ScheduledItem[] = results.rows._array
                   const a = results.rows._array.slice()
                   tempScheduledItems.forEach((ms, index) => {
                     ms.date = JSON.parse(ms.date.toString())
                     const t = tempExercises.find(ex => ex.name == a[index].exercise)
-                    tempScheduledItems[index].exercise = t!;
+                    tempScheduledItems[index].exercise = t!
                   })
                   setScheduledItemState({
                     ...scheduledItemState,
@@ -76,23 +85,38 @@ export default function App() {
                   })
                 })
           setExerciseState({
-            ...exerciseState, exercises: tempExercises, filteredExercises: tempExercises
+            ...exerciseState, exercises: tempExercises,
+            filteredExercises: tempExercises
           })
         })
-    if (majorMuscles[0] == initialMajorMuscles[0])
-      retrieveMajorMuscles((_, results) => setMajorMuscles(results.rows._array))
+
+    if (exerciseState.majorMuscles[0] == initialMajorMuscles[0]) {
+      retrieveMajorMuscles(
+        (_, results) => setExerciseState({
+          ...exerciseState,
+          majorMuscles: results.rows._array
+        }))
+    }
     if (emm[0] == initialEmm[0])
-      retrieveExerciseMajorMuscleRelationships((_, results) => setEmm(results.rows._array))
-    if (majorMuscles.length > 1 && exerciseState.exercises.length > 1 && emm.length > 1) {
+      retrieveExerciseMajorMuscleRelationships(
+        (_, results) => setEmm(results.rows._array))
+    if (exerciseState.majorMuscles.length > 1
+      && exerciseState.exercises.length > 1
+      && emm.length > 1) {
       emm.forEach(x => {
-        const ex = exerciseState.exercises.find(e => e.name == x.exercise_name)
-        const mm2 = majorMuscles.find(mm => mm.name == x.major_muscle_name)
-        if (ex == undefined) return;
-        if (ex.major_muscles == initialMajorMuscles) ex.major_muscles = [mm2!]
-        else if (!ex.major_muscles.find(x => x.name == mm2?.name)) ex.major_muscles.push(mm2!)
+        const ex: Exercise =
+          exerciseState.exercises.find(e => e.name == x.exercise_name)!
+        const mm2: MajorMuscle = exerciseState
+          .majorMuscles
+          .find(mm => mm.name == x.major_muscle_name)!
+        if (ex == undefined || mm2 == undefined) return
+        if (ex.major_muscles == initialMajorMuscles)
+          ex.major_muscles = [mm2!]
+        else if (!ex.major_muscles.find(x => x.name == mm2.name))
+          ex.major_muscles.push(mm2!)
       })
     }
-  }, [scheduledItemState, exerciseState, majorMuscles, emm])
+  }, [scheduledItemState, exerciseState, emm])
   init()
 
   let textInputStyle, numberInputStyle
@@ -109,7 +133,6 @@ export default function App() {
     setExerciseState(initialExerciseState)
     setScheduledItemState(initialScheduledItemState)
     SetDialogState(initialDialogState)
-    setMajorMuscles(initialMajorMuscles)
     setEmm(initialEmm)
   }
 
@@ -121,25 +144,44 @@ export default function App() {
     }
     const permissions = await StorageAccessFramework.requestDirectoryPermissionsAsync()
     if (!permissions.granted) return
-    let uri = await StorageAccessFramework.createFileAsync(permissions.directoryUri, "GymTracker backup", "application/json")
+    let uri = await StorageAccessFramework.createFileAsync(
+      permissions.directoryUri, "GymTracker backup", "application/json"
+    )
     await StorageAccessFramework.writeAsStringAsync(uri, JSON.stringify(exportData))
+    Alert.alert("", `The backup data is now saved in the approved folder as `
+      + `GymTracker backup.json`
+      + `\nNote: if there is multiple backups, it will be numbered.`,
+      [{
+        text: "Cancel",
+        onPress: () => { },
+        style: "cancel"
+      }],
+      { cancelable: true }
+    )
+
   }
 
   async function handleImport() {
-    const permissions = await StorageAccessFramework.requestDirectoryPermissionsAsync()
+    Toast.show("Please grant folder permissions.")
+    const permissions =
+      await StorageAccessFramework
+        .requestDirectoryPermissionsAsync()
     if (!permissions.granted) return
-    const directory = await StorageAccessFramework.readDirectoryAsync(permissions.directoryUri)
-    const fileName = directory.find((v) => v.includes('backup')&& v.includes('GymTracker')&&v.includes('.json'))
-    if (fileName == undefined) {
-      Toast.show("Cannot find the file name with the suffix \'backup.json\'")
-      return
-    }
-    const data = JSON.parse(await StorageAccessFramework.readAsStringAsync(fileName))
+    Toast.show("Please choose the correct json file")
+    let documentResult: DocumentPicker.DocumentResult =
+      await DocumentPicker.getDocumentAsync({ type: 'application/json' })
+    if (documentResult.type == 'cancel') return
+
+    const data = JSON.parse(
+      await StorageAccessFramework
+        .readAsStringAsync(documentResult.uri))
+    console.log(data)
     if (!('exercises' in data) || !('scheduledItems' in data)) {
       Toast.show("The data does not have the correct format")
       return
     }
-    if (Array.isArray(data.exercises) || Array.isArray(data.scheduledItems !== Array)) {
+    if (!Array.isArray(data.exercises)
+      || !Array.isArray(data.scheduledItems)) {
       Toast.show("The data does not have the correct format")
       return
     }
@@ -156,56 +198,74 @@ export default function App() {
     })
     data.exercises.forEach((ex: Exercise) => createExercise(ex))
     console.log(scheduledItemState.scheduledItems)
-    data.scheduledItems.forEach((si: ScheduledItem) => createScheduledItem(si))
+    data
+      .scheduledItems
+      .forEach((si: ScheduledItem) => createScheduledItem(si))
   }
 
   function cancelDialog() {
-    SetDialogState({ ...dialogState, isExDialogVisible: false, isCalendarDialogVisible: false, isPlanDialogVisible: false });
+    SetDialogState({
+      ...dialogState,
+      isExDialogVisible: false,
+      isCalendarDialogVisible: false,
+      isPlanDialogVisible: false
+    })
   }
 
   // Exercises Functions:
   //renders
   const renderExerciseDialogForViewing = (exercise: Exercise) => {
-    textInputStyle = styles.textInputViewOnly;
-    setExerciseState({ ...exerciseState, aExercise: exercise, oldExerciseName: exercise.name })
-    const names: string[] = [];
+    textInputStyle = styles.textInputViewOnly
+    setExerciseState({
+      ...exerciseState,
+      aExercise: exercise,
+      oldExerciseName: exercise.name
+    })
+    const names: string[] = []
     exercise.major_muscles.forEach(mm => names.push(mm.name))
-    setMajorMuscleValues(names)
+    setDropDownMajorMuscleValues(names)
     setDropDownPushPullSelected(exercise.push_or_pull)
     SetDialogState({
       ...dialogState,
       isExDialogVisible: true, openPushPullDropDown: false,
       dialogText: ExerciseInformationText,
       isEditable: false, isDropDownOpen: false,
-    });
+    })
   }
 
   const renderExerciseDialogForEdit = () => {
-    textInputStyle = styles.textInputEditable;
+    textInputStyle = styles.textInputEditable
     SetDialogState({
       ...dialogState,
       isEditable: true,
       dialogText: EditExerciseText,
       isDropDownOpen: false,
       openPushPullDropDown: false
-    });
+    })
   }
 
   const renderExerciseDialogForCreate = () => {
-    setExerciseState({ ...exerciseState, aExercise: initialExerciseState.aExercise })
-    setMajorMuscleValues([])
-    textInputStyle = styles.textInputEditable;
+    setExerciseState({
+      ...exerciseState, aExercise:
+        initialExerciseState.aExercise
+    })
+    setDropDownMajorMuscleValues([])
+    textInputStyle = styles.textInputEditable
     SetDialogState({
       ...dialogState,
       isExDialogVisible: true, openPushPullDropDown: false,
       dialogText: CreateExerciseText, isEditable: true, isDropDownOpen: false
-    });
+    })
     setDropDownPushPullSelected(PushPullEnum.Push)
   }
 
   //db
   const commonExercisesCRUD = (es: Exercise[]) => {
-    setExerciseState({ ...exerciseState, exercises: [...es], filteredExercises: [...es], filteredExerciseKeyword: "" })
+    setExerciseState({
+      ...exerciseState, exercises: [...es],
+      filteredExercises: [...es],
+      filteredExerciseKeyword: ""
+    })
     cancelDialog()
   }
 
@@ -213,22 +273,30 @@ export default function App() {
     Alert.alert(
       "Confirmation",
       "Are you sure you want to delete this exercise?",
-      [{ text: "Yes", onPress: () => deleteExerciseWithStateUpdate(exercise) },
-      { text: "No", onPress: () => renderExerciseDialogForViewing(exercise) }],//warning, recursive-
+      [{
+        text: "Yes",
+        onPress: () => deleteExerciseWithStateUpdate(exercise)
+      },
+      {
+        text: "No",
+        onPress: () => renderExerciseDialogForViewing(exercise)
+      }],//warning, recursive-
       { cancelable: true }
     )
-  };
+  }
 
   const deleteExerciseWithStateUpdate = (exercise: Exercise) => {
-    const selected: MajorMuscle[] = majorMuscles.filter(x => dropDownMajorMuscleNameSelected.includes(x.name))
-    selected.forEach(x => deleteExerciseMajorMuscleRelationship(exercise.name, x.name))
+    const selected: MajorMuscle[] = exerciseState.majorMuscles.filter(
+      x => dropDownMajorMuscleNameSelected.includes(x.name))
+    selected.forEach(
+      x => deleteExerciseMajorMuscleRelationship(exercise.name, x.name))
     deleteExercise(exercise.name, () => {
-      const deletedName = exercise.name;
+      const deletedName = exercise.name
       const es: Exercise[] = exerciseState.exercises.slice()
       es.forEach((currentExercise, i) => {
         if (currentExercise.name == deletedName) {
           es.splice(i, 1)
-          return;
+          return
         }
       })
       //correct way of removing element from a array for me. Not using delete keyword which leaves a undefined space
@@ -239,30 +307,35 @@ export default function App() {
 
   const updateExerciseWithStateUpdate = () => {
     const aExercise = exerciseState.aExercise
-    console.log("111" + aExercise.name + "111")
     if (aExercise.name.trim() == "") {
       Toast.show("name cannot be empty")
       return
     }
     const oldExerciseName = exerciseState.oldExerciseName
     const pushPullDropDownValue = dropDownPushPullSelected
-    const selected: MajorMuscle[] = majorMuscles.filter(x => dropDownMajorMuscleNameSelected.includes(x.name))
-    const toBeCreated: MajorMuscle[] = selected.filter(x => !aExercise.major_muscles.find(t => t.name == x.name))
-    const toBeDeleted: MajorMuscle[] = aExercise.major_muscles.filter(x => !selected.find(t => t.name == x.name))
-    toBeCreated.forEach(x => createExerciseMajorMuscleRelationship(aExercise.name, x.name))
-    toBeDeleted.forEach(x => deleteExerciseMajorMuscleRelationship(aExercise.name, x.name))
+    const selected: MajorMuscle[] = exerciseState.majorMuscles.filter(
+      x => dropDownMajorMuscleNameSelected.includes(x.name))
+    const toBeCreated: MajorMuscle[] = selected.filter(
+      x => !aExercise.major_muscles.find(t => t.name == x.name))
+    const toBeDeleted: MajorMuscle[] = aExercise.major_muscles.filter(
+      x => !selected.find(t => t.name == x.name))
+    toBeCreated.forEach(
+      x => createExerciseMajorMuscleRelationship(aExercise.name, x.name))
+    toBeDeleted.forEach(
+      x => deleteExerciseMajorMuscleRelationship(aExercise.name, x.name))
     aExercise.push_or_pull = pushPullDropDownValue
     updateExercise(aExercise, oldExerciseName,
       () => {
         const exerciseToBeUpdated: Exercise = {
-          name: aExercise.name, description: aExercise.description, imagesJson: aExercise.imagesJson,
+          name: aExercise.name, description: aExercise.description,
+          imagesJson: aExercise.imagesJson,
           major_muscles: selected, push_or_pull: dropDownPushPullSelected
         }
         const es: Exercise[] = exerciseState.exercises.slice()
         es.forEach((currentExercise, i) => {
           if (currentExercise.name == oldExerciseName) {
             es.splice(i, 1, exerciseToBeUpdated)
-            return;
+            return
           }
         })
         commonExercisesCRUD(es)
@@ -271,20 +344,23 @@ export default function App() {
   }
 
   function createExerciseWithStateUpdate() {
-    const aExercise = exerciseState.aExercise;
+    const aExercise = exerciseState.aExercise
     if (aExercise.name == "") {
       Toast.show("name cannot be empty")
       return
     }
-    const selected: MajorMuscle[] = majorMuscles.filter(x => dropDownMajorMuscleNameSelected.includes(x.name))
-    selected.forEach(x => createExerciseMajorMuscleRelationship(aExercise.name, x.name))
+    const selected: MajorMuscle[] = exerciseState.majorMuscles.filter(
+      x => dropDownMajorMuscleNameSelected.includes(x.name))
+    selected.forEach(
+      x => createExerciseMajorMuscleRelationship(aExercise.name, x.name))
 
     aExercise.push_or_pull = dropDownPushPullSelected
     console.log(aExercise.push_or_pull)
     createExercise(aExercise, (_, result) => {
       const es: Exercise[] = exerciseState.exercises.slice()
       es.push({
-        name: aExercise.name, description: aExercise.description, imagesJson: aExercise.imagesJson, major_muscles: selected,
+        name: aExercise.name, description: aExercise.description,
+        imagesJson: aExercise.imagesJson, major_muscles: selected,
         push_or_pull: dropDownPushPullSelected
       })
       commonExercisesCRUD(es)
@@ -302,6 +378,7 @@ export default function App() {
           || e.major_muscles.filter(
             mm => mm.name.includes(keyword)
           ).length > 0
+          || e.description.includes(keyword)
         )),
       filteredExerciseKeyword: keyword
     })
@@ -312,31 +389,38 @@ export default function App() {
   //Scheduled Item Functions: 
   //renders:
   function renderScheduledItemDialogForViewing(scheduledItem: ScheduledItem) {
-    textInputStyle = styles.textInputViewOnly;
-    numberInputStyle = styles.numberInputViewOnly;
-    setScheduledItemState({ ...scheduledItemState, aScheduledItem: scheduledItem })
+    textInputStyle = styles.textInputViewOnly
+    numberInputStyle = styles.numberInputViewOnly
+    setScheduledItemState({
+      ...scheduledItemState,
+      aScheduledItem: scheduledItem
+    })
     SetDialogState({
       ...dialogState,
       isEditable: false, dialogText: ScheduledItemInformation,
-      isExDialogVisible: false, openPushPullDropDown: false, isPlanDialogVisible: true
+      isExDialogVisible: false, openPushPullDropDown: false,
+      isPlanDialogVisible: true
     })
     setDropDownExNameSelected(scheduledItem.exercise.name)
   }
 
   function commonLogicForScheduledItemEditAndDuplication(dialogText: string) {
-    textInputStyle = styles.textInputEditable;
+    textInputStyle = styles.textInputEditable
     setScheduledItemState({ ...scheduledItemState, })
     SetDialogState({
       ...dialogState, isEditable: true,
       isDropDownOpen: false, dialogText: dialogText
-    });
+    })
     setDropDownExNameSelected(scheduledItemState.aScheduledItem.exercise.name)
   }
 
   function renderScheduledItemDialogForCreate() {
-    textInputStyle = styles.textInputEditable;
-    numberInputStyle = styles.numberInputEditable;
-    setScheduledItemState({ ...scheduledItemState, aScheduledItem: initialScheduledItem[0] })
+    textInputStyle = styles.textInputEditable
+    numberInputStyle = styles.numberInputEditable
+    setScheduledItemState({
+      ...scheduledItemState,
+      aScheduledItem: initialScheduledItem[0]
+    })
     SetDialogState({
       ...dialogState,
       isEditable: true, dialogText: CreateScheduledItemText,
@@ -345,15 +429,21 @@ export default function App() {
     setDropDownExNameSelected(exerciseState.exercises[0].name)
     const parts: string[] = dialogState.planHeader.split(" ")[1].split("-")
     const monthNumber: number = Number(parts[1])
-    const month: string = monthNumber < 10 ? "0" + monthNumber.toString() : monthNumber.toString()
-    const day: string = Number(parts[0]) < 10 ? "0" + parts[0] : parts[0];
+    const month: string = monthNumber < 10
+      ? "0" + monthNumber.toString()
+      : monthNumber.toString()
+    const day: string = Number(parts[0]) < 10 ? "0" + parts[0] : parts[0]
     const date: DateData = {
-      year: Number(parts[2]), month: monthNumber, day: Number(parts[0]), timestamp: 0,
+      year: Number(parts[2]), month: monthNumber,
+      day: Number(parts[0]), timestamp: 0,
       dateString: parts[2] + "-" + month + "-" + day
     }
     const aScheduledItem = initialScheduledItem[0]
-    aScheduledItem.date = date;
-    setScheduledItemState({ ...scheduledItemState, aScheduledItem: { ...aScheduledItem } })
+    aScheduledItem.date = date
+    setScheduledItemState({
+      ...scheduledItemState,
+      aScheduledItem: { ...aScheduledItem }
+    })
   }
 
   //db:
@@ -375,7 +465,7 @@ export default function App() {
       { text: "No", onPress: () => renderScheduledItemDialogForViewing(ms) }],//warning, recursive
       { cancelable: true }
     )
-  };
+  }
 
   const deleteScheduledItemWithStateUpdate = (id: number) => {
     deleteScheduledItem(id, () => {
@@ -383,7 +473,7 @@ export default function App() {
       si.forEach((ms1, i) => {
         if (ms1.id == id) {
           si.splice(i, 1)
-          return;
+          return
         }
       }) //correct way of removing element from a array for me. Not using delete keyword which leaves a undefined space
       Toast.show("The scheduled item is deleted.")
@@ -395,24 +485,25 @@ export default function App() {
     const aScheduledItem = scheduledItemState.aScheduledItem
     if (dropDownExNameSelected == undefined || dropDownExNameSelected == "") {
       Toast.show("exercise must be selected")
-      return;
+      return
     }
     const theexercise = exerciseState.exercises.filter((e, i, a) => {
-      if (e.name == dropDownExNameSelected) return e;
-    })[0];
+      if (e.name == dropDownExNameSelected) return e
+    })[0]
     updateScheduledItem(aScheduledItem,
       (_, result) => {
         const toBeUpdated: ScheduledItem = {
           id: aScheduledItem.id, exercise: theexercise, reps: aScheduledItem.reps,
           percent_complete: aScheduledItem.percent_complete, sets: aScheduledItem.sets,
           duration_in_seconds: aScheduledItem.duration_in_seconds,
-          weight: aScheduledItem.weight, notes: aScheduledItem.notes, date: aScheduledItem.date
+          weight: aScheduledItem.weight, notes: aScheduledItem.notes,
+          date: aScheduledItem.date
         }
         const ms: ScheduledItem[] = scheduledItemState.scheduledItems.slice()
         ms.forEach((currentScheduledItem, i) => {
           if (currentScheduledItem.id == aScheduledItem.id) {
             ms.splice(i, 1, toBeUpdated)
-            return;
+            return
           }
         })
         commonScheduledItemCRUD(ms)
@@ -431,7 +522,7 @@ export default function App() {
     })
     createScheduledItem(aScheduledItem,
       (_, r) => {
-        const tempScheduledItem = Object.assign({}, aScheduledItem)
+        const tempScheduledItem = { ...aScheduledItem }
         tempScheduledItem.id = r.insertId!
         tempScheduledItem.date = aScheduledItem.date
         tempScheduledItem.duration_in_seconds = aScheduledItem.duration_in_seconds
@@ -445,7 +536,7 @@ export default function App() {
   function handleFilterScheduledItem(keyword: string) {
     console.log("here")
     const filtered = scheduledItemState.scheduledItems.filter(si => {
-      const sec = si.duration_in_seconds % 60;
+      const sec = si.duration_in_seconds % 60
       const min = Math.floor(si.duration_in_seconds / 60)
       return ((si.percent_complete.toString() + "%").includes(keyword)
         || si.id.toString().includes(keyword)
@@ -460,7 +551,11 @@ export default function App() {
       )
     }
     )
-    setScheduledItemState({ ...scheduledItemState, filteredScheduledItems: filtered, filteredScheduledItemKeyword: keyword })
+    setScheduledItemState({
+      ...scheduledItemState,
+      filteredScheduledItems: filtered,
+      filteredScheduledItemKeyword: keyword
+    })
   }
   const buttonsSetProps: ButtonSetProps = {
     cancelDialog: cancelDialog,
@@ -471,11 +566,13 @@ export default function App() {
     createScheduledItemWithStateUpdate: createScheduledItemWithStateUpdate,
     updateScheduledItemWithStateUpdate: updateScheduledItemWithStateUpdate,
     renderScheduledItemDialogForViewing: renderScheduledItemDialogForViewing,
-    renderScheduledItemDialogForDuplication: () => commonLogicForScheduledItemEditAndDuplication(DuplicateScheduledItemText),
-    renderScheduledItemDialogForEdit: () => commonLogicForScheduledItemEditAndDuplication(EditScheduledItemText),
+    renderScheduledItemDialogForDuplication:
+      () => commonLogicForScheduledItemEditAndDuplication(DuplicateScheduledItemText),
+    renderScheduledItemDialogForEdit:
+      () => commonLogicForScheduledItemEditAndDuplication(EditScheduledItemText),
     renderExerciseDialogForEdit: renderExerciseDialogForEdit,
     renderExerciseDialogForViewing: renderExerciseDialogForViewing,
-  };
+  }
 
   const contextProps: ContextProps = {
     renderScheduledItemDialogForViewing: renderScheduledItemDialogForViewing,
@@ -519,14 +616,14 @@ export default function App() {
           exerciseState={exerciseState}
           dialogState={dialogState}
           scheduledItemState={scheduledItemState}
-          majorMuscles={majorMuscles}
+          majorMuscles={exerciseState.majorMuscles}
           dropDownPushPullSelected={dropDownPushPullSelected}
           dropDownMajorMuscleNameSelected={dropDownMajorMuscleNameSelected}
 
           setDropDownPushPullSelected={setDropDownPushPullSelected}
           setDialogState={SetDialogState}
           setExerciseState={setExerciseState}
-          setMajorMuscleValues={setMajorMuscleValues}
+          setMajorMuscleValues={setDropDownMajorMuscleValues}
 
           buttonsSetProps={buttonsSetProps}
         />
@@ -538,8 +635,13 @@ export default function App() {
           setDialogState={SetDialogState}
 
           commonScheduledItemCRUD={commonScheduledItemCRUD}
+          buttonsSetProps={buttonsSetProps}
         />
-        <SettingsScreenContext.Provider value={{ handleResetDB: handleResetDB, handleExport: handleExport, handleImport: handleImport }}>
+        <SettingsScreenContext.Provider value={{
+          handleResetDB: handleResetDB,
+          handleExport: handleExport,
+          handleImport: handleImport
+        }}>
           <ExerciseScreenContext.Provider value={{ contextProps: contextProps }}>
             <ScheduledItemContext.Provider value={{ contextProps: contextProps }}>
               <Tab.Navigator
@@ -550,13 +652,13 @@ export default function App() {
                     switch (route.name) {
                       case 'Plan':
                         iconName = focused ? 'clipboard-list' : 'clipboard-list-outline'
-                        return <MaterialCommunityIcons name={iconName} size={size} color={color} />;
+                        return <MaterialCommunityIcons name={iconName} size={size} color={color} />
                       case 'Exercises':
                         iconName = focused ? 'arm-flex' : 'arm-flex-outline'
-                        return <MaterialCommunityIcons name={iconName} size={size} color={color} />;
+                        return <MaterialCommunityIcons name={iconName} size={size} color={color} />
                       case 'Settings':
                         iconName = focused ? 'settings' : 'settings-outline'
-                        return <Ionicons name={iconName} size={size} color={color} />;
+                        return <Ionicons name={iconName} size={size} color={color} />
                     }
                   },
                   tabBarActiveTintColor: Colors.light.tint

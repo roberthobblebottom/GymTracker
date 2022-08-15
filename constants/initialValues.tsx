@@ -1,14 +1,32 @@
-import { ExerciseState, PushPullEnum, ScheduledItem, ScheduledItemState, MajorMuscle, Emm, ContextProps } from "../types";
+import React from "react";
+import {
+  ExerciseState, PushPullEnum, ScheduledItem,
+  ScheduledItemState, MajorMuscle, Emm, ContextProps
+} from "../types";
 
 const d: Date = new Date()
 //initial constant values
-export const initialDate = { year: 0, month: 0, day: 0, timestamp: 0, dateString: "" };
+export const initialDate =
+  { year: 0, month: 0, day: 0, timestamp: 0, dateString: "" };
+export const initialMajorMuscles: MajorMuscle[] =
+  [{ name: "", notes: "", imageJson: "" }];
 export const initialExerciseState: ExerciseState = {
-  exercises: [{ name: "", description: "", imagesJson: "", major_muscles: [], push_or_pull: PushPullEnum.Push }]
-  , aExercise: { name: "", description: "", imagesJson: "", major_muscles: [], push_or_pull: PushPullEnum.Push }
-  , filteredExercises: [{ name: "", description: "", imagesJson: "", major_muscles: [], push_or_pull: PushPullEnum.Push }]
-  , filteredExerciseKeyword: ""
-  , oldExerciseName: ""
+  exercises: [{
+    name: "", description: "", imagesJson: "",
+    major_muscles: [], push_or_pull: PushPullEnum.Push
+  }],
+  aExercise: {
+    name: "", description: "", imagesJson: "",
+    major_muscles: [], push_or_pull: PushPullEnum.Push
+  },
+  filteredExercises: [{
+    name: "", description: "", imagesJson: "",
+    major_muscles: [], push_or_pull: PushPullEnum.Push
+  }],
+  filteredExerciseKeyword: "",
+  oldExerciseName: "",
+  majorMuscles: initialMajorMuscles
+
 };
 export const initialScheduledItem: ScheduledItem[] = [{
   id: 0, exercise: initialExerciseState.aExercise,
@@ -23,8 +41,8 @@ export const initialScheduledItemState: ScheduledItemState = {
   selectedScheduledItems: [],
   isMovingScheduledItems: false
 }
-export const initialMajorMuscles: MajorMuscle[] = [{ name: "", notes: "", imageJson: "" }];
-export const initialEmm: Emm[] = [{ id: 9999, exercise_name: "", major_muscle_name: "" }];
+export const initialEmm: Emm[] =
+  [{ id: 9999, exercise_name: "", major_muscle_name: "" }];
 export const initialDialogState = {
   isExDialogVisible: false,
   openPushPullDropDown: false,
@@ -34,7 +52,8 @@ export const initialDialogState = {
   isDropDownOpen: false,
   isPlanDialogVisible: false,
   isHistoryDialogVisible: false,
-  planHeader: "Plan " + d.getDate() + "-" + (d.getMonth() + 1) + "-" + d.getFullYear(),
+  planHeader: "Plan " + d.getDate() + "-" + (d.getMonth() + 1)
+    + "-" + d.getFullYear(),
   isExerciseHistory: true,
 }
 export const initalContextProps: ContextProps = {
@@ -53,3 +72,13 @@ export const initalContextProps: ContextProps = {
   setDialogState: () => { },
   dialogState: initialDialogState,
 }
+//contexts
+export const SettingsScreenContext =
+  React.createContext({
+    handleResetDB: () => { },
+    handleExport: () => { }, handleImport: () => { }
+  })
+export const ExerciseScreenContext =
+  React.createContext({ contextProps: initalContextProps })
+export const ScheduledItemContext =
+  React.createContext({ contextProps: initalContextProps })
