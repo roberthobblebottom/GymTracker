@@ -396,10 +396,11 @@ export function ScheduleDialog(props: any) {
             </Pressable>
           </View>
           <ButtonSet
-            dialogText={dialogState.dialogText}
             aExercise={aExercise}
             aScheduledItem={aScheduledItem}
             buttonsSetProps={buttonsSetProps}
+            dialogState={dialogState}
+            SetDialogState={setDialogState}
           />
         </TouchableOpacity>
       </TouchableOpacity>

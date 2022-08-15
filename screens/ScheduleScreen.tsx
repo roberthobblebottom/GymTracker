@@ -275,6 +275,7 @@ export function PlanScreen() {
                     selectedScheduledItems: []
                   })
                   commonScheduledItemCRUD(scheduledItems)
+                  Toast.show("Selected scheduled Items are deleted.")
                 }
               }, { text: "No", onPress: () => { } }], { cancelable: true })
           }}

@@ -29,7 +29,7 @@ export function ExerciseDialog(props: any) {
     const setDropDownPushPullSelected = props.setDropDownPushPullSelected
     const setExerciseState: Dispatch<any> = props.setExerciseState
     const setMajorMuscleValues: Dispatch<any> = props.setMajorMuscleValues
-    const SetDialogState: Dispatch<DialogState> = props.setDialogState
+    const setDialogState: Dispatch<DialogState> = props.setDialogState
     const setAExercise = (e: Exercise) => setExerciseState({ ...exerciseState, aExercise: e })
 
     const buttonsSetProps = props.buttonsSetProps
@@ -73,10 +73,10 @@ export function ExerciseDialog(props: any) {
     return (
         <Modal visible={dialogState.isExDialogVisible} animationType="fade" transparent={true}>
             <TouchableOpacity style={styles.overallDialog} onPressIn={
-                () => SetDialogState({ ...dialogState, isExDialogVisible: false })}
+                () => setDialogState({ ...dialogState, isExDialogVisible: false })}
             >
                 <TouchableOpacity style={styles.innerTouchableOpacity}
-                    onPress={() => { SetDialogState({ ...dialogState, isDropDownOpen: false }) }}
+                    onPress={() => { setDialogState({ ...dialogState, isDropDownOpen: false }) }}
                     activeOpacity={1}
                 >
                     <Text style={{ fontSize: Layout.defaultFontSize }}>{dialogState.dialogText}</Text>
@@ -139,7 +139,7 @@ export function ExerciseDialog(props: any) {
                             value={dropDownPushPullSelected}
                             setValue={setDropDownPushPullSelected}
                             open={dialogState.openPushPullDropDown}
-                            setOpen={v => SetDialogState({ ...dialogState, openPushPullDropDown: v })}
+                            setOpen={v => setDialogState({ ...dialogState, openPushPullDropDown: v })}
                             disabled={!dialogState.isEditable}
                             dropDownDirection="TOP"
                             closeOnBackPressed={true}
@@ -170,7 +170,7 @@ export function ExerciseDialog(props: any) {
                             value={dropDownMajorMuscleNameSelected}
                             setValue={setMajorMuscleValues}
                             open={dialogState.isDropDownOpen}
-                            setOpen={o => SetDialogState({ ...dialogState, isDropDownOpen: o })}
+                            setOpen={o => setDialogState({ ...dialogState, isDropDownOpen: o })}
                             disabled={!dialogState.isEditable}
                             multiple={true}
                             dropDownDirection="TOP"
@@ -185,7 +185,7 @@ export function ExerciseDialog(props: any) {
 
                     <Modal visible={dialogState.isHistoryDialogVisible} animationType="fade" transparent={true}>
                         <TouchableOpacity style={styles.overallDialog} onPressIn={
-                            () => SetDialogState({
+                            () => setDialogState({
                                 ...dialogState,
                                 isHistoryDialogVisible: false
                             })}>
@@ -228,12 +228,12 @@ export function ExerciseDialog(props: any) {
                                 />
                                 <View style={bases.numberCRUD}>
                                     <Button onPress={
-                                        () => SetDialogState({
+                                        () => setDialogState({
                                             ...dialogState,
                                             isExerciseHistory: !dialogState.isExerciseHistory
                                         })} title={buttonTitle} />
                                     <Button onPress={
-                                        () => SetDialogState({
+                                        () => setDialogState({
                                             ...dialogState,
                                             isHistoryDialogVisible: false
                                         })} title="cancel"></Button>
@@ -242,12 +242,12 @@ export function ExerciseDialog(props: any) {
                         </TouchableOpacity>
                     </Modal>
                     <ButtonSet
-                        dialogText={dialogState.dialogText}
+                        // dialogText={dialogState.dialogText}
                         aExercise={aExercise}
                         aScheduledItem={aScheduledItem}
                         buttonsSetProps={buttonsSetProps}
                         dialogState={dialogState}
-                        SetDialogState={SetDialogState}
+                        SetDialogState={setDialogState}
                     />
                 </TouchableOpacity>
             </TouchableOpacity>

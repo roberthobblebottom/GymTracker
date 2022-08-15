@@ -30,7 +30,7 @@ import { styles } from './constants/styles'
 import { SelectDateDialog } from './screens/SelectDateDialog'
 import { StorageAccessFramework } from 'expo-file-system'
 import {
-  ExerciseInformationText, EditExerciseText, 
+  ExerciseInformationText, EditExerciseText,
   CreateExerciseText, ScheduledItemInformation,
   EditScheduledItemText, DuplicateScheduledItemText, CreateScheduledItemText
 } from './constants/strings'
@@ -104,10 +104,11 @@ export default function App() {
       && exerciseState.exercises.length > 1
       && emm.length > 1) {
       emm.forEach(x => {
-        const ex = exerciseState.exercises.find(e => e.name == x.exercise_name)
-        const mm2 = exerciseState
+        const ex: Exercise =
+          exerciseState.exercises.find(e => e.name == x.exercise_name)!
+        const mm2: MajorMuscle = exerciseState
           .majorMuscles
-          .find(mm => mm.name == x.major_muscle_name)
+          .find(mm => mm.name == x.major_muscle_name)!
         if (ex == undefined || mm2 == undefined) return
         if (ex.major_muscles == initialMajorMuscles)
           ex.major_muscles = [mm2!]
@@ -162,20 +163,25 @@ export default function App() {
 
   async function handleImport() {
     Toast.show("Please grant folder permissions.")
-    const permissions = await StorageAccessFramework.requestDirectoryPermissionsAsync()
+    const permissions =
+      await StorageAccessFramework
+        .requestDirectoryPermissionsAsync()
     if (!permissions.granted) return
     Toast.show("Please choose the correct json file")
     let documentResult: DocumentPicker.DocumentResult =
       await DocumentPicker.getDocumentAsync({ type: 'application/json' })
     if (documentResult.type == 'cancel') return
 
-    const data = JSON.parse(await StorageAccessFramework.readAsStringAsync(documentResult.uri))
+    const data = JSON.parse(
+      await StorageAccessFramework
+        .readAsStringAsync(documentResult.uri))
     console.log(data)
     if (!('exercises' in data) || !('scheduledItems' in data)) {
       Toast.show("The data does not have the correct format")
       return
     }
-    if (!Array.isArray(data.exercises) || !Array.isArray(data.scheduledItems)) {
+    if (!Array.isArray(data.exercises)
+      || !Array.isArray(data.scheduledItems)) {
       Toast.show("The data does not have the correct format")
       return
     }
@@ -192,7 +198,9 @@ export default function App() {
     })
     data.exercises.forEach((ex: Exercise) => createExercise(ex))
     console.log(scheduledItemState.scheduledItems)
-    data.scheduledItems.forEach((si: ScheduledItem) => createScheduledItem(si))
+    data
+      .scheduledItems
+      .forEach((si: ScheduledItem) => createScheduledItem(si))
   }
 
   function cancelDialog() {
@@ -237,7 +245,10 @@ export default function App() {
   }
 
   const renderExerciseDialogForCreate = () => {
-    setExerciseState({ ...exerciseState, aExercise: initialExerciseState.aExercise })
+    setExerciseState({
+      ...exerciseState, aExercise:
+        initialExerciseState.aExercise
+    })
     setDropDownMajorMuscleValues([])
     textInputStyle = styles.textInputEditable
     SetDialogState({
@@ -262,8 +273,14 @@ export default function App() {
     Alert.alert(
       "Confirmation",
       "Are you sure you want to delete this exercise?",
-      [{ text: "Yes", onPress: () => deleteExerciseWithStateUpdate(exercise) },
-      { text: "No", onPress: () => renderExerciseDialogForViewing(exercise) }],//warning, recursive-
+      [{
+        text: "Yes",
+        onPress: () => deleteExerciseWithStateUpdate(exercise)
+      },
+      {
+        text: "No",
+        onPress: () => renderExerciseDialogForViewing(exercise)
+      }],//warning, recursive-
       { cancelable: true }
     )
   }
@@ -618,6 +635,7 @@ export default function App() {
           setDialogState={SetDialogState}
 
           commonScheduledItemCRUD={commonScheduledItemCRUD}
+          buttonsSetProps={buttonsSetProps}
         />
         <SettingsScreenContext.Provider value={{
           handleResetDB: handleResetDB,

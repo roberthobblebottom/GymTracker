@@ -39,7 +39,7 @@ function ExercisesScreen() {
                 transform: [{ rotateX: "180deg" }],
                 fontSize: layoutConstants.defaultFontSize
               }}>
-                {item.name}:
+                {item.name}
               </Text >
             </TouchableOpacity>
         }

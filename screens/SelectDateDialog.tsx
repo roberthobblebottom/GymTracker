@@ -5,6 +5,7 @@ import Layout from "../constants/Layout"
 import { Calendar } from "react-native-calendars"
 import { DialogState, ScheduledItem, ScheduledItemState } from "../types"
 import { createScheduledItem, updateScheduledItem } from '../dbhandler'
+import Toast from 'react-native-simple-toast'
 export function SelectDateDialog(props: any) {
     const dialogState: DialogState = props.dialogState
     const scheduledItemState: ScheduledItemState = props.scheduledItemState
@@ -55,6 +56,7 @@ export function SelectDateDialog(props: any) {
                                         updateScheduledItem(s)
                                     })
                                     commonScheduledItemCRUD(si)
+                                    Toast.show("Selected scheduled items are moved over to "+day.dateString)
                                 }
                                 else {
                                     let arr: ScheduledItem[] = []
@@ -69,6 +71,7 @@ export function SelectDateDialog(props: any) {
                                     })
                                     let si = arr.concat(scheduledItems)
                                     commonScheduledItemCRUD(si)
+                                    Toast.show("Selected scheduled items are copied over to "+day.dateString)
                                 }
                             } else {
                                 const s = { ...aScheduledItem }
